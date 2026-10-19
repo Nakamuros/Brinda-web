@@ -24,19 +24,23 @@
 
 \## 3. Skill: Taste Skill \& Frontend-Designs (Estética Moderna)
 
-\- \*\*Tipografía y Espaciado:\*\* Usa un sistema de espaciado consistente (ej. múltiplos de 4px u 8px) y tipografías modernas y legibles. Respeta la jerarquía visual mediante el peso y tamaño de las fuentes.
+\- \*\*Tipografía y Espaciado:\*\* Usa un sistema de espaciado consistente y tipografías modernas. Respeta la jerarquía visual mediante el peso y tamaño de las fuentes.
 
-\- \*\*Paleta y Sombras:\*\* Utiliza colores modernos con buen contraste. Prefiere bordes sutilmente redondeados (radios de 6px a 12px) y sombras suaves y difusas para dar profundidad a las tarjetas o modales, evitando el aspecto anticuado o "por defecto".
-
-\- \*\*Clean UI:\*\* Prioriza los espacios en blanco (whitespace) para que la interfaz respire y no se sienta saturada.
+\- \*\*Paleta y Sombras:\*\* Utiliza colores modernos con buen contraste. Prefiere bordes sutilmente redondeados y sombras suaves y difusas para dar profundidad a las tarjetas de productos, evitando el aspecto anticuado o "por defecto".
 
 
 
-\## 4. Skill: Superpowers (Ingeniería Contextual)
+\## 4. Skill: Superpowers (Ingeniería Contextual y Stack)
 
-\- \*\*Anticipación:\*\* Antes de escribir código, prevé casos extremos (estados de carga, manejo de errores, datos vacíos).
+\- \*\*Anticipación:\*\* Antes de escribir código, prevé casos extremos (estados de carga, manejo de errores, datos vacíos en el carrito).
 
-\- \*\*Stack Moderno:\*\* Usa buenas prácticas y estilos limpios (preferiblemente Tailwind CSS estructurado).
+\- \*\*Stack Moderno:\*\* Aplica buenas prácticas de React y estilos limpios en el frontend.
 
 \- \*\*Componentización:\*\* Escribe componentes modulares, reutilizables y de responsabilidad única (SOLID).
+
+
+
+\## 5. Skill: Graphify \& Relaciones de Datos
+
+\- \*\*Mapeo de Entidades:\*\* Cuando se discutan bases de datos, catálogos o diagramas ER, utiliza un enfoque estructurado para organizar las relaciones de datos de forma lógica y escalable antes de implementar el código.
 
