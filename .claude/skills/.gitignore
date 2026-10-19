@@ -1,0 +1,31 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Browser data
+browser_state/
+
+# Auth data
+auth_info.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Claude Code local state (per-machine, never committed)
+.claude/settings.local.json
+.claude/.cache/
+.claude/settings.json.before-security-suite.bak
+.claude/settings.json.created-by-security-suite

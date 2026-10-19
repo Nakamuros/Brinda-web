@@ -1,0 +1,132 @@
+erDiagram
+    CATEGORIES ||--o{ PRODUCTS : "clasifica"
+    DELIVERY_ZONES ||--o{ DISTRICTS : "agrupa"
+    DISTRICTS ||--o{ ORDERS : "destino de entrega"
+    ORDERS ||--|{ ORDER_ITEMS : "contiene"
+    PRODUCTS ||--o{ ORDER_ITEMS : "es pedido en"
+    PRODUCTS ||--o{ STOCK_MOVEMENTS : "registra cambios de stock"
+    ORDERS |o--o{ STOCK_MOVEMENTS : "origina (venta o anulacion)"
+    USERS |o--o{ ORDERS : "confirma"
+    USERS |o--o{ STOCK_MOVEMENTS : "registra"
+    USERS |o--o{ AUDIT_LOGS : "genera"
+
+    USERS {
+        UUID id PK
+        VARCHAR username UK
+        VARCHAR email UK
+        VARCHAR password_hash "BCrypt costo 12 o mas"
+        VARCHAR role "ROLE_ADMIN o ROLE_CASHIER"
+        BOOLEAN active "false = cuenta desactivada"
+        BOOLEAN must_change_password "true en el primer ingreso"
+        INTEGER failed_attempts "intentos fallidos de login"
+        TIMESTAMP locked_until "bloqueo temporal, opcional"
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CATEGORIES {
+        BIGSERIAL id PK
+        VARCHAR name UK
+        VARCHAR slug UK
+        TEXT description
+        VARCHAR icon_url
+        BOOLEAN is_active
+        INTEGER display_order
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCTS {
+        UUID id PK
+        BIGINT category_id FK
+        VARCHAR sku UK "opcional"
+        VARCHAR name
+        VARCHAR slug UK
+        TEXT description
+        NUMERIC price
+        NUMERIC discount_price "opcional, menor que price"
+        VARCHAR image_url
+        INTEGER stock_quantity "no puede ser negativo"
+        INTEGER min_stock "umbral minimo (color de alerta)"
+        INTEGER max_stock "umbral maximo"
+        BOOLEAN is_available "interruptor manual"
+        BOOLEAN is_featured
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    DELIVERY_ZONES {
+        BIGSERIAL id PK
+        VARCHAR name UK "ej. Zona 1 - Cercanos"
+        NUMERIC fee "tarifa de envio de la zona"
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    DISTRICTS {
+        BIGSERIAL id PK
+        BIGINT zone_id FK
+        VARCHAR name UK "Lima y Callao"
+        BOOLEAN is_active
+    }
+
+    ORDERS {
+        UUID id PK
+        VARCHAR order_code UK "codigo corto, ej. EQ12"
+        VARCHAR channel "WHATSAPP o STORE (futuro)"
+        VARCHAR status "PENDING, CONFIRMED, CANCELLED, EXPIRED"
+        VARCHAR customer_first_name
+        VARCHAR customer_last_name
+        VARCHAR customer_phone
+        VARCHAR customer_dni_encrypted "cifrado, obligatorio si supera S/700"
+        VARCHAR delivery_address
+        VARCHAR delivery_reference
+        BIGINT district_id FK
+        NUMERIC subtotal_amount
+        NUMERIC delivery_fee "copia de la tarifa al momento del pedido"
+        NUMERIC total_amount "calculado siempre en el servidor"
+        VARCHAR payment_method "YAPE o PLIN"
+        BOOLEAN adult_confirmed "casilla de mayoria de edad"
+        TIMESTAMP terms_accepted_at "terminos y condiciones"
+        TIMESTAMP privacy_accepted_at "politica de privacidad"
+        TIMESTAMP expires_at "vencimiento del pedido pendiente"
+        TIMESTAMP confirmed_at "fecha real de la venta"
+        UUID confirmed_by FK "usuario que confirmo, opcional"
+        VARCHAR cancel_reason "opcional"
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    ORDER_ITEMS {
+        BIGSERIAL id PK
+        UUID order_id FK
+        UUID product_id FK
+        VARCHAR product_name "copia del nombre al momento del pedido"
+        INTEGER quantity
+        NUMERIC list_price "precio normal en ese momento"
+        NUMERIC unit_price "precio cobrado (con descuento si hubo)"
+        NUMERIC subtotal
+    }
+
+    STOCK_MOVEMENTS {
+        BIGSERIAL id PK
+        UUID product_id FK
+        UUID order_id FK "opcional"
+        UUID created_by FK "opcional"
+        VARCHAR movement_type "SALE, RESTOCK, ADJUSTMENT, CANCEL_RETURN"
+        INTEGER quantity_change "positivo o negativo"
+        INTEGER stock_after
+        VARCHAR reason "obligatorio en ajustes manuales"
+        TIMESTAMP created_at
+    }
+
+    AUDIT_LOGS {
+        BIGSERIAL id PK
+        UUID user_id FK "opcional"
+        VARCHAR action "LOGIN_OK, LOGIN_FAIL, ORDER_CONFIRM, PRICE_CHANGE..."
+        VARCHAR entity "tabla afectada"
+        VARCHAR entity_id
+        VARCHAR ip_address
+        TIMESTAMP created_at
+    }

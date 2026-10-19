@@ -1,0 +1,94 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "phoenix-security",
+  "description": "Phoenix Security skills for Claude Code: AppSec review, threat modelling, SAST rule generation, CTI research, security-first PRDs, readiness gates, and documentation automation.",
+  "owner": {
+    "name": "Phoenix Security",
+    "email": "admin@phoenix.security",
+    "url": "https://phoenix.security"
+  },
+  "metadata": {
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "phoenix-security-review",
+      "source": "./plugins/phoenix-security-review",
+      "description": "AppSec review suite: multi-language security-reviewer (8-point check, 7 language packs, OWASP/ASVS + endpoint checklists), whole-repo security-assessment, diff-scoped 0day-scanner, STRIDE/DREAD threat-modeling, and two threat-model-driven tiers (tm-quick-security-assessment, tm-security-review). Ships 4 slash commands, a security-reviewer subagent, and 3 opt-in hooks.",
+      "category": "security",
+      "keywords": [
+        "security",
+        "appsec",
+        "owasp",
+        "asvs",
+        "threat-modeling",
+        "code-review"
+      ]
+    },
+    {
+      "name": "phoenix-readiness-reviews",
+      "source": "./plugins/phoenix-readiness-reviews",
+      "description": "Two adversarial review gates. plan-readiness-review asks whether a PRD, spec or RFC is implementable without inventing anything. production-readiness-review asks whether the code is actually built, wired, tested and safe to deploy, backed by a deterministic repo scanner.",
+      "category": "code-quality",
+      "keywords": [
+        "review",
+        "prd",
+        "production-readiness",
+        "qa",
+        "ship-gate"
+      ]
+    },
+    {
+      "name": "phoenix-sast-rules",
+      "source": "./plugins/phoenix-sast-rules",
+      "description": "Generate opengrep/semgrep SAST rules for 30+ languages, including pattern and taint-mode rules. The research variant first researches a CVE or CWE with web search, then writes targeted detection rules from the findings.",
+      "category": "security",
+      "keywords": [
+        "sast",
+        "opengrep",
+        "semgrep",
+        "static-analysis",
+        "cve",
+        "cwe"
+      ]
+    },
+    {
+      "name": "phoenix-cti-search",
+      "source": "./plugins/phoenix-cti-search",
+      "description": "Cyber threat intelligence search across 595 curated security domains in 4 authority tiers, for CVEs, threat actors, malware families, exploits and breach reports. Ships a skill that needs no API key, a Node CLI, an MCP server, and a /cti-search command. Optional push to NotebookLM.",
+      "category": "security",
+      "keywords": [
+        "cti",
+        "threat-intelligence",
+        "cve",
+        "malware",
+        "osint"
+      ]
+    },
+    {
+      "name": "phoenix-prd-pipeline",
+      "source": "./plugins/phoenix-prd-pipeline",
+      "description": "Security-first specification pipeline. prd-generator writes a full PRD with a threat model from a plain-language feature description. The 12 phoenix-* roles run the same pipeline stage by stage: context curation, scope, constraints, RFC 2119 requirements, ambiguity hunting, threat model, API contracts, verification matrix, delivery batches and a final ship gate.",
+      "category": "productivity",
+      "keywords": [
+        "prd",
+        "spec",
+        "requirements",
+        "threat-modeling",
+        "planning"
+      ]
+    },
+    {
+      "name": "phoenix-docs-research",
+      "source": "./plugins/phoenix-docs-research",
+      "description": "Documentation and research tooling. project-documenter generates and self-heals a full documentation pack across 6 modes. notebooklm queries Google NotebookLM for citation-backed, source-grounded answers. phoenix-research-pipeline runs web and YouTube research and pushes sources into NotebookLM.",
+      "category": "documentation",
+      "keywords": [
+        "documentation",
+        "research",
+        "notebooklm",
+        "architecture-docs"
+      ]
+    }
+  ]
+}
