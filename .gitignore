@@ -1,0 +1,15 @@
+# Secretos
+.env
+!.env.example
+
+# Backend
+backend/target/
+*.log
+.idea/
+*.iml
+
+# Frontend (futuro)
+node_modules/
+dist/
+.angular/
+backups/
