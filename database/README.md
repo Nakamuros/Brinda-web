@@ -3,7 +3,7 @@
 ## Orden de ejecución
 | # | Archivo | Rol | Cuándo |
 |---|---|---|---|
-| 1 | `setup/01_create_roles.sql` | superusuario | una vez (cambia las claves) |
+| 1 | `setup/01_create_roles.sql` | superusuario | una vez (claves por variables de psql, ver abajo) |
 | 2 | `migrations/V1__schema.sql` | `brinda_owner` | tablas y restricciones |
 | 3 | `migrations/V2__indexes_triggers.sql` | `brinda_owner` | índices + `updated_at` |
 | 4 | `seed-dev/V3__seed_data.sql` | `brinda_owner` | solo local/pruebas (no corre en `prod`) |
@@ -15,12 +15,23 @@
 
 En DBeaver: conecta a la BD `brinda`, abre cada archivo y ejecútalo como script (Alt+X). Los `V*` están listos para Flyway (`db/migration`).
 
+## Crear los roles (sin claves en el repo)
+`setup/01_create_roles.sql` no trae claves: las recibe como variables de psql (`owner_password`, `app_password`). Genera dos claves aleatorias, guárdalas en `backend/.env` (`DB_OWNER_PASSWORD`, `DB_APP_PASSWORD`; el archivo está ignorado por git) y ejecuta:
+
+```
+psql -U postgres -h localhost -p 5433 -v owner_password='<clave-owner>' -v app_password='<clave-app>' -f database/setup/01_create_roles.sql
+```
+
+Con Docker: `docker exec -i brinda-db psql -U postgres -v owner_password='...' -v app_password='...' < database/setup/01_create_roles.sql`. En DBeaver el script no funciona tal cual (no interpola variables): usa la terminal.
+
+Rotar una clave existente: `ALTER ROLE brinda_app PASSWORD '<nueva>';` y actualizar `backend/.env`.
+
 ## Privilegios y builds de release
 - `setup/02_grants.sql` es la **fuente única** de privilegios de `brinda_app`. El `pom.xml` lo copia como `db/migration/afterMigrate.sql` y Flyway lo ejecuta con `brinda_owner` tras cada migración (arranque de la app). Idempotente.
 - **Los builds de release usan siempre `mvn clean package`.** Un `target/` viejo puede arrastrar el seed (`V3`) a `db/migration`. Defensas: el test `MigrationsSeedGuardTest` rompe el build si lo encuentra, y con perfil `prod` la app no arranca si existe el usuario `admin@brinda.local`.
 
 ## Credenciales semilla (solo desarrollo)
-- Usuario `admin` · clave `Brinda-oBFrNt2TKNDv` (BCrypt costo 12, `must_change_password = true`).
+- Usuario `admin` · la clave inicial está solo como hash BCrypt (costo 12, `must_change_password = true`) en `database/seed-dev/V3__seed_data.sql`; pídesela al desarrollador, no se documenta aquí.
 - **No usar en producción**: crear el admin de Lucía con su correo y clave propia.
 
 ## Reglas aplicadas en la BD

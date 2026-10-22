@@ -1,11 +1,12 @@
 -- BRINDA · Setup 1/2 · Roles de base de datos (ejecutar ANTES de las migraciones, como superusuario)
--- Reemplaza las claves por valores reales; no subir las claves al repositorio.
+-- Las claves NO van en este archivo: se pasan como variables de psql (ver database/README.md):
+--   psql -U postgres -v owner_password='...' -v app_password='...' -f 01_create_roles.sql
 
 -- Dueño del esquema: lo usa Flyway / DBeaver para migraciones (DDL).
-CREATE ROLE brinda_owner LOGIN PASSWORD 'OWNER1234';
+CREATE ROLE brinda_owner LOGIN PASSWORD :'owner_password';
 
 -- Usuario de la aplicación (Spring): sin DDL, solo lo mínimo (ver 02_grants.sql).
-CREATE ROLE brinda_app LOGIN PASSWORD 'APP1234';
+CREATE ROLE brinda_app LOGIN PASSWORD :'app_password';
 
 CREATE DATABASE brinda OWNER brinda_owner ENCODING 'UTF8';
 REVOKE ALL ON DATABASE brinda FROM PUBLIC;

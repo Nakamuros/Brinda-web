@@ -13,3 +13,8 @@ node_modules/
 dist/
 .angular/
 backups/
+
+# Grafo (graphify): se versionan graph.json y GRAPH_REPORT.md
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/graph.html
