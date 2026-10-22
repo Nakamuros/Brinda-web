@@ -736,26 +736,39 @@ Implementado en el backend (migraciones `V4` a `V7`). Decisiones acordadas:
 - **Privilegios de `brinda_app`**: `setup/02_grants.sql` es la fuente única y se reaplica sola como callback `afterMigrate` (solo concede y revoca lo que la app nunca debe tener; sin ventana de `permission denied` entre instancias).
 - **Protecciones del seed en producción:** test que rompe el build si `db/migration` trae el seed; con perfil `prod` la app no arranca si existe `admin@brinda.local`. Los builds de release usan `mvn clean package`.
 
+### Decisiones de la etapa V8–V9 y de infraestructura
+
+- **DNI obligatorio siempre:** trigger `BEFORE INSERT` en V8; el umbral de S/ 700 ya no existe.
+- **Vencimiento del pedido:** 20 min; un pedido vencido aún puede confirmarse (pago tardío).
+- **Sin refresh token:** sesión de 8 h con `token_version` (V9), que invalida los tokens al cerrar sesión o cambiar la clave.
+- **Imágenes:** carga manual por ahora (`products.image_url` + `IMAGES_BASE_URL`, plantilla `database/templates/update_image_urls.sql`). La subida desde el panel con WebP y almacenamiento externo (R2) queda como pendiente 21.
+- **Distritos y tarifas:** editables desde el admin; el pedido guarda la tarifa cobrada.
+- **Legal (a cargo del asesor de Lucía):** anuncios de licor y cigarros, términos y condiciones, libro de reclamaciones virtual (pendiente 18; puede ser obligatorio desde el inicio, confirmar) y política de privacidad (pendiente 19).
+- **Infra prevista:** Angular en Vercel/Netlify (`brinda.com` y `www`), Spring Boot en Railway (`api.brinda.com`), Postgres gestionado; dominio en Cloudflare; cuentas a nombre de Lucía.
+- **Combos en WhatsApp:** la línea del combo añade "(incluye: 2 x X, 1 x Y)" en el mensaje y la boleta (el resumen corto de pedidos largos no lo lleva).
+- **Verificación del backend (Hito 1 cerrado):** migraciones V1–V9 aplicadas con Flyway, 45 tests unitarios y colección Postman con Newman (133 peticiones, 170 aserciones, 0 fallos).
+- **Correo del dominio:** Email Routing de Cloudflare hacia un Gmail personal de Lucía; las cuentas críticas van con ese Gmail, no con @brinda.com.
+
 ## 19. Pendientes antes de producción (no implementar ahora)
 
-1. **IP real detrás del proxy:** `ClientIp` usa `getRemoteAddr()` y el comentario asume que `forward-headers-strategy=framework` lo corrige; no está confirmado. Probar en staging y, si hace falta, usar la estrategia `native` con proxies de confianza. Si no, el límite de 5 pedidos por minuto se compartiría entre todos los clientes.
-2. **Crear la cuenta real de la dueña** (script o endpoint) y desactivar la del seed.
+1. **IP real detrás del proxy:** `ClientIp` usa `getRemoteAddr()` y el comentario asume que `forward-headers-strategy=framework` lo corrige; no está confirmado. Probar en staging y, si hace falta, usar la estrategia `native` con proxies de confianza. Si no, el límite de 5 pedidos por minuto se compartiría entre todos los clientes. **Estado:** ABIERTO (probar en staging con el proxy real).
+2. **Crear la cuenta real de la dueña** (script o endpoint) y desactivar la del seed. **Estado:** ABIERTO (cuenta de Lucía pendiente; el `admin` del seed solo existe en `local`).
 3. ~~Umbral de S/ 700 para DNI~~ — **resuelto en V8**: DNI obligatorio siempre, sin umbral. Los pedidos previos sin DNI (solo existen en bases de desarrollo) quedan como están.
-4. **`DNI_ENCRYPTION_KEY`:** respaldarla aparte; no hay rotación. Perderla deja los DNI ilegibles.
-5. **Rol de cajero para el hijo:** hoy todo el panel exige `ROLE_ADMIN`.
-6. **Fotos de productos:** hoy solo `image_url`, sin subida de archivos. Decidir dónde viven.
-7. **Cookie `SameSite=Strict`:** requiere dominio propio con frontend y API como subdominios del mismo sitio; con `*.vercel.app` y `*.railway.app` la sesión no se mantendría.
-8. **Bloqueo de cuenta por intentos:** el usuario `admin` es fácil de adivinar y se puede bloquear a la dueña. Usar un nombre de usuario menos obvio y mantener el límite por IP.
+4. **`DNI_ENCRYPTION_KEY`:** respaldarla aparte; no hay rotación. Perderla deja los DNI ilegibles. **Estado:** ABIERTO (en local las claves están en `backend/.env`; en producción generarlas y respaldarlas aparte).
+5. **Rol de cajero para el hijo:** hoy todo el panel exige `ROLE_ADMIN`. **Estado:** ABIERTO (decidir con Lucía si el hijo usará el panel).
+6. **Fotos de productos:** hoy solo `image_url`, sin subida de archivos. Decidir dónde viven. **Estado:** DIFERIDO: hoy carga manual (ver 21 y decisión de imágenes en sección 18).
+7. **Cookie `SameSite=Strict`:** requiere dominio propio con frontend y API como subdominios del mismo sitio; con `*.vercel.app` y `*.railway.app` la sesión no se mantendría. **Estado:** ABIERTO (depende de comprar el dominio y de la infraestructura prevista, sección 18).
+8. **Bloqueo de cuenta por intentos:** el usuario `admin` es fácil de adivinar y se puede bloquear a la dueña. Usar un nombre de usuario menos obvio y mantener el límite por IP. **Estado:** ABIERTO (definir el usuario real de Lucía al crear su cuenta).
 9. ~~Sesión sin invalidación~~ — **resuelto (V9 `users.token_version`):** logout y cambio de clave invalidan los tokens anteriores. Sigue sin refresh token (decisión consciente; sesión de 8 h).
-10. **Sin captcha en pedidos;** el límite por IP está en memoria (se reinicia con la app).
-11. **No se registran los pedidos rechazados por falta de stock** (demanda perdida).
-12. **Pendientes funcionales:** desarmar combos, ofertas programadas con fecha de inicio, promociones que mezclan productos.
-13. **Validar con el asesor:** publicidad y venta de cigarros y alcohol en un catálogo en línea.
-14. **Sin tests automáticos de integración;** solo unitarios (regla de oferta, promoción, `buildableNow`, cálculo "lleva N paga M", textos de línea, guarda del seed).
-15. **No subir `backend/.env` ni compartirlo;** usar claves nuevas (`JWT_SECRET`, `DNI_ENCRYPTION_KEY`, contraseñas de base) en producción.
-16. **Tarifas y distritos de `V4` son provisionales** hasta tener la lista real de la dueña.
+10. **Sin captcha en pedidos;** el límite por IP está en memoria (se reinicia con la app). **Estado:** ABIERTO.
+11. **No se registran los pedidos rechazados por falta de stock** (demanda perdida). **Estado:** ABIERTO.
+12. **Pendientes funcionales:** desarmar combos, ofertas programadas con fecha de inicio, promociones que mezclan productos. **Estado:** ABIERTO (posterior al lanzamiento).
+13. **Validar con el asesor:** publicidad y venta de cigarros y alcohol en un catálogo en línea. **Estado:** ABIERTO: en manos del asesor de Lucía.
+14. **Sin tests automáticos de integración;** solo unitarios (regla de oferta, promoción, `buildableNow`, cálculo "lleva N paga M", textos de línea, guarda del seed). **Estado:** PARCIAL: 45 tests unitarios + colección Postman con Newman (133 peticiones, 170 aserciones, 0 fallos) como prueba de API; siguen sin tests de integración automáticos.
+15. **No subir `backend/.env` ni compartirlo;** usar claves nuevas (`JWT_SECRET`, `DNI_ENCRYPTION_KEY`, contraseñas de base) en producción. **Estado:** VIGENTE: en local las claves están en `backend/.env` (ignorado por git); `.env.example` queda con valores vacíos.
+16. **Tarifas y distritos de `V4` son provisionales** hasta tener la lista real de la dueña. **Estado:** ABIERTO (datos reales de Lucía).
 17. ~~Mensaje de WhatsApp y boleta sin contenido de combos~~ — **resuelto:** la línea del combo añade "(incluye: 2 x Whisky X, 1 x Gaseosa)". El resumen corto de WhatsApp (pedidos largos) no lo lleva.
-18. **Libro de reclamaciones virtual:** formulario público (datos del consumidor, bien contratado, tipo reclamo/queja, detalle, pedido del consumidor), tabla `complaints` con correlativo y fecha, aviso por correo/WhatsApp a Lucía al registrarse, hoja de reclamación al consumidor y plazo de respuesta (30 días). Confirmar requisitos exactos con el asesor.
-19. **Política de privacidad con casilla de aceptación en el checkout:** el backend ya exige `privacyAccepted` y guarda `privacy_accepted_at`; falta redactar la política (finalidad, plazo de conservación del DNI, derechos ARCO), publicarla y enlazarla en el checkout.
+18. **Libro de reclamaciones virtual:** formulario público (datos del consumidor, bien contratado, tipo reclamo/queja, detalle, pedido del consumidor), tabla `complaints` con correlativo y fecha, aviso por correo/WhatsApp a Lucía al registrarse, hoja de reclamación al consumidor y plazo de respuesta (30 días). Confirmar requisitos exactos con el asesor. **Estado:** ABIERTO: en manos del asesor; confirmar si es obligatorio desde el inicio.
+19. **Política de privacidad con casilla de aceptación en el checkout:** el backend ya exige `privacyAccepted` y guarda `privacy_accepted_at`; falta redactar la política (finalidad, plazo de conservación del DNI, derechos ARCO), publicarla y enlazarla en el checkout. **Estado:** ABIERTO: backend listo; falta redactar y publicar la política (asesor).
 20. ~~Casilla "soy mayor de 18"~~ — **resuelto en backend:** `adultConfirmed` es obligatorio en `POST /orders` y se guarda en `orders.adult_confirmed`. Frontend: mostrar la casilla en el checkout; si el asesor pide otro texto o un aviso en el catálogo, solo cambia la interfaz.
-21. **Fotos: subida desde el panel** (diferida; hoy carga manual con `database/templates/update_image_urls.sql` e `IMAGES_BASE_URL`). Al hacerlo: multipart, validar tipo por contenido (no por extensión/Content-Type) y tamaño máximo, convertir a WebP, guardar en almacenamiento compatible con S3 (R2) y dejar la ruta relativa en `image_url`.
+21. **Fotos: subida desde el panel** (diferida; hoy carga manual con `database/templates/update_image_urls.sql` e `IMAGES_BASE_URL`). Al hacerlo: multipart, validar tipo por contenido (no por extensión/Content-Type) y tamaño máximo, convertir a WebP, guardar en almacenamiento compatible con S3 (R2) y dejar la ruta relativa en `image_url`. **Estado:** DIFERIDO (almacenamiento externo, p. ej. R2).

@@ -44,3 +44,15 @@
 
 \- \*\*Mapeo de Entidades:\*\* Cuando se discutan bases de datos, catálogos o diagramas ER, utiliza un enfoque estructurado para organizar las relaciones de datos de forma lógica y escalable antes de implementar el código.
 
+
+## Al iniciar sesión
+- Lee avances.md y CONTEXTO-BRINDA.md (secciones 18 y 19) y, si existe graphify-out/GRAPH_REPORT.md, léelo antes de explorar el código.
+
+## Al terminar una tarea
+- Actualiza avances.md: qué se hizo, qué queda, decisiones nuevas.
+
+## Reglas de seguridad y alcance
+- Nunca generes, inventes ni imprimas secretos (.env, DNI_ENCRYPTION_KEY, JWT, contraseñas).
+- No hagas commit ni push sin que el usuario lo pida.
+- No ejecutes nada destructivo sobre la BD sin confirmación.
+- No toques .claude/ ni las skills sin avisar.
