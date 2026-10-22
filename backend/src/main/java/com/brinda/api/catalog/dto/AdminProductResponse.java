@@ -1,18 +1,21 @@
 package com.brinda.api.catalog.dto;
 
 import com.brinda.api.catalog.model.Product;
+import com.brinda.api.shared.image.ImageUrlSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/** discountPrice/offerEndsAt se muestran tal cual están guardados; offerActive/offerExpired dicen su vigencia. */
+/** imageUrl = URL final para mostrar; imageKey = valor guardado (el que se reenvía al editar). discountPrice/offerEndsAt se muestran tal cual están guardados; offerActive/offerExpired dicen su vigencia. */
 public record AdminProductResponse(UUID id, Long categoryId, String categoryName, String sku, String name, String slug, String productType,
                                    String description, BigDecimal price, BigDecimal discountPrice,
                                    OffsetDateTime offerEndsAt, boolean offerActive, boolean offerExpired,
                                    Short promoBuy, Short promoPay, OffsetDateTime promoEndsAt,
                                    boolean promoActive, boolean promoExpired,
-                                   BigDecimal finalPrice, String imageUrl,
+                                   BigDecimal finalPrice,
+                                   @JsonSerialize(using = ImageUrlSerializer.class) String imageUrl, String imageKey,
                                    int stockQuantity, int minStock, int maxStock, String stockLevel,
                                    boolean available, boolean featured) {
 
@@ -20,7 +23,7 @@ public record AdminProductResponse(UUID id, Long categoryId, String categoryName
         return new AdminProductResponse(p.getId(), p.getCategory().getId(), p.getCategory().getName(), p.getSku(),
                 p.getName(), p.getSlug(), p.getProductType().name(), p.getDescription(), p.getPrice(), p.getDiscountPrice(),
                 p.getOfferEndsAt(), p.isOfferActive(now), p.isOfferExpired(now),
-                p.getPromoBuy(), p.getPromoPay(), p.getPromoEndsAt(), p.isPromoActive(now), p.isPromoExpired(now), p.effectivePrice(now), p.getImageUrl(),
+                p.getPromoBuy(), p.getPromoPay(), p.getPromoEndsAt(), p.isPromoActive(now), p.isPromoExpired(now), p.effectivePrice(now), p.getImageUrl(), p.getImageUrl(),
                 p.getStockQuantity(), p.getMinStock(), p.getMaxStock(), stockLevel(p),
                 p.isAvailable(), p.isFeatured());
     }

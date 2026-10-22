@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Arma el mensaje y el enlace wa.me en el servidor: el número de destino sale de la configuración,
@@ -22,6 +25,7 @@ public class WhatsAppMessageBuilder {
     private static final int MAX_MESSAGE_CHARS = 1200;
 
     private final OrderProperties props;
+    private final OrderComboContents comboContents;
 
     /** Devuelve null si el número de WhatsApp aún no está configurado. */
     public String url(Order order) {
@@ -34,11 +38,11 @@ public class WhatsAppMessageBuilder {
     }
 
     String message(Order o) {
-        String full = build(o, false);
-        return full.length() <= MAX_MESSAGE_CHARS ? full : build(o, true);
+        String full = build(o, false, comboContents.of(o.getItems()));
+        return full.length() <= MAX_MESSAGE_CHARS ? full : build(o, true, Map.of());
     }
 
-    private String build(Order o, boolean summary) {
+    private String build(Order o, boolean summary, Map<UUID, List<String>> contents) {
         StringBuilder sb = new StringBuilder();
         sb.append("*Pedido BRINDA ").append(o.getOrderCode()).append("*\n");
         if (summary) {
@@ -47,7 +51,7 @@ public class WhatsAppMessageBuilder {
                     .append(" unidades). Detalle completo en el sistema.\n");
         } else {
             for (OrderItem i : o.getItems()) {
-                sb.append("• ").append(OrderLineText.line(i)).append(" - S/ ").append(money(i.getSubtotal())).append('\n');
+                sb.append("• ").append(OrderLineText.line(i, contents.get(i.getProductId()))).append(" - S/ ").append(money(i.getSubtotal())).append('\n');
             }
         }
         sb.append("\nSubtotal: S/ ").append(money(o.getSubtotalAmount()))

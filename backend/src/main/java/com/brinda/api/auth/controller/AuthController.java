@@ -31,7 +31,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal AuthenticatedUser principal, HttpServletRequest http) {
+        if (principal != null) {
+            authService.logout(principal.id(), ClientIp.of(http));
+        }
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, jwtService.clearCookie().toString())
                 .build();

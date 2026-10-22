@@ -90,3 +90,20 @@ Hito 1: extraer ZIP → DDL PostgreSQL → seeds → esqueleto backend → `auth
 - Estado: backend completo hasta V7 (35 tests unitarios ok), base local devuelta al estado del seed, app apagada.
 - Siguiente: colección Postman (usar `backend/ENDPOINTS.md`), luego frontend Angular (Hito 2).
 - Antes de producción: ver `CONTEXTO-BRINDA.md` sección 19 (17 pendientes) y datos reales de Lucía (tarifas, distritos, números `WHATSAPP_NUMBER`/`YAPE_NUMBER`/`PLIN_NUMBER`, cuenta de la dueña).
+
+## 2026-10-22
+- Vencimiento de pedidos: 45 → 20 min (`brinda.order.expiration-minutes=20`; `ENDPOINTS.md` actualizado).
+- Refresh token: descartado por ahora (un solo admin, sesión de 8 h; añadiría tabla, rotación e interceptor en Angular sin beneficio claro). Revisar si se exige sesión corta.
+
+## 2026-10-22 · DNI siempre, imágenes por URL base
+- `V8__dni_always_required.sql`: elimina `ck_orders_dni_700`; trigger BEFORE INSERT exige DNI (un NOT NULL/CHECK habría bloqueado confirmar/anular pedidos viejos sin DNI). Propiedad `dni-required-above` eliminada; `dni` obligatorio con 8 dígitos en `CreateOrderRequest`.
+- Imágenes: `products.image_url` ya existía (V1) y se devuelve en catálogo público y admin. Nuevo `IMAGES_BASE_URL` (`brinda.images.base-url`): rutas relativas se resuelven al responder; admin devuelve además `imageKey`. Plantilla `database/templates/update_image_urls.sql`.
+- Sección 19 de CONTEXTO: pendientes 3 resuelto; añadidos 18 (libro de reclamaciones), 19 (privacidad), 20 (mayor de 18), 21 (subida de fotos).
+- Tests: 41 en verde. V8 y el serializador de imágenes NO se ejecutaron contra Postgres (Docker apagado).
+
+## 2026-10-22 · token_version, combos en WhatsApp, colección Postman
+- `V9__users_token_version.sql`: el JWT lleva `tv`; logout y cambio de clave incrementan `users.token_version` e invalidan los tokens anteriores (`JwtServiceTest`). Probado en vivo.
+- Contenido de combos en WhatsApp y boleta ("incluye: 2 x X, 1 x Y"), `OrderComboContents`.
+- Vencimiento de 20 min revisado en todo el proyecto (código, ENDPOINTS, CONTEXTO).
+- `postman/`: colección v2.1 + environment, ejecutada con Newman contra la API real: 132 peticiones, 167 aserciones, 0 fallos (incluye EXPIRED, 429, bloqueo y token invalidado).
+- Suite: 45 tests unitarios en verde. Base devuelta al seed (V7; V8 y V9 se aplican al arrancar).

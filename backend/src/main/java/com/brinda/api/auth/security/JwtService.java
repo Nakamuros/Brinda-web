@@ -19,6 +19,12 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
+    private static final String VERSION_CLAIM = "tv";
+
+    /** Lo que se lee de un token válido: el usuario y la versión de sesión con la que se emitió. */
+    public record Session(UUID userId, int tokenVersion) {
+    }
+
     private final JwtProperties props;
     private final SecretKey key;
 
@@ -32,17 +38,22 @@ public class JwtService {
         return Jwts.builder()
                 .subject(user.getId().toString())
                 .claim("role", user.getRole().name())
+                .claim(VERSION_CLAIM, user.getTokenVersion())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(Duration.ofMinutes(props.expirationMinutes()))))
                 .signWith(key)
                 .compact();
     }
 
-    /** Devuelve el id del usuario si el token es válido y no ha vencido; vacío en cualquier otro caso. */
-    public Optional<UUID> validate(String token) {
+    /** Devuelve la sesión si el token está bien firmado y no ha vencido; vacío en cualquier otro caso. */
+    public Optional<Session> validate(String token) {
         try {
             Claims claims = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-            return Optional.of(UUID.fromString(claims.getSubject()));
+            Integer version = claims.get(VERSION_CLAIM, Integer.class);
+            if (version == null) {
+                return Optional.empty();
+            }
+            return Optional.of(new Session(UUID.fromString(claims.getSubject()), version));
         } catch (JwtException | IllegalArgumentException ex) {
             return Optional.empty();
         }

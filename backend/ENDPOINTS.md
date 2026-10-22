@@ -22,7 +22,12 @@ Cuerpo de `POST /api/v1/orders` (el servidor ignora cualquier precio/total envia
   "adultConfirmed": true, "termsAccepted": true, "privacyAccepted": true
 }
 ```
-`dni` opcional salvo que el total supere S/ 700.
+`dni` **obligatorio siempre**, exactamente 8 dígitos (400 con `fields.dni` si falta o es inválido). La base lo exige además en todo pedido nuevo (V8).
+
+### Imágenes (`imageUrl`)
+- `products.image_url` guarda una ruta relativa (`products/SKU-0001.webp`) o una URL absoluta. La API devuelve siempre la URL final: las relativas se resuelven con `IMAGES_BASE_URL` (si está vacía, se devuelve la ruta tal cual); las absolutas no se tocan.
+- **Sin imagen**: el campo `imageUrl` **no viene en el JSON** (la API omite los nulos). El frontend debe tratar `imageUrl` ausente/`null` como "sin foto" y mostrar una imagen genérica.
+- Admin: la respuesta trae `imageUrl` (final, para mostrar) e `imageKey` (valor guardado, el que se reenvía al editar). Carga masiva manual: `database/templates/update_image_urls.sql`.
 
 ## Auth
 | Método | Ruta | Notas |
@@ -59,11 +64,11 @@ Cuerpo de `POST /api/v1/orders` (el servidor ignora cualquier precio/total envia
 | GET | `/api/v1/admin/orders/{id}/copy/delivery` · `/copy/receipt` |
 
 ## Reglas a recordar
-- "Lleva N, paga M": grupos = floor(q/N), gratis = grupos x (N-M). El stock baja por todas las unidades entregadas; el subtotal, el total y el umbral de DNI usan lo ya descontado. Línea del pedido: `promoDiscount`, `promoType=BUY_X_PAY_Y`. Público: `promoBuy/promoPay/promoLabel/promoEndsAt` (solo si está activa; cuenta como `onOffer`).
+- "Lleva N, paga M": grupos = floor(q/N), gratis = grupos x (N-M). El stock baja por todas las unidades entregadas; el subtotal y el total usan lo ya descontado. Línea del pedido: `promoDiscount`, `promoType=BUY_X_PAY_Y`. Público: `promoBuy/promoPay/promoLabel/promoEndsAt` (solo si está activa; cuenta como `onOffer`).
 - Combo = producto con stock propio y composición fija (sin combos dentro de combos). Armar resta de los componentes (`COMBO_CONSUME`, con `comboId`) y suma al combo (`COMBO_BUILD`); no es venta. Se vende y se anula como cualquier producto. Público: `productType` y `items` (`name`, `quantity`).
 - Oferta activa = `discountPrice` y (sin fecha de fin o fecha de fin futura); se evalúa al consultar, sin tareas. Público: `discountPrice/onOffer/discountPercent/offerEndsAt` solo si está activa. Admin: `offerActive` / `offerExpired`.
 - Un pedido conserva el precio (y `promoType=OFFER`) del momento de crearlo aunque la oferta venza antes de confirmarlo.
 - El stock se descuenta **solo al confirmar**. Si no alcanza, el pedido sigue `PENDING` y no cambia nada.
-- Un pedido `EXPIRED` (45 min sin confirmar) aún se puede confirmar si el pago llegó tarde.
+- Un pedido `EXPIRED` (20 min sin confirmar) aún se puede confirmar si el pago llegó tarde.
 - Nada se borra: se desactiva (`active`/`available`) o se cancela con motivo.
 - Los pedidos conservan la tarifa y precios de su momento aunque luego se editen.

@@ -20,7 +20,7 @@ public record CreateOrderRequest(
         @NotBlank @Pattern(regexp = "^[\\p{L} .'-]{1,80}$", message = "Nombre inválido") String firstName,
         @NotBlank @Pattern(regexp = "^[\\p{L} .'-]{1,80}$", message = "Apellido inválido") String lastName,
         @NotBlank @Pattern(regexp = "^[0-9]{9}$", message = "El celular debe tener 9 dígitos") String phone,
-        @Pattern(regexp = "^([0-9]{8})?$", message = "El DNI debe tener 8 dígitos") String dni,
+        @NotBlank(message = "El DNI es obligatorio") @Pattern(regexp = "^[0-9]{8}$", message = "El DNI debe tener 8 dígitos") String dni,
         @NotBlank @Size(max = 255) String address,
         @Size(max = 255) String reference,
         @NotNull Long districtId,

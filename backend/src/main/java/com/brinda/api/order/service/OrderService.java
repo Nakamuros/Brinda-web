@@ -81,17 +81,11 @@ public class OrderService {
         BigDecimal fee = district.getZone().getFee();
         BigDecimal total = subtotal.add(fee);
 
-        String dni = blankToNull(req.dni());
-        if (dni == null && total.compareTo(props.dniRequiredAbove()) > 0) {
-            throw new BusinessRuleException("Para pedidos mayores a S/ " + props.dniRequiredAbove().toPlainString()
-                    + " el DNI es obligatorio");
-        }
-
         order.setOrderCode(codeGenerator.next());
         order.setCustomerFirstName(clean(req.firstName()));
         order.setCustomerLastName(clean(req.lastName()));
         order.setCustomerPhone(req.phone());
-        order.setCustomerDniEncrypted(dni == null ? null : dniCipher.encrypt(dni));
+        order.setCustomerDniEncrypted(dniCipher.encrypt(req.dni()));
         order.setDeliveryAddress(clean(req.address()));
         order.setDeliveryReference(blankToNull(clean(req.reference())));
         order.setDistrict(district);

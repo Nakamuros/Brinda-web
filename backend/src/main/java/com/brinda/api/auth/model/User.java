@@ -45,6 +45,14 @@ public class User extends Auditable {
     @Column(name = "locked_until")
     private OffsetDateTime lockedUntil;
 
+    /** Sube al cerrar sesión o cambiar la clave: los tokens emitidos antes dejan de valer. */
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion;
+
+    public void invalidateSessions() {
+        tokenVersion++;
+    }
+
     public boolean isLocked() {
         return lockedUntil != null && lockedUntil.isAfter(OffsetDateTime.now());
     }

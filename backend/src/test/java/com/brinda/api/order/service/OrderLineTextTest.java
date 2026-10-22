@@ -31,4 +31,13 @@ class OrderLineTextTest {
         assertEquals("2 x Pilsen", OrderLineText.line(i));
         assertNull(OrderLineText.promo(i));
     }
+
+    @Test
+    void lineaDeComboListaSuContenido() {
+        OrderItem i = item(1, "0.00", null, null);
+        i.setProductName("Combo Fiesta");
+        assertEquals("1 x Combo Fiesta (incluye: 2 x Whisky X, 1 x Gaseosa)",
+                OrderLineText.line(i, java.util.List.of("2 x Whisky X", "1 x Gaseosa")));
+        assertEquals("1 x Combo Fiesta", OrderLineText.line(i, java.util.List.of()));
+    }
 }

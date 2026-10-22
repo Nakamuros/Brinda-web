@@ -24,7 +24,7 @@ En DBeaver: conecta a la BD `brinda`, abre cada archivo y ejecútalo como script
 - **No usar en producción**: crear el admin de Lucía con su correo y clave propia.
 
 ## Reglas aplicadas en la BD
-- Dinero `NUMERIC(10,2)`, fechas `TIMESTAMPTZ`; `total = subtotal + envío`; DNI obligatorio si total > S/ 700.
+- Dinero `NUMERIC(10,2)`, fechas `TIMESTAMPTZ`; `total = subtotal + envío`; DNI obligatorio en todo pedido nuevo (V8: trigger de INSERT; los pedidos anteriores sin DNI se conservan).
 - Stock nunca negativo; ajustes manuales exigen motivo; `SALE` resta, `RESTOCK`/`CANCEL_RETURN` suman.
 - `ON DELETE RESTRICT` en todo; `brinda_app` no tiene `DELETE` ni DDL, y `order_items`, `stock_movements`, `audit_logs` son solo-inserción.
 - Zonas/tarifas/distritos del seed son **provisionales**.

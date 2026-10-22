@@ -2,6 +2,8 @@ package com.brinda.api.catalog.dto;
 
 import com.brinda.api.catalog.model.Product;
 import com.brinda.api.catalog.model.PromoRule;
+import com.brinda.api.shared.image.ImageUrlSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,7 +16,7 @@ public record PublicProductResponse(UUID id, String slug, String name, String de
                                     BigDecimal price, BigDecimal discountPrice, BigDecimal finalPrice,
                                     boolean onOffer, Integer discountPercent, OffsetDateTime offerEndsAt,
                                     Short promoBuy, Short promoPay, String promoLabel, OffsetDateTime promoEndsAt,
-                                    String imageUrl, String categorySlug, String categoryName,
+                                    @JsonSerialize(using = ImageUrlSerializer.class) String imageUrl, String categorySlug, String categoryName,
                                     boolean featured, boolean inStock, String productType, List<Line> items) {
 
     /** Contenido de un combo ("Incluye: 2 x Whisky X"). Sin cantidades de stock. */

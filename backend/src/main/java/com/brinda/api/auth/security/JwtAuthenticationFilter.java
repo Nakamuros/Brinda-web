@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             jwtService.validate(token)
-                    .flatMap(userRepository::findById)
+                    .flatMap(s -> userRepository.findById(s.userId()).filter(u -> u.getTokenVersion() == s.tokenVersion()))
                     .filter(User::isActive)
                     .filter(u -> !u.isLocked())
                     .ifPresent(this::authenticate);

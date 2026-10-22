@@ -1,0 +1,5610 @@
+{
+  "info": {
+    "name": "BRINDA API v1",
+    "description": "Colección completa de la API (catálogo, pedidos, panel, inventario, combos, zonas, seguridad). Ejecutar con el Collection Runner en orden, con la API en perfil local y el seed de desarrollo. Cada petición lleva pm.test. Las pausas por rate limit se hacen solas (pueden tardar unos minutos). La carpeta 13 deja al admin bloqueado 15 min: ver su descripción para desbloquearlo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "ts",
+      "value": ""
+    },
+    {
+      "key": "expiredOrderId",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Respeta el rate limit del servidor: espera si ya se enviaron demasiados POST de login/pedido en el último minuto.",
+          "const LIM = { '/api/v1/orders': 4, '/api/v1/auth/login': 8 };",
+          "const p = pm.request.url.getPath();",
+          "if (pm.request.method === 'POST' && LIM[p]) {",
+          "  const key = '_hits' + p; const now = Date.now();",
+          "  let hits = JSON.parse(pm.collectionVariables.get(key) || '[]').filter(t => now - t < 61000);",
+          "  const rl = pm.info.requestName.startsWith('[RL]');",
+          "  let wait = 0;",
+          "  if (!rl && hits.length >= LIM[p]) wait = 61000 - (now - hits[0]);",
+          "  hits.push(now + wait);",
+          "  pm.collectionVariables.set(key, JSON.stringify(hits));",
+          "  if (wait > 0) { console.log('Pausa de ' + Math.ceil(wait / 1000) + ' s por rate limit'); setTimeout(() => {}, wait); }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00 · Sesión de administrador",
+      "item": [
+        {
+          "name": "00.1 Login admin",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (!g('ts')) s('ts', String(Date.now()).slice(-8));",
+                  "s('tomorrow', new Date(Date.now() + 864e5).toISOString());",
+                  "s('yesterday', new Date(Date.now() - 864e5).toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "if (pm.response.code === 401 && !g('loginRetried') && pm.environment.get('adminNewPassword') !== pm.environment.get('adminPassword')) {",
+                  "  s('loginRetried', '1'); pm.environment.set('adminPassword', pm.environment.get('adminNewPassword'));",
+                  "  postman.setNextRequest(pm.info.requestName); return;",
+                  "}",
+                  "s('loginRetried', '');",
+                  "pm.test('200 y cookie HttpOnly', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  const c = pm.response.headers.get('Set-Cookie') || '';",
+                  "  pm.expect(c).to.include('brinda_token='); pm.expect(c.toLowerCase()).to.include('httponly');",
+                  "});",
+                  "const j = pm.response.json();",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/);",
+                  "if (m) s('sessionToken', m[1]);",
+                  "s('mustChange', String(j.mustChangePassword));",
+                  "pm.test('Rol ADMIN', () => pm.expect(j.role).to.eql('ROLE_ADMIN'));",
+                  "postman.setNextRequest(j.mustChangePassword ? '00.2 Admin antes de cambiar la clave → 403' : '00.4 Sesión /auth/me');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Entra con adminPassword; si la clave ya fue cambiada en una corrida previa, reintenta una vez con adminNewPassword."
+          }
+        },
+        {
+          "name": "00.2 Admin antes de cambiar la clave → 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('403 hasta cambiar la clave', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Solo en el primer ingreso (must_change_password = true)."
+          }
+        },
+        {
+          "name": "00.3 Cambiar la clave inicial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ya no exige cambio', () => pm.expect(j.mustChangePassword).to.eql(false));",
+                  "pm.environment.set('adminPassword', pm.environment.get('adminNewPassword'));",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); if (m) s('sessionToken', m[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminNewPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "00.4 Sesión /auth/me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y usuario admin', () => { pm.response.to.have.status(200); pm.expect(j.username).to.eql(pm.environment.get('adminUser')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 · Catálogo público y filtros",
+      "item": [
+        {
+          "name": "01.1 Categorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y lista con slug', () => { pm.response.to.have.status(200); pm.expect(j).to.be.an('array').that.is.not.empty; pm.expect(j[0]).to.have.property('slug'); });",
+                  "s('categorySlug', j[0].slug);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.2 Productos (paginado, sin stock expuesto)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y paginación', () => { pm.response.to.have.status(200); pm.expect(j).to.include.keys('content', 'page', 'size', 'totalElements'); });",
+                  "pm.test('No expone cantidades de stock', () => j.content.forEach(p => { pm.expect(p).to.not.have.property('stockQuantity'); pm.expect(p).to.have.property('inStock'); }));",
+                  "pm.test('Orden: con stock primero', () => { const f = j.content.findIndex(p => !p.inStock); if (f >= 0) pm.expect(j.content.slice(f).every(p => !p.inStock)).to.be.true; });",
+                  "if (j.content.length) { s('publicSlug', j.content[0].slug); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.3 Filtro por categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todos de la categoría', () => { pm.response.to.have.status(200); j.content.forEach(p => pm.expect(p.categorySlug).to.eql(g('categorySlug'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?category={{categorySlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "{{categorySlug}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.4 Búsqueda q=pisco",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y coincidencias', () => { pm.response.to.have.status(200); pm.expect(j.content.length).to.be.above(0); j.content.forEach(p => pm.expect(p.name.toLowerCase()).to.include('pisco')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?q=pisco",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pisco"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.5 Filtro onOffer=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todos en oferta', () => { pm.response.to.have.status(200); pm.expect(j.content.length).to.be.above(0); j.content.forEach(p => pm.expect(p.onOffer).to.be.true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?onOffer=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "onOffer",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.6 Filtro featured=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todos destacados', () => { pm.response.to.have.status(200); j.content.forEach(p => pm.expect(p.featured).to.be.true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?featured=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "featured",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.7 Tamaño de página limitado (size=500)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('size ≤ 50', () => { pm.response.to.have.status(200); pm.expect(j.size).to.be.at.most(50); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?size=500",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "500"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.8 Detalle por slug",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y slug', () => { pm.response.to.have.status(200); pm.expect(j.slug).to.eql(g('publicSlug')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/{{publicSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "{{publicSlug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.9 Slug inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('404 NOT_FOUND', () => { pm.response.to.have.status(404); pm.expect(pm.response.json().code).to.eql('NOT_FOUND'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/no-existe-{{ts}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "no-existe-{{ts}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "01.10 Distritos con tarifa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y tarifa numérica', () => { pm.response.to.have.status(200); pm.expect(j).to.be.an('array').that.is.not.empty; pm.expect(Number(j[0].fee)).to.be.at.least(0); });",
+                  "s('districtId', String(j[0].id)); s('districtFee', String(j[0].fee));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/delivery/districts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "delivery",
+                "districts"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 · Preparación (ids, precios y stock)",
+      "item": [
+        {
+          "name": "02.1 Resolver productos del seed por SKU",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const by = {}; j.content.forEach(p => by[p.sku] = p);",
+                  "['WHI-001', 'PIS-001', 'SNK-001', 'ICE-001'].forEach(k => pm.test('Existe ' + k, () => pm.expect(by[k], k).to.exist));",
+                  "s('whiskyId', by['WHI-001'].id); s('whiskyFinal', String(by['WHI-001'].finalPrice));",
+                  "s('piscoId', by['PIS-001'].id); s('piscoPrice', String(by['PIS-001'].finalPrice));",
+                  "s('snackId', by['SNK-001'].id); s('snackPrice', String(by['SNK-001'].finalPrice));",
+                  "s('iceId', by['ICE-001'].id);",
+                  "pm.test('El whisky tiene oferta vigente', () => pm.expect(by['WHI-001'].offerActive).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "02.2 Stock inicial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_ini', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('ini');",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 · Ofertas y \"lleva N, paga M\"",
+      "item": [
+        {
+          "name": "03.1 Oferta con fecha pasada → rechazada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400/422', () => pm.expect([400, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{snackId}}/offer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{snackId}}",
+                "offer"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"discountPrice\": 8,\n  \"endsAt\": \"{{yesterday}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03.2 Oferta válida con fecha de fin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y oferta activa', () => { pm.response.to.have.status(200); pm.expect(j.offerActive).to.be.true; pm.expect(Number(j.finalPrice)).to.eql(8); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{snackId}}/offer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{snackId}}",
+                "offer"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"discountPrice\": 8,\n  \"endsAt\": \"{{tomorrow}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03.3 Catálogo público muestra la oferta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const p = j.content.find(x => x.name.includes('Piqueo'));",
+                  "pm.test('Piqueo en oferta con fecha de fin', () => { pm.expect(p).to.exist; pm.expect(Number(p.discountPrice)).to.eql(8); pm.expect(p).to.have.property('offerEndsAt'); pm.expect(p.discountPercent).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?onOffer=true&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "onOffer",
+                  "value": "true"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "03.4 Quitar la oferta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/204', () => pm.expect([200, 204]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{snackId}}/offer",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{snackId}}",
+                "offer"
+              ]
+            }
+          }
+        },
+        {
+          "name": "03.5 Promoción lleva 3 paga 2 (pisco)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y promo activa', () => { pm.response.to.have.status(200); pm.expect(j.promoActive).to.be.true; pm.expect(j.promoBuy).to.eql(3); pm.expect(j.promoPay).to.eql(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{piscoId}}/promo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{piscoId}}",
+                "promo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buy\": 3,\n  \"pay\": 2,\n  \"endsAt\": \"{{tomorrow}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03.6 Promoción sobre producto con oferta → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422 (excluyente con la oferta)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{whiskyId}}/promo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{whiskyId}}",
+                "promo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buy\": 3,\n  \"pay\": 2,\n  \"endsAt\": \"{{tomorrow}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03.7 Promoción inválida (paga ≥ lleva)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400/422', () => pm.expect([400, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{piscoId}}/promo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{piscoId}}",
+                "promo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buy\": 2,\n  \"pay\": 2,\n  \"endsAt\": \"{{tomorrow}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "03.8 Público: promoción visible y cuenta como oferta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const p = j.content.find(x => x.name.includes('Quebranta'));",
+                  "pm.test('Promo pública', () => { pm.expect(p.promoBuy).to.eql(3); pm.expect(p.promoPay).to.eql(2); pm.expect(p.promoLabel).to.be.a('string'); pm.expect(p.onOffer).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products?q=pisco",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pisco"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 · Combos",
+      "item": [
+        {
+          "name": "04.1 Crear combo (arma 3 unidades)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('201', () => pm.response.to.have.status(201));",
+                  "pm.test('Es COMBO con 3 unidades', () => { pm.expect(j.combo.productType).to.eql('COMBO'); pm.expect(j.combo.stockQuantity).to.eql(3); pm.expect(j.items.length).to.eql(2); });",
+                  "s('comboId', j.combo.id); s('comboSlug', j.combo.slug); s('comboPrice', String(j.combo.finalPrice));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Combo Prueba {{ts}}\",\n  \"description\": \"Piqueo + hielo\",\n  \"imageUrl\": \"\",\n  \"price\": 15.5,\n  \"minStock\": 0,\n  \"maxStock\": 10,\n  \"featured\": false,\n  \"available\": true,\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    },\n    {\n      \"productId\": \"{{iceId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"unitsToBuild\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04.2 Stock tras armar combo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_combo1', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('combo1');",
+                  "const a = S('ini');",
+                  "pm.test('Los componentes bajaron 3', () => { pm.expect(now[g('snackId')]).to.eql(a[g('snackId')] - 3); pm.expect(now[g('iceId')]).to.eql(a[g('iceId')] - 3); });",
+                  "pm.test('El combo tiene 3', () => pm.expect(now[g('comboId')]).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "04.3 Detalle del combo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 con composición y buildableNow', () => { pm.response.to.have.status(200); pm.expect(j.items.length).to.eql(2); pm.expect(j.buildableNow).to.be.at.least(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos/{{comboId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos",
+                "{{comboId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "04.4 Combo sin componentes → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vacío {{ts}}\",\n  \"price\": 10,\n  \"minStock\": 0,\n  \"maxStock\": 1,\n  \"featured\": false,\n  \"available\": true,\n  \"items\": [],\n  \"unitsToBuild\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04.5 Editar combo rechaza items/stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422 (composición y stock son fijos)', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos/{{comboId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos",
+                "{{comboId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Combo Prueba {{ts}}\",\n  \"price\": 15.5,\n  \"minStock\": 0,\n  \"maxStock\": 10,\n  \"featured\": false,\n  \"available\": true,\n  \"items\": [\n    {\n      \"productId\": \"{{iceId}}\",\n      \"quantity\": 9\n    }\n  ],\n  \"stockQuantity\": 500\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04.6 Armar 2 más",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y 5 unidades', () => { pm.response.to.have.status(200); pm.expect(j.combo.stockQuantity).to.eql(5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos/{{comboId}}/build",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos",
+                "{{comboId}}",
+                "build"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"units\": 2,\n  \"reason\": \"prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04.7 Armar sin componentes suficientes → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422 todo o nada', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/combos/{{comboId}}/build",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "combos",
+                "{{comboId}}",
+                "build"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"units\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "04.8 Stock tras armar 2 más",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_combo2', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('combo2');",
+                  "const a = S('ini');",
+                  "pm.test('Componentes -5 en total (nada se descontó del intento fallido)', () => { pm.expect(now[g('snackId')]).to.eql(a[g('snackId')] - 5); pm.expect(now[g('iceId')]).to.eql(a[g('iceId')] - 5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "04.9 Público: combo con su contenido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('COMBO con items y sin stock numérico', () => { pm.response.to.have.status(200); pm.expect(j.productType).to.eql('COMBO'); pm.expect(j.items.length).to.eql(2); pm.expect(j.inStock).to.be.true; pm.expect(j).to.not.have.property('stockQuantity'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/{{comboSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "{{comboSlug}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 · Zonas, distritos y tarifas",
+      "item": [
+        {
+          "name": "05.1 Listar zonas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 con tarifas', () => { pm.response.to.have.status(200); pm.expect(j.length).to.be.at.least(3); pm.expect(j[0]).to.include.keys('id', 'name', 'fee', 'active', 'districts'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "zones"
+              ]
+            }
+          }
+        },
+        {
+          "name": "05.2 Crear zona de prueba (S/ 5.00)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('201', () => pm.response.to.have.status(201)); s('zoneTestId', String(j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "zones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zona Test {{ts}}\",\n  \"fee\": 5,\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "05.3 Zona duplicada → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "zones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zona Test {{ts}}\",\n  \"fee\": 5,\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "05.4 Tarifa negativa → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/zones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "zones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Negativa {{ts}}\",\n  \"fee\": -1,\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "05.5 Crear distrito de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('201', () => pm.response.to.have.status(201)); s('districtTestId', String(j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/districts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "districts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"zoneId\": {{zoneTestId}}, \"name\": \"Distrito Test {{ts}}\", \"active\": true }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "05.6 Público: el distrito aparece con S/ 5.00",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const d = j.find(x => String(x.id) === g('districtTestId'));",
+                  "pm.test('Visible con tarifa 5', () => { pm.expect(d).to.exist; pm.expect(Number(d.fee)).to.eql(5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/delivery/districts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "delivery",
+                "districts"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 · Pedido: validaciones (no crean pedido)",
+      "item": [
+        {
+          "name": "06.1 Sin DNI → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.2 DNI vacío → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.3 DNI de 7 dígitos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"1234567\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.4 DNI con letras → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"1234567a\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.5 Sin confirmar mayoría de edad → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en adultConfirmed', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('adultConfirmed'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": false,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.6 Sin aceptar privacidad → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en privacyAccepted', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('privacyAccepted'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.7 Sin aceptar términos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en termsAccepted', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('termsAccepted'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": false,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.8 Celular inválido → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en phone', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('phone'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"12345\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.9 Sin productos → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.10 Cantidad 0 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 0\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.11 Cantidad 51 → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 51\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.12 Distrito sin reparto → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": 999999,\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.13 Producto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('404/422', () => pm.expect([404, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"00000000-0000-0000-0000-000000000000\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "06.14 Más que el stock → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('422 sin stock suficiente', () => { pm.response.to.have.status(422); pm.expect(j.message.toLowerCase()).to.include('stock'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 50\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 · Pedido: creación (precios del servidor)",
+      "item": [
+        {
+          "name": "07.1 Pedido A: oferta + lleva 3 paga 2 + combo (con precios manipulados)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('Pedido creado (200/201) en PENDING', () => { pm.expect([200, 201]).to.include(pm.response.code); pm.expect(j.status).to.eql('PENDING'); });",
+                  "pm.test('El DNI no viaja en la respuesta', () => pm.expect(JSON.stringify(j)).to.not.include('12345678'));",
+                  "const mins = (new Date(j.expiresAt) - Date.now()) / 60000;",
+                  "pm.test('Vence en ~20 min', () => { pm.expect(mins).to.be.within(18.5, 20.5); });",
+                  "const cents = x => Math.round(Number(x) * 100);",
+                  "const whisky = cents(g('whiskyFinal')) * 2, pisco = cents(g('piscoPrice')) * 2, combo = cents(g('comboPrice')), fee = cents(g('districtFee'));",
+                  "pm.test('OFFER: 2 x precio de oferta', () => pm.expect(cents(j.items[0].subtotal)).to.eql(whisky));",
+                  "pm.test('BUY_X_PAY_Y: 3 pagan 2', () => { pm.expect(cents(j.items[1].subtotal)).to.eql(pisco); pm.expect(j.items[1].promo).to.be.a('string'); pm.expect(cents(j.items[1].promoDiscount)).to.eql(cents(g('piscoPrice'))); });",
+                  "pm.test('Combo a su precio', () => pm.expect(cents(j.items[2].subtotal)).to.eql(combo));",
+                  "pm.test('Total = subtotal + tarifa, calculado en el servidor', () => { pm.expect(cents(j.subtotal)).to.eql(whisky + pisco + combo); pm.expect(cents(j.deliveryFee)).to.eql(fee); pm.expect(cents(j.total)).to.eql(whisky + pisco + combo + fee); });",
+                  "const url = decodeURIComponent(j.whatsappUrl || '');",
+                  "pm.test('WhatsApp: lista el contenido del combo y no lleva el DNI', () => { pm.expect(url).to.include('wa.me'); pm.expect(url).to.include('incluye:'); pm.expect(url).to.not.include('12345678'); });",
+                  "s('codeA', j.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 2,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{piscoId}}\",\n      \"quantity\": 3,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{comboId}}\",\n      \"quantity\": 1,\n      \"unitPrice\": 0.01\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true,\n  \"total\": 0.01,\n  \"deliveryFee\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "El cliente envía unitPrice/total falsos: el servidor los ignora y calcula todo."
+          }
+        },
+        {
+          "name": "07.2 Pedido B: simple (para anular pendiente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('Pedido creado (200/201) en PENDING', () => { pm.expect([200, 201]).to.include(pm.response.code); pm.expect(j.status).to.eql('PENDING'); });",
+                  "pm.test('El DNI no viaja en la respuesta', () => pm.expect(JSON.stringify(j)).to.not.include('12345678'));",
+                  "const mins = (new Date(j.expiresAt) - Date.now()) / 60000;",
+                  "pm.test('Vence en ~20 min', () => { pm.expect(mins).to.be.within(18.5, 20.5); });",
+                  "s('codeB', j.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "07.3 Pedido C: en el distrito de prueba (tarifa 5.00)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('Pedido creado (200/201) en PENDING', () => { pm.expect([200, 201]).to.include(pm.response.code); pm.expect(j.status).to.eql('PENDING'); });",
+                  "pm.test('El DNI no viaja en la respuesta', () => pm.expect(JSON.stringify(j)).to.not.include('12345678'));",
+                  "const mins = (new Date(j.expiresAt) - Date.now()) / 60000;",
+                  "pm.test('Vence en ~20 min', () => { pm.expect(mins).to.be.within(18.5, 20.5); });",
+                  "pm.test('Tarifa cobrada 5.00', () => pm.expect(Number(j.deliveryFee)).to.eql(5)); s('codeC', j.code); s('totalC', String(j.total));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "07.4 Pedido D: 6 whiskys (para probar stock al confirmar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('Pedido creado (200/201) en PENDING', () => { pm.expect([200, 201]).to.include(pm.response.code); pm.expect(j.status).to.eql('PENDING'); });",
+                  "pm.test('El DNI no viaja en la respuesta', () => pm.expect(JSON.stringify(j)).to.not.include('12345678'));",
+                  "const mins = (new Date(j.expiresAt) - Date.now()) / 60000;",
+                  "pm.test('Vence en ~20 min', () => { pm.expect(mins).to.be.within(18.5, 20.5); });",
+                  "s('codeD', j.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 6\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 · Panel: confirmar, anular y stock",
+      "item": [
+        {
+          "name": "08.1 Lista PENDING → ids de A, B, C y D",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "['codeA:orderA', 'codeB:orderB', 'codeC:orderC', 'codeD:orderD'].forEach(x => { const [c, v] = x.split(':'); const o = j.content.find(y => y.code === g(c)); pm.test('Está ' + c, () => pm.expect(o).to.exist); if (o) s(v, o.id); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders?status=PENDING&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.2 Contador de pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y ≥ 4', () => { pm.response.to.have.status(200); pm.expect(Object.values(j)[0]).to.be.at.least(4); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/pending-count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "pending-count"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.3 Detalle de A (DNI descifrado y tipos de promoción)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "pm.test('DNI descifrado y consentimientos guardados', () => { pm.expect(j.dni).to.eql('12345678'); pm.expect(j.adultConfirmed).to.be.true; pm.expect(j.termsAcceptedAt).to.exist; pm.expect(j.privacyAcceptedAt).to.exist; });",
+                  "pm.test('promoType por línea', () => { const t = {}; j.items.forEach(i => t[i.name] = i.promoType); const v = Object.values(t); pm.expect(v).to.include('OFFER'); pm.expect(v).to.include('BUY_X_PAY_Y'); pm.expect(v.filter(x => x === null || x === undefined).length).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.4 Texto para el motorizado (sin DNI)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 sin DNI', () => { pm.response.to.have.status(200); pm.expect(JSON.stringify(j)).to.not.include('12345678'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/copy/delivery",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "copy",
+                "delivery"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.5 Texto para boleta (DNI y contenido del combo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const t = Object.values(j)[0];",
+                  "pm.test('Incluye DNI y \"incluye:\" del combo', () => { pm.response.to.have.status(200); pm.expect(t).to.include('DNI: 12345678'); pm.expect(t).to.include('incluye:'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/copy/receipt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "copy",
+                "receipt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6 Stock antes de confirmar A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_a0', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('a0');",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.7 Confirmar A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.8 Stock tras confirmar A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_a1', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('a1');",
+                  "const a = S('a0');",
+                  "pm.test('Whisky -2, pisco -3 (todas las unidades), combo -1', () => { pm.expect(now[g('whiskyId')]).to.eql(a[g('whiskyId')] - 2); pm.expect(now[g('piscoId')]).to.eql(a[g('piscoId')] - 3); pm.expect(now[g('comboId')]).to.eql(a[g('comboId')] - 1); });",
+                  "pm.test('Los componentes del combo no se tocan', () => { pm.expect(now[g('snackId')]).to.eql(a[g('snackId')]); pm.expect(now[g('iceId')]).to.eql(a[g('iceId')]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.9 Confirmar A otra vez → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.10 Anular sin motivo → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.11 Anular A confirmada (devuelve stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 CANCELLED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CANCELLED'); pm.expect(j.cancelReason).to.eql('Prueba Postman'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.12 Stock tras anular A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_a2', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('a2');",
+                  "const a = S('a0');",
+                  "pm.test('Stock devuelto exactamente', () => ['whiskyId', 'piscoId', 'comboId', 'snackId', 'iceId'].forEach(k => pm.expect(now[g(k)], k).to.eql(a[g(k)])));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.13 Anular B pendiente (no toca stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 CANCELLED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CANCELLED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderB}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderB}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.14 Stock tras anular B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_b1', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('b1');",
+                  "const a = S('a0');",
+                  "pm.test('Sin cambios', () => ['whiskyId', 'piscoId', 'comboId', 'snackId'].forEach(k => pm.expect(now[g(k)], k).to.eql(a[g(k)])));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.15 Dejar el whisky con 2 unidades (ajuste)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const stock = JSON.parse(g('snap_b1'))[g('whiskyId')]; s('whiskyStockBefore', String(stock));",
+                  "pm.request.body.update(JSON.stringify({ quantityChange: -(stock - 2), reason: 'Prueba Postman: simular poco stock' }));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/201', () => pm.expect([200, 201]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{whiskyId}}/adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{whiskyId}}",
+                "adjust"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityChange\": -1,\n  \"reason\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.16 Confirmar D sin stock suficiente → 422 y sigue PENDING",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422 y mensaje', () => { pm.response.to.have.status(422); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderD}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderD}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.17 D sigue PENDING",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('PENDING', () => pm.expect(j.status).to.eql('PENDING'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderD}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderD}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.18 Restaurar el stock del whisky",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.request.body.update(JSON.stringify({ quantityChange: Number(g('whiskyStockBefore')) - 2, reason: 'Prueba Postman: restaurar' }));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/201', () => pm.expect([200, 201]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{whiskyId}}/adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{whiskyId}}",
+                "adjust"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityChange\": 1,\n  \"reason\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.19 Anular D",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderD}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderD}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.20 Subir la tarifa de la zona de prueba a S/ 7.00",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y tarifa 7', () => { pm.response.to.have.status(200); pm.expect(Number(j.fee)).to.eql(7); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/zones/{{zoneTestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "zones",
+                "{{zoneTestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Zona Test {{ts}}\",\n  \"fee\": 7,\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.21 C conserva la tarifa cobrada (5.00)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('Tarifa y total congelados', () => { pm.expect(Number(j.deliveryFee)).to.eql(5); pm.expect(Number(j.total)).to.eql(Number(g('totalC'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderC}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderC}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.22 Público: el distrito ya cobra 7.00",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const d = j.find(x => String(x.id) === g('districtTestId')); pm.test('Tarifa nueva 7', () => pm.expect(Number(d.fee)).to.eql(7));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/delivery/districts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "delivery",
+                "districts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.23 Anular C",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderC}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderC}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.24 Desactivar el distrito de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/delivery/districts/{{districtTestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "delivery",
+                "districts",
+                "{{districtTestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"zoneId\": {{zoneTestId}}, \"name\": \"Distrito Test {{ts}}\", \"active\": false }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.25 Pedido a distrito desactivado → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.26 Quitar la promoción del pisco",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/204', () => pm.expect([200, 204]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{piscoId}}/promo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{piscoId}}",
+                "promo"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 · Inventario",
+      "item": [
+        {
+          "name": "09.1 Reponer 10 de piqueo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/201', () => pm.expect([200, 201]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{snackId}}/restock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{snackId}}",
+                "restock"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 10,\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09.2 Movimientos del piqueo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const arr = Array.isArray(j) ? j : j.content;",
+                  "pm.test('200 y último movimiento RESTOCK +10', () => { pm.response.to.have.status(200); const m = arr.find(x => x.type === 'RESTOCK' && x.quantityChange === 10); pm.expect(m).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{snackId}}/movements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{snackId}}",
+                "movements"
+              ]
+            }
+          }
+        },
+        {
+          "name": "09.3 Ajuste sin motivo → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{snackId}}/adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{snackId}}",
+                "adjust"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityChange\": -1,\n  \"reason\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09.4 Ajuste que dejaría stock negativo → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/products/{{snackId}}/adjust",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "products",
+                "{{snackId}}",
+                "adjust"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityChange\": -100000,\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09.5 Recepción por lote",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200/201', () => pm.expect([200, 201]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/restock-batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "restock-batch"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reference\": \"Guía Postman\",\n  \"lines\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 2\n    },\n    {\n      \"productId\": \"{{iceId}}\",\n      \"quantity\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09.6 Lote con producto repetido → rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400/422', () => pm.expect([400, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/restock-batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "restock-batch"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lines\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    },\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "09.7 Alertas de stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/inventory/alerts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "inventory",
+                "alerts"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 · Productos, categorías e imágenes",
+      "item": [
+        {
+          "name": "10.1 Crear categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('201', () => pm.response.to.have.status(201)); s('catTestId', String(j.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "categories"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoría Test {{ts}}\",\n  \"description\": \"Prueba\",\n  \"iconUrl\": \"\",\n  \"active\": true,\n  \"displayOrder\": 99\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.2 Crear producto con ruta de imagen relativa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('201 con stock 0', () => { pm.response.to.have.status(201); pm.expect(j.stockQuantity).to.eql(0); });",
+                  "pm.test('imageKey = valor guardado; imageUrl = final', () => { pm.expect(j.imageKey).to.eql('products/TST-' + g('ts') + '.webp'); pm.expect(j.imageUrl).to.include(j.imageKey); });",
+                  "s('prodTestId', j.id); s('prodTestSlug', j.slug);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"categoryId\": {{catTestId}}, \"sku\": \"TST-{{ts}}\", \"name\": \"Producto Test {{ts}}\", \"description\": \"Prueba\", \"price\": 10.00, \"imageUrl\": \"products/TST-{{ts}}.webp\", \"minStock\": 1, \"maxStock\": 10, \"available\": true, \"featured\": false }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.3 SKU duplicado → rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('409/422', () => pm.expect([409, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"categoryId\": {{catTestId}}, \"sku\": \"TST-{{ts}}\", \"name\": \"Otro {{ts}}\", \"price\": 10.00, \"minStock\": 0, \"maxStock\": 1, \"available\": true, \"featured\": false }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.4 Editar: el stock enviado se ignora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200, stock sigue en 0 y sin imagen', () => { pm.response.to.have.status(200); pm.expect(j.stockQuantity).to.eql(0); pm.expect(j.name).to.include('editado'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{prodTestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{prodTestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"categoryId\": {{catTestId}}, \"sku\": \"TST-{{ts}}\", \"name\": \"Producto Test {{ts}} editado\", \"price\": 12.00, \"imageUrl\": \"\", \"minStock\": 1, \"maxStock\": 10, \"available\": true, \"featured\": false, \"stockQuantity\": 999 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.5 Público sin imagen: el campo imageUrl no viene",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y sin imageUrl (el frontend muestra la genérica)', () => { pm.response.to.have.status(200); pm.expect(j).to.not.have.property('imageUrl'); pm.expect(j.inStock).to.be.false; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/{{prodTestSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "{{prodTestSlug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10.6 Ocultar por lote",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y 1 cambiado', () => { pm.response.to.have.status(200); pm.expect(j.changed).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "visibility"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{prodTestId}}\"\n  ],\n  \"available\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.7 Oculto: público 404 y admin lo filtra por HIDDEN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('404 NOT_FOUND', () => { pm.response.to.have.status(404); pm.expect(pm.response.json().code).to.eql('NOT_FOUND'); });",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/{{prodTestSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "{{prodTestSlug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10.8 Admin visibility=HIDDEN lo lista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('Incluye el producto oculto', () => pm.expect(j.content.some(p => p.id === g('prodTestId'))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?visibility=HIDDEN&size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "visibility",
+                  "value": "HIDDEN"
+                },
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "10.9 Mostrar por lote",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('1 cambiado', () => pm.expect(j.changed).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "visibility"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{prodTestId}}\"\n  ],\n  \"available\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.10 Visible otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/products/{{prodTestSlug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "products",
+                "{{prodTestSlug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10.11 Lote vacío → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "visibility"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [],\n  \"available\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.12 Editar categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 e inactiva', () => { pm.response.to.have.status(200); pm.expect(j.active).to.be.false; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/categories/{{catTestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "categories",
+                "{{catTestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Categoría Test {{ts}}\", \"description\": \"Editada\", \"iconUrl\": \"\", \"active\": false, \"displayOrder\": 99 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 · Vencimiento (EXPIRED)",
+      "item": [
+        {
+          "name": "11.1 Listar vencidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todos EXPIRED', () => { pm.response.to.have.status(200); j.content.forEach(o => pm.expect(o.status).to.eql('EXPIRED')); });",
+                  "if (j.content.length && !g('expiredOrderId')) s('expiredOrderId', j.content[0].id);",
+                  "postman.setNextRequest(g('expiredOrderId') ? '11.2 Stock antes de confirmar el vencido' : '12.1 Login para probar el cierre de sesión');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders?status=EXPIRED&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "EXPIRED"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "El job marca EXPIRED los PENDING con más de 20 min (corre cada minuto). Para provocar uno: UPDATE orders SET expires_at = now() - interval '1 minute' WHERE order_code = '<código>' AND status = 'PENDING'; y esperar ~1 min. Si hay uno, las peticiones 11.2 a 11.5 lo confirman (pago tardío) y lo anulan verificando el stock."
+          }
+        },
+        {
+          "name": "11.2 Stock antes de confirmar el vencido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_e0', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('e0');",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11.3 Confirmar vencido (pago tardío)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{expiredOrderId}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{expiredOrderId}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11.4 Anular el vencido confirmado (devuelve stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{expiredOrderId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{expiredOrderId}}",
+                "cancel"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11.5 Stock tras anular el vencido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = {}; j.content.forEach(p => m[p.id] = p.stockQuantity);",
+                  "s('snap_e1', JSON.stringify(m));",
+                  "const S = l => JSON.parse(g('snap_' + l));",
+                  "const now = S('e1');",
+                  "const a = S('e0'); pm.test('Stock restituido', () => Object.keys(a).forEach(k => pm.expect(now[k], k).to.eql(a[k])));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products?size=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · Sesión: cierre, token invalidado y acceso sin cookie",
+      "item": [
+        {
+          "name": "12.1 Login para probar el cierre de sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT1', m ? m[1] : '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.2 Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('204 y cookie borrada', () => { pm.response.to.have.status(204); pm.expect(pm.response.headers.get('Set-Cookie')).to.match(/Max-Age=0/i); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.3 El token anterior ya no sirve (token_version) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token={{tokenT1}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Reenvía a mano el token emitido antes del logout: el servidor lo rechaza aunque no haya vencido."
+          }
+        },
+        {
+          "name": "12.4 Admin sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.5 Admin sin cookie (POST) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "visibility"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{snackId}}\"\n  ],\n  \"available\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.6 Pedidos admin sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.7 Token basura → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401, nunca 500', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token=basura.basura.basura"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.8 /auth/me sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.9 El catálogo público sigue abierto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.10 Login (sesión T2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT2', m ? m[1] : '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.11 Cambiar la clave (temporal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminPassword}}-tmp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.12 T2 (anterior al cambio de clave) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401: cambiar la clave invalida las sesiones previas', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token={{tokenT2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.13 La sesión nueva (cookie del cambio) sigue válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.14 Restaurar la clave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}-tmp\",\n  \"newPassword\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 · Bloqueo de cuenta y rate limit (dejan al admin bloqueado 15 min)",
+      "item": [
+        {
+          "name": "13.1 Clave incorrecta (se repite 5 veces)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "s('lock_n', String(Number(g('lock_n') || 0) + 1));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401 INVALID_CREDENTIALS', () => { pm.response.to.have.status(401); pm.expect(pm.response.json().code).to.eql('INVALID_CREDENTIALS'); });",
+                  "if (Number(g('lock_n')) < 5) { postman.setNextRequest(pm.info.requestName); } else { s('lock_n', ''); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"clave-incorrecta-{{ts}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Cinco fallos seguidos bloquean la cuenta 15 min. Para desbloquear: UPDATE users SET locked_until = NULL, failed_attempts = 0 WHERE username = 'admin';"
+          }
+        },
+        {
+          "name": "13.2 Clave correcta con la cuenta bloqueada → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "pm.test('401: sigue bloqueada aunque la clave sea correcta', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "[RL] 13.3 Login: rate limit por IP → 429",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "s('loop_login_n', String(Number(g('loop_login_n') || 0) + 1));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const n = Number(g('loop_login_n'));",
+                  "if (pm.response.code !== 429 && n < 15) { postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('loop_login_n', '');",
+                  "pm.test('Llega el 429 (tras ' + n + ' intentos)', () => pm.expect(pm.response.code).to.eql(429));",
+                  "pm.test('Código TOO_MANY_REQUESTS y Retry-After', () => { pm.expect(pm.response.json().code).to.eql('TOO_MANY_REQUESTS'); pm.expect(pm.response.headers.get('Retry-After')).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"nadie-{{ts}}\",\n  \"password\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "[RL] 13.4 Pedidos: rate limit por IP → 429",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "s('loop_orders_n', String(Number(g('loop_orders_n') || 0) + 1));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const n = Number(g('loop_orders_n'));",
+                  "if (pm.response.code !== 429 && n < 12) { postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('loop_orders_n', '');",
+                  "pm.test('Llega el 429 (tras ' + n + ' intentos)', () => pm.expect(pm.response.code).to.eql(429));",
+                  "pm.test('Código TOO_MANY_REQUESTS y Retry-After', () => { pm.expect(pm.response.json().code).to.eql('TOO_MANY_REQUESTS'); pm.expect(pm.response.headers.get('Retry-After')).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

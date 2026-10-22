@@ -76,8 +76,18 @@ public class AuthService {
         }
         user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
         user.setMustChangePassword(false);
+        user.invalidateSessions();
         auditService.record(user.getId(), "PASSWORD_CHANGE", "users", user.getId().toString(), ip);
         return user;
+    }
+
+    /** Invalida todos los tokens emitidos al usuario (no solo borra la cookie del navegador). */
+    @Transactional
+    public void logout(UUID userId, String ip) {
+        userRepository.findById(userId).ifPresent(u -> {
+            u.invalidateSessions();
+            auditService.record(u.getId(), "LOGOUT", "users", u.getId().toString(), ip);
+        });
     }
 
     private void registerFailure(User user, String ip) {

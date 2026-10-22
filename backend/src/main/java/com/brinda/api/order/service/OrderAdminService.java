@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** Gestión de pedidos desde el panel: lista, detalle, confirmar ("Finalizada"), cancelar y textos para copiar. */
@@ -36,6 +37,7 @@ public class OrderAdminService {
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
     private final DniCipher dniCipher;
+    private final OrderComboContents comboContents;
     private final AuditService auditService;
 
     @Transactional(readOnly = true)
@@ -118,8 +120,9 @@ public class OrderAdminService {
             sb.append("DNI: ").append(dni).append('\n');
         }
         sb.append("Productos:\n");
+        Map<UUID, List<String>> contents = comboContents.of(o.getItems());
         for (OrderItem i : o.getItems()) {
-            sb.append("- ").append(OrderLineText.line(i))
+            sb.append("- ").append(OrderLineText.line(i, contents.get(i.getProductId())))
                     .append("  S/ ").append(WhatsAppMessageBuilder.money(i.getSubtotal())).append('\n');
         }
         sb.append("Envío: S/ ").append(WhatsAppMessageBuilder.money(o.getDeliveryFee())).append('\n')

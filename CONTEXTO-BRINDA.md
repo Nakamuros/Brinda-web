@@ -176,7 +176,7 @@ Notas del flujo:
 
 ### 5.4 DNI y boletas
 - Lucía necesita el DNI **para emitir boletas**, no para verificar edad.
-- **Recomendación:** DNI **opcional**; **obligatorio si el total supera S/ 700** (según la guía de SUNAT consultada; **confirmar con el contador**, estas reglas cambian). Validar solo el formato (8 dígitos); **no consultarlo en servicios externos**.
+- **Recomendación:** DNI **obligatorio siempre** (decisión 2026-10-22; antes: solo sobre S/ 700). Validar solo el formato (8 dígitos); **no consultarlo en servicios externos**.
 - Se guarda **cifrado** en BD, se muestra solo a quien lo necesite, **no se escribe en logs** y **no se comparte** con la empresa de reparto.
 - El desarrollador quiere guardarlo en BD y que lo use la boleta; **no prometer en la política de privacidad que "nadie lo verá ni se compartirá"**, porque no sería cierto (la boleta se informa a SUNAT, Lucía lo ve en el panel, el proveedor de hosting almacena la BD). Texto sugerido: *"Usamos tu DNI solo para emitir tu comprobante de pago, lo informamos a SUNAT según la ley, lo guardamos cifrado y solo accede el personal autorizado."* (que lo valide su asesor).
 - **El sistema no emite boletas ni reemplaza obligaciones con SUNAT.** Las boletas siguen emitiéndose desde SUNAT.
@@ -288,7 +288,7 @@ erDiagram
         VARCHAR customer_first_name
         VARCHAR customer_last_name
         VARCHAR customer_phone
-        VARCHAR customer_dni_encrypted "cifrado, obligatorio si supera S/700"
+        VARCHAR customer_dni_encrypted "cifrado, obligatorio en pedidos nuevos (V8)"
         VARCHAR delivery_address
         VARCHAR delivery_reference
         BIGINT district_id FK
@@ -350,7 +350,7 @@ erDiagram
 - `failed_attempts` + `locked_until`: bloqueo temporal tras intentos fallidos de login.
 - `customer_dni_encrypted`: DNI cifrado, nunca en texto plano. Los datos del cliente viven dentro del pedido (sin tabla de clientes) para limitar datos personales almacenados.
 - `terms_accepted_at`, `privacy_accepted_at`, `adult_confirmed`: prueba del consentimiento por pedido.
-- `expires_at`: vencimiento automático de pedidos pendientes (30–60 min, **por definir con ellos**).
+- `expires_at`: vencimiento automático de pedidos pendientes: **20 min** (`brinda.order.expiration-minutes`; decisión 2026-10-22).
 - `confirmed_by`, `audit_logs`: trazabilidad de quién confirmó y quién cambió precios, inició sesión, etc.
 - Los roles `ROLE_CASHIER` y `orders.channel = STORE` quedan en el modelo aunque la caja esté fuera de la v1.
 
@@ -363,7 +363,7 @@ erDiagram
 - **Trigger** que actualiza `updated_at` automáticamente.
 - Timestamps con zona horaria (`TIMESTAMPTZ`) [RECOMENDADO].
 - **Mínimo privilegio:** el usuario de BD que usa Spring tiene solo `SELECT/INSERT/UPDATE` en las tablas necesarias (sin `DROP/ALTER/CREATE`). Las migraciones se corren con otro rol propietario.
-- Regla de aplicación: pedidos con total > S/ 700 exigen DNI.
+- Regla de aplicación: todo pedido nuevo exige DNI (8 dígitos); V8 la refuerza con un trigger de INSERT.
 
 ### 6.3 Entregables de datos que siguen pendientes
 - Script **DDL completo** para PostgreSQL (DBeaver).
@@ -626,7 +626,7 @@ Orientación, no asesoría legal:
   - La inscripción de bancos de datos ahora es gratuita y de aprobación automática; preguntar al asesor si les corresponde.
 - La política de privacidad debe **mencionar que se comparten los datos de entrega** (nombre, dirección, celular) **con la empresa de reparto**, solo para entregar. El DNI no se comparte con ella.
 - **Términos y condiciones:** los redacta el cliente. Dos apuntes: (1) el consentimiento de datos va aparte; (2) la cláusula "no nos hacemos responsables si el cliente es menor" no reemplaza la obligación legal de no vender alcohol a menores (que hasta donde sé existe en Perú) → que su asesor revise cómo protegerse. Del lado técnico: casilla obligatoria de mayoría de edad, aviso al entrar y registro de fecha/hora de aceptación en cada pedido.
-- **Boletas/SUNAT:** el sistema no las emite ni reemplaza obligaciones; la emisión sigue en SUNAT. Regla de DNI > S/ 700 por confirmar con el contador.
+- **Boletas/SUNAT:** el sistema no las emite ni reemplaza obligaciones; la emisión sigue en SUNAT. DNI obligatorio siempre (sin umbral).
 - **Pendiente de revisar con asesor** (no confirmado por mí): restricciones municipales de horario de venta de alcohol (varían por distrito), reglas de publicidad de alcohol, y si hace falta licencia de funcionamiento para operar solo en línea sin local (una guía consultada indica que no en un primer momento, pero depende del municipio del domicilio fiscal).
 
 ---
@@ -661,7 +661,7 @@ No soy abogado; los montos los decide el desarrollador según su mercado.
 ## 15. Pendientes y preguntas abiertas
 
 ### Con el contador / asesor
-- [ ] Regla del DNI en la boleta (umbral de S/ 700) y cuánto tiempo conservar esos datos.
+- [ ] Cuánto tiempo conservar el DNI y demás datos personales.
 - [ ] Cómo protegerse con la verificación de mayoría de edad en el delivery de alcohol.
 - [ ] Restricciones municipales de horario y publicidad de alcohol; licencia de funcionamiento para operar sin local.
 - [ ] ¿Les corresponde inscribir un banco de datos personales?
@@ -669,7 +669,7 @@ No soy abogado; los montos los decide el desarrollador según su mercado.
 ### Con Lucía
 - [ ] **Empresa de motorizados:** nombre, lista de tarifas por distrito o zona, y acuerdo sobre botella rota y cliente ausente; que se obliguen por escrito a verificar el documento del receptor.
 - [ ] **Zonas:** cuántas y qué distrito va en cada una (propuesta 3–4 zonas).
-- [ ] Minutos de espera antes de que un pedido pase a `EXPIRED` (propuesta 30–60 min).
+- [x] Minutos de espera antes de que un pedido pase a `EXPIRED`: 20.
 - [ ] Umbral de **stock bajo**: ¿mismo número para todos o por producto (el hielo se agota antes que un whisky caro)?
 - [ ] ¿Quién cuenta el **inventario inicial**? ¿Cómo manejan cajas vs unidades sueltas?
 - [ ] **Logo** en alta calidad, **slogan** (si no, se proponen 3 opciones), redes sociales, qué quiere ver en la landing.
@@ -730,7 +730,7 @@ Implementado en el backend (migraciones `V4` a `V7`). Decisiones acordadas:
 - **Recepción de mercadería:** reposición por lote (máx. 100 líneas, todo o nada), un movimiento `RESTOCK` por línea y una auditoría por lote.
 - **Ofertas de precio:** mismo producto, mismo stock, **fecha y hora de fin obligatoria y futura**. Se evalúan por fecha al consultar (sin tareas programadas). Un pedido pendiente conserva su precio aunque la oferta venza antes de confirmarlo. La línea del pedido guarda `promo_type = 'OFFER'`.
 - **Combos pre-armados:** un combo es un producto con stock propio y **composición fija** (no se edita; para otro contenido se crea otro combo; sin combos dentro de combos). Armar N combos resta `N × cantidad` de cada componente (`COMBO_CONSUME`, con `combo_id`) y suma N al combo (`COMBO_BUILD`); **no es venta**. Se vende y se anula por el flujo normal de pedidos. Desarmar queda para después (los tipos `COMBO_DISASSEMBLE` y `COMBO_RETURN` ya están permitidos en la base).
-- **"Lleva N, paga M"** (2x1, 3x2): sobre el mismo producto, fecha de fin obligatoria, excluyente con la oferta de precio (incluso en combos; también lo exige la base). Cálculo: `grupos = floor(q/N)`, `gratis = grupos × (N−M)`, `descuento = gratis × precio`. El **stock baja por todas las unidades entregadas**. El total del pedido y el umbral de S/ 700 para DNI usan el subtotal ya descontado. La línea guarda `promo_type = 'BUY_X_PAY_Y'`, `promo_discount` y N/M (solo si el descuento aplicó; con menos de N unidades no hay descuento ni marca de promoción).
+- **"Lleva N, paga M"** (2x1, 3x2): sobre el mismo producto, fecha de fin obligatoria, excluyente con la oferta de precio (incluso en combos; también lo exige la base). Cálculo: `grupos = floor(q/N)`, `gratis = grupos × (N−M)`, `descuento = gratis × precio`. El **stock baja por todas las unidades entregadas**. El total del pedido usa el subtotal ya descontado. La línea guarda `promo_type = 'BUY_X_PAY_Y'`, `promo_discount` y N/M (solo si el descuento aplicó; con menos de N unidades no hay descuento ni marca de promoción).
 - **Seed de desarrollo** (`database/seed-dev`) solo corre con el perfil `local`; zonas y distritos son datos de referencia en `V4`. La categoría "Combos y promociones" va en `V6`.
 - **Auditoría con detalle** (`audit_logs.details`, valor anterior → nuevo, sin datos personales).
 - **Privilegios de `brinda_app`**: `setup/02_grants.sql` es la fuente única y se reaplica sola como callback `afterMigrate` (solo concede y revoca lo que la app nunca debe tener; sin ventana de `permission denied` entre instancias).
@@ -740,13 +740,13 @@ Implementado en el backend (migraciones `V4` a `V7`). Decisiones acordadas:
 
 1. **IP real detrás del proxy:** `ClientIp` usa `getRemoteAddr()` y el comentario asume que `forward-headers-strategy=framework` lo corrige; no está confirmado. Probar en staging y, si hace falta, usar la estrategia `native` con proxies de confianza. Si no, el límite de 5 pedidos por minuto se compartiría entre todos los clientes.
 2. **Crear la cuenta real de la dueña** (script o endpoint) y desactivar la del seed.
-3. **Umbral de S/ 700 para DNI duplicado** (propiedad y `ck_orders_dni_700` fijo): si el contador dice otro valor, nueva migración.
+3. ~~Umbral de S/ 700 para DNI~~ — **resuelto en V8**: DNI obligatorio siempre, sin umbral. Los pedidos previos sin DNI (solo existen en bases de desarrollo) quedan como están.
 4. **`DNI_ENCRYPTION_KEY`:** respaldarla aparte; no hay rotación. Perderla deja los DNI ilegibles.
 5. **Rol de cajero para el hijo:** hoy todo el panel exige `ROLE_ADMIN`.
 6. **Fotos de productos:** hoy solo `image_url`, sin subida de archivos. Decidir dónde viven.
 7. **Cookie `SameSite=Strict`:** requiere dominio propio con frontend y API como subdominios del mismo sitio; con `*.vercel.app` y `*.railway.app` la sesión no se mantendría.
 8. **Bloqueo de cuenta por intentos:** el usuario `admin` es fácil de adivinar y se puede bloquear a la dueña. Usar un nombre de usuario menos obvio y mantener el límite por IP.
-9. **Sesión de 8 horas** sin invalidación en logout o cambio de clave; sin refresh token (decisión consciente).
+9. ~~Sesión sin invalidación~~ — **resuelto (V9 `users.token_version`):** logout y cambio de clave invalidan los tokens anteriores. Sigue sin refresh token (decisión consciente; sesión de 8 h).
 10. **Sin captcha en pedidos;** el límite por IP está en memoria (se reinicia con la app).
 11. **No se registran los pedidos rechazados por falta de stock** (demanda perdida).
 12. **Pendientes funcionales:** desarmar combos, ofertas programadas con fecha de inicio, promociones que mezclan productos.
@@ -754,4 +754,8 @@ Implementado en el backend (migraciones `V4` a `V7`). Decisiones acordadas:
 14. **Sin tests automáticos de integración;** solo unitarios (regla de oferta, promoción, `buildableNow`, cálculo "lleva N paga M", textos de línea, guarda del seed).
 15. **No subir `backend/.env` ni compartirlo;** usar claves nuevas (`JWT_SECRET`, `DNI_ENCRYPTION_KEY`, contraseñas de base) en producción.
 16. **Tarifas y distritos de `V4` son provisionales** hasta tener la lista real de la dueña.
-17. **Mensaje de WhatsApp y boleta** no listan el contenido de los combos (solo su nombre).
+17. ~~Mensaje de WhatsApp y boleta sin contenido de combos~~ — **resuelto:** la línea del combo añade "(incluye: 2 x Whisky X, 1 x Gaseosa)". El resumen corto de WhatsApp (pedidos largos) no lo lleva.
+18. **Libro de reclamaciones virtual:** formulario público (datos del consumidor, bien contratado, tipo reclamo/queja, detalle, pedido del consumidor), tabla `complaints` con correlativo y fecha, aviso por correo/WhatsApp a Lucía al registrarse, hoja de reclamación al consumidor y plazo de respuesta (30 días). Confirmar requisitos exactos con el asesor.
+19. **Política de privacidad con casilla de aceptación en el checkout:** el backend ya exige `privacyAccepted` y guarda `privacy_accepted_at`; falta redactar la política (finalidad, plazo de conservación del DNI, derechos ARCO), publicarla y enlazarla en el checkout.
+20. ~~Casilla "soy mayor de 18"~~ — **resuelto en backend:** `adultConfirmed` es obligatorio en `POST /orders` y se guarda en `orders.adult_confirmed`. Frontend: mostrar la casilla en el checkout; si el asesor pide otro texto o un aviso en el catálogo, solo cambia la interfaz.
+21. **Fotos: subida desde el panel** (diferida; hoy carga manual con `database/templates/update_image_urls.sql` e `IMAGES_BASE_URL`). Al hacerlo: multipart, validar tipo por contenido (no por extensión/Content-Type) y tamaño máximo, convertir a WebP, guardar en almacenamiento compatible con S3 (R2) y dejar la ruta relativa en `image_url`.
