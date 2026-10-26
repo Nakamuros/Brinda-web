@@ -263,3 +263,69 @@ html.menu-open {
 [data-cat='combos-y-promociones'] {
   --tint: var(--teal);
 }
+
+/* Formularios: campo, casilla y opción (también servirán al panel admin) */
+.input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: 1rem; /* 16px: evita el zoom de iOS al enfocar */
+  color: var(--cream);
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  appearance: none;
+}
+.input::placeholder {
+  color: var(--text-soft);
+  opacity: 0.8;
+}
+.input:hover {
+  border-color: var(--line);
+}
+.input:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+  border-color: var(--brass);
+  background: color-mix(in srgb, var(--bg-deep) 80%, transparent);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--promo);
+}
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+select.input option,
+select.input optgroup {
+  color: var(--cream);
+  background: var(--bg);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  padding-block: 0.625rem;
+  cursor: pointer;
+}
+.check input {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--cream);
+  cursor: pointer;
+}
+.check input:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+.check span {
+  line-height: 1.45;
+}

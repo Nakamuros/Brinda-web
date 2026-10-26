@@ -1,0 +1,263 @@
+<section class="head candle-edge" aria-labelledby="ped-title">
+  <div class="container">
+    <h1 id="ped-title" class="title" appReveal="lines">
+      <span class="line"
+        ><span>Tu <span class="accent">pedido</span></span></span
+      >
+    </h1>
+    <p class="lead" appReveal [revealDelay]="0.15">Déjanos tus datos y dónde entregarlo.</p>
+  </div>
+</section>
+
+<div class="container body">
+  @if (cart.itemCount() === 0) {
+    <app-state-panel
+      title="Tu carrito está vacío"
+      text="Agrega productos del catálogo para armar tu pedido."
+    >
+      <a class="btn btn-ghost" routerLink="/catalogo">Ver el catálogo</a>
+    </app-state-panel>
+  } @else {
+    <div class="layout">
+      <form class="form" [formGroup]="form" novalidate>
+        <fieldset class="group">
+          <legend class="legend">Tus datos</legend>
+          <div class="grid2">
+            <app-field label="Nombres" controlId="firstName" [error]="error('firstName')">
+              <input
+                id="firstName"
+                class="input"
+                formControlName="firstName"
+                autocomplete="given-name"
+                maxlength="80"
+                [attr.aria-invalid]="invalid('firstName')"
+                [attr.aria-describedby]="invalid('firstName') ? 'firstName-msg' : null"
+              />
+            </app-field>
+            <app-field label="Apellidos" controlId="lastName" [error]="error('lastName')">
+              <input
+                id="lastName"
+                class="input"
+                formControlName="lastName"
+                autocomplete="family-name"
+                maxlength="80"
+                [attr.aria-invalid]="invalid('lastName')"
+                [attr.aria-describedby]="invalid('lastName') ? 'lastName-msg' : null"
+              />
+            </app-field>
+            <app-field
+              label="Celular"
+              controlId="phone"
+              [error]="error('phone')"
+              hint="9 dígitos. Te escribimos por WhatsApp a este número."
+            >
+              <input
+                id="phone"
+                class="input"
+                formControlName="phone"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="tel-national"
+                maxlength="9"
+                [attr.aria-invalid]="invalid('phone')"
+                [attr.aria-describedby]="'phone-msg'"
+                (input)="digits('phone', 9, $event)"
+              />
+            </app-field>
+            <app-field
+              label="DNI"
+              controlId="dni"
+              [error]="error('dni')"
+              hint="8 dígitos. Lo necesitamos para tu boleta."
+            >
+              <input
+                id="dni"
+                class="input"
+                formControlName="dni"
+                inputmode="numeric"
+                autocomplete="off"
+                maxlength="8"
+                [attr.aria-invalid]="invalid('dni')"
+                [attr.aria-describedby]="'dni-msg'"
+                (input)="digits('dni', 8, $event)"
+              />
+            </app-field>
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend class="legend">Entrega</legend>
+          <div class="stack">
+            <app-field
+              label="Distrito"
+              controlId="districtId"
+              [error]="
+                error('districtId') ||
+                (delivery.status() === 'error' ? 'No pudimos cargar los distritos.' : '')
+              "
+            >
+              <span class="select">
+                <select
+                  id="districtId"
+                  class="input"
+                  formControlName="districtId"
+                  [attr.aria-invalid]="invalid('districtId')"
+                  [attr.aria-describedby]="invalid('districtId') ? 'districtId-msg' : null"
+                >
+                  <option [ngValue]="null" disabled>
+                    {{
+                      delivery.status() === 'loading' ? 'Cargando distritos…' : 'Elige tu distrito'
+                    }}
+                  </option>
+                  @for (z of zones(); track z.name) {
+                    <optgroup [label]="z.name">
+                      @for (d of z.districts; track d.id) {
+                        <option [ngValue]="d.id">{{ d.name }}</option>
+                      }
+                    </optgroup>
+                  }
+                </select>
+                <svg
+                  class="chevron"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </app-field>
+            @if (delivery.status() === 'error') {
+              <button type="button" class="link" (click)="delivery.retry()">Reintentar</button>
+            }
+            <app-field label="Dirección" controlId="address" [error]="error('address')">
+              <input
+                id="address"
+                class="input"
+                formControlName="address"
+                autocomplete="street-address"
+                maxlength="255"
+                placeholder="Calle o avenida y número"
+                [attr.aria-invalid]="invalid('address')"
+                [attr.aria-describedby]="invalid('address') ? 'address-msg' : null"
+              />
+            </app-field>
+            <app-field
+              label="Referencia"
+              controlId="reference"
+              [optional]="true"
+              [error]="error('reference')"
+            >
+              <input
+                id="reference"
+                class="input"
+                formControlName="reference"
+                maxlength="255"
+                placeholder="Frente al parque, portón negro…"
+                [attr.aria-invalid]="invalid('reference')"
+              />
+            </app-field>
+          </div>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend class="legend">Cómo pagarás</legend>
+          <div class="choices" role="radiogroup" aria-describedby="pay-note">
+            <label class="choice">
+              <input type="radio" formControlName="paymentMethod" value="YAPE" />
+              <span>Yape</span>
+            </label>
+            <label class="choice">
+              <input type="radio" formControlName="paymentMethod" value="PLIN" />
+              <span>Plin</span>
+            </label>
+          </div>
+          @if (error('paymentMethod'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+          <p id="pay-note" class="note">Pagas cuando confirmemos tu pedido por WhatsApp.</p>
+        </fieldset>
+
+        <fieldset class="group">
+          <legend class="sr-only">Confirmaciones</legend>
+          <label class="check">
+            <input type="checkbox" formControlName="adultConfirmed" />
+            <span>Soy mayor de 18 años.</span>
+          </label>
+          @if (error('adultConfirmed'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+          <label class="check">
+            <input type="checkbox" formControlName="termsAccepted" />
+            <span>Acepto los términos y condiciones.</span>
+          </label>
+          @if (error('termsAccepted'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+          <label class="check">
+            <input type="checkbox" formControlName="privacyAccepted" />
+            <span>Acepto la política de privacidad.</span>
+          </label>
+          @if (error('privacyAccepted'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+        </fieldset>
+      </form>
+
+      <aside class="summary" aria-labelledby="sum-title">
+        <h2 id="sum-title" class="sum-title">Tu compra</h2>
+        <ul class="items">
+          @for (r of rows(); track r.id) {
+            <li>
+              <span class="item-name">{{ r.qty }} × {{ r.name }}</span>
+              <span class="item-total">{{ r.total }}</span>
+            </li>
+          }
+        </ul>
+        @if (hasUnavailable()) {
+          <p class="note">
+            Algunos productos ya no están disponibles y no se incluyen.
+            <a routerLink="/carrito">Revisar carrito</a>
+          </p>
+        }
+        <dl class="sum">
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{{ subtotal() }}</dd>
+          </div>
+          @if (cart.totals().discount > 0) {
+            <div>
+              <dt>Promoción</dt>
+              <dd>−{{ discount() }}</dd>
+            </div>
+          }
+          <div>
+            <dt>Delivery</dt>
+            <dd>
+              @if (district(); as d) {
+                {{ fee() }}
+              } @else {
+                <span class="pending">Elige tu distrito</span>
+              }
+            </dd>
+          </div>
+          <div class="sum-total">
+            <dt>Total estimado</dt>
+            <dd>{{ total() }}</dd>
+          </div>
+        </dl>
+        <p class="note">
+          La tarifa y el total finales los confirma el servidor al enviar tu pedido.
+        </p>
+        <button type="button" class="btn btn-cta finish">Finalizar compra</button>
+        <a class="back" routerLink="/carrito">Volver al carrito</a>
+      </aside>
+    </div>
+  }
+</div>

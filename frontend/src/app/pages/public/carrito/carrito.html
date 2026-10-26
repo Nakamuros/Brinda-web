@@ -93,6 +93,9 @@
           enviar tu pedido.
         </p>
         <div class="sum-actions">
+          @if (cart.itemCount() > 0) {
+            <a class="btn btn-cta" routerLink="/pedido">Continuar con el pedido</a>
+          }
           <a class="btn btn-ghost" routerLink="/catalogo">Seguir comprando</a>
           <button type="button" class="link" (click)="cart.clear()">Vaciar carrito</button>
         </div>
