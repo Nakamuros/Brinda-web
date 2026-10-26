@@ -1,3 +1,13 @@
 .claude/
 graphify-out/
 backups/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/capturas/
+frontend/package-lock.json
+frontend/public/
+frontend/.vscode/
+frontend/capturas-serve.log
