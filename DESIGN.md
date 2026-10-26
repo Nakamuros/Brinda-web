@@ -200,7 +200,7 @@ Refinados y contenidos: el contorno fino es la regla, el relleno sólido es la e
 - **Deshabilitado:** opacidad 0.55, sin eventos.
 
 ### Navigation
-- **Escritorio (≥75rem):** transparente sobre el hero, sólida (marrón) al hacer scroll con un filete suave abajo. Enlaces centrados en mayúsculas de 0.78rem con tracking 0.17em; el subrayado de latón se dibuja de izquierda a derecha al pasar el ratón y queda fijo en la página activa. La marca aparece a la izquierda solo tras el scroll. Carrito a la derecha, inerte hasta que exista.
+- **Escritorio (≥75rem):** transparente sobre el hero, sólida (marrón) al hacer scroll con un filete suave abajo. Enlaces centrados en mayúsculas de 0.78rem con tracking 0.17em; el subrayado de latón se dibuja de izquierda a derecha al pasar el ratón y queda fijo en la página activa. La marca aparece a la izquierda solo tras el scroll. Carrito a la derecha: ícono con contador en un círculo crema (late al cambiar la cantidad) y enlace a `/carrito`.
 - **Móvil y tablet:** hamburguesa que se convierte en X; menú a pantalla completa sobre ciruela con enlaces en Libre Baskerville grandes y separados por filetes, que entran escalonados. Se cierra con Escape y devuelve el foco al botón.
 
 ### Barra fija "Pedir ahora"
@@ -212,6 +212,28 @@ Franja fija al pie en celular y tablet: fondo marrón profundo casi opaco, filet
 - **Contenido:** silueta de botella genérica ("sin foto") en el centro y el nombre en Libre Baskerville al pie, sobre un degradado oscuro.
 - **Hover:** el borde pasa a latón, la ficha sube 4px y la botella crece un 6%.
 - **Layout:** carrusel con asomo en celular; seis en fila desde 64rem.
+
+### Product card
+- **Estructura:** `article` de 12px con filete de latón al 28%: botón que abre el detalle (foto teñida por categoría, etiqueta, nombre en Libre Baskerville 700 y precio en Jost con tabulares) y una franja al pie con "Agregar".
+- **Etiqueta:** una sola por producto. Promo: texto marrón sobre crema con filete terracota (no crema sobre terracota); combo: crema sobre verde azulado; agotado: fondo oscuro con la foto atenuada y sin acción.
+- **Precio:** oferta con el precio anterior tachado (filete terracota). Sin foto: botella genérica.
+- **Agregar:** franja de 44px en mayúsculas espaciadas, contorno y no relleno; al agregar se vuelve el selector de cantidad. Hover: sube 4px y el borde pasa a latón.
+- **Entrada:** sube y se aclara una sola vez al entrar en pantalla, escalonada (solo transform y opacity).
+
+### Qty stepper
+Selector de − / cantidad / + con botones de 44px. Con cantidad 1, el "−" es una papelera (quita el producto). Se usa en la tarjeta, el detalle y el carrito.
+
+### Detalle de producto
+`<dialog>` nativo: hoja desde abajo en celular y ventana de dos columnas (foto | datos) desde 48rem. Cierra con Escape, el fondo o la X. Muestra categoría, nombre, etiqueta, precio, fecha de fin de oferta, descripción en cursiva y, en combos, "Incluye". La acción de pedir ("Agregar al pedido") es CTA burdeos.
+
+### Filtros del catálogo
+Fila fija bajo el menú: chips de 44px (categorías y "Ofertas") con contorno fino; el elegido se rellena de crema con texto marrón. En celular se desplaza horizontalmente con el borde derecho difuminado; desde 64rem se reparte en filas. La búsqueda es un campo de 48px con lupa de latón.
+
+### Campos de formulario
+Etiqueta en mayúsculas espaciadas sobre un campo de 48px (`.input`: fondo marrón profundo al 55%, filete de latón al 28%, foco con contorno crema). El error lleva borde terracota, ícono y mensaje en crema (la terracota como texto no llega a 4.5:1). Casillas y opciones de pago (Yape/Plin) de 44px; la opción elegida se rellena de crema. Los datos sensibles (DNI) no se guardan en el navegador.
+
+### Resumen del pedido
+Tarjeta de 12px con filete de latón: líneas, subtotal, promoción, delivery (según el distrito) y total estimado en Libre Baskerville 700. Siempre aclara que el servidor confirma el total final. "Finalizar compra" y "Continuar con el pedido" son CTA burdeos.
 
 ### Sello +18
 Un círculo de 44px con filete de latón y "+18" en Libre Baskerville, junto a "Venta solo para mayores de 18 años", en el pie.
@@ -235,7 +257,7 @@ Fondo marrón profundo con filete de latón arriba, marca centrada con su lema e
 - **Don't** usar gris piedra como texto, ni terracota con texto crema pequeño (3.76:1).
 - **Don't** poner gradientes en el texto, ni sombras duras de desplazamiento fijo, ni halos sin desplazamiento como profundidad.
 - **Don't** repetir el mismo ícono de botella como identidad de cada categoría una vez haya fotos reales; hasta entonces, sin recortes propios por categoría.
-- **Don't** inventar productos, precios, horarios, distritos ni promociones de ejemplo; los marcadores internos ("Por confirmar") solo existen en desarrollo.
+- **Don't** inventar productos, precios, horarios, distritos ni promociones de ejemplo; los marcadores internos ("Por confirmar") y el catálogo de ejemplo solo existen en desarrollo.
 - **Don't** mostrar cigarros hasta que el asesor lo confirme, ni redactar avisos legales por cuenta propia.
 - **Don't** añadir sobretítulos encima de los titulares, ni numerar secciones que no sean una secuencia real (solo "Cómo pedir").
 - **Don't** convertir el sistema en una tienda de ofertas: nada de rojo y amarillo promocional ni cuenta regresiva.

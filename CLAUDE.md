@@ -46,7 +46,9 @@
 
 
 ## Al iniciar sesión
-- Lee avances.md y CONTEXTO-BRINDA.md (secciones 18 y 19) y, si existe graphify-out/GRAPH_REPORT.md, léelo antes de explorar el código.
+- Lee en este orden: CLAUDE.md, avances.md (sección "Resumen" y "Frontend (Hito 2)"), PRODUCT.md y DESIGN.md, graphify-out/GRAPH_REPORT.md (sin leer graph.json completo; para dudas puntuales usa `graphify query`, `graphify path` o `graphify explain`) y CONTEXTO-BRINDA.md solo en las secciones 18 y 19. Lee FRONTEND-BRIEF-BRINDA.md (secciones 6, 9, 10 y 11) solo si vas a tocar el diseño, y backend/ENDPOINTS.md solo si hace falta (no inventes rutas ni campos).
+- Para levantar el entorno local (Docker, backend, frontend) sigue `readme.md`. Al empezar, los servicios suelen estar apagados.
+- Resume en máximo 12 líneas: estado, qué se hizo, qué sigue y decisiones tomadas; después espera la indicación del usuario.
 
 ## Al terminar una tarea
 - Actualiza avances.md: qué se hizo, qué queda, decisiones nuevas.
@@ -56,3 +58,7 @@
 - No hagas commit ni push sin que el usuario lo pida.
 - No ejecutes nada destructivo sobre la BD sin confirmación.
 - No toques .claude/ ni las skills sin avisar.
+- No inventes productos, precios, promociones, horarios, distritos, números de WhatsApp/Yape/Plin ni textos legales: esperan datos de Lucía y del asesor. Los datos de ejemplo (`core/catalog.mock.ts`) solo existen como herramienta de diseño, con la bandera `brinda.mock` en desarrollo, y nunca en producción.
+- No toques la paleta, las tipografías ni el botón fantasma del hero (fijados por el brief). El burdeos es solo para botones de pedir.
+- No instales dependencias nuevas sin consultar. No mates procesos por nombre (`taskkill /IM node.exe`): detén solo el proceso por su puerto.
+- Verifica toda pantalla a 360, 768 y 1440 px y corre `npx ng test --no-watch` y `npx ng build` antes de dar algo por terminado.

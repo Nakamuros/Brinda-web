@@ -1,6 +1,14 @@
 # BRINDA — Avances
 
 > Registro de estado. Se actualiza al terminar cada tarea. Decisiones: `CONTEXTO-BRINDA.md` (secciones 18 y 19).
+> Para retomar: arranque local en `readme.md` y prompt de inicio en `PROMPT-INICIO-SESION.md`.
+
+## Resumen (2026-10-26)
+- Backend: cerrado para el Hito 1 (Spring Boot, PostgreSQL, V1–V9).
+- Frontend (Angular 21): landing, **catálogo conectado a la API real**, **carrito local** y **checkout `/pedido` solo formulario** (el botón "Finalizar compra" aún no hace nada, a pedido del usuario).
+- Último commit de código: `5b1124d`; git limpio al cerrar la sesión. 33 tests (frontend) y build de producción sin avisos.
+- Servicios locales apagados al cerrar: Angular (4200), backend (8080) y el contenedor `brinda-db` (datos intactos en su volumen).
+- `DESIGN.md` actualizado con las piezas nuevas; su sidecar `.impeccable/design.json` no se regeneró (hacerlo con `/impeccable document` cuando convenga).
 
 ## Estado actual (2026-10-22) · Backend cerrado para el Hito 1
 
@@ -81,9 +89,11 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 - Datos reales de Lucía: tarifas, distritos, `WHATSAPP_NUMBER`, `YAPE_NUMBER`, `PLIN_NUMBER` (hoy son de prueba).
 
 ## Qué sigue
-1. **Frontend Angular (Hito 2)**: catálogo, carrito/checkout (casillas de mayor de 18, términos y privacidad), panel admin.
-2. **Datos reales de Lucía** y creación de su cuenta.
-3. **Despliegue**: Angular en Vercel/Netlify, Spring Boot en Railway, Postgres gestionado, dominio en Cloudflare, cuentas a nombre de Lucía.
+1. **Pedido real (siguiente etapa del checkout):** al pulsar "Finalizar compra": validar todo el formulario (marcar errores), `POST /api/v1/orders` (items con `productId` y cantidad; el servidor recalcula precios y tarifa), manejar `429` (5 pedidos/min por IP) y errores amables, vaciar el carrito, pantalla `/pedido/:codigo` con el código corto, resumen, aviso de 20 min, cómo pagar (Yape/Plin) y "Enviar por WhatsApp" con la `whatsappUrl` de la respuesta.
+2. **Categorías y datos reales de Lucía:** las fichas de la landing (cervezas, vinos…) no coinciden con las categorías de la BD (Piscos y Whiskys, Snacks, Hielo y Bebidas, Combos y promociones); decidir las reales y, idealmente, leerlas de la API. Además: productos con fotos, WhatsApp/Yape/Plin, horario, distritos y tarifas reales, video del hero, y su cuenta de administradora.
+3. **Panel admin** (`/admin`): login y cambio de clave obligatorio, pedidos (confirmar/anular), productos, ofertas, combos, stock, zonas/distritos. Usa los estilos de formulario globales (`.input`, `.check`).
+4. **Legales y calidad:** enlaces a términos y privacidad en el checkout cuando el asesor entregue los textos; `/impeccable critique` y `audit` del catálogo/checkout (la landing quedó en 23/32); probar en celular real por red local.
+5. **Despliegue:** Angular en Vercel/Netlify, Spring Boot en Railway, Postgres gestionado, dominio en Cloudflare; resolver cómo llega `/api` al backend en producción (proxy del hosting o URL absoluta) y el CORS.
 
 ## Historial resumido
 - 2026-10-19: diseño cerrado, DDL, seeds, esqueleto del backend y módulos de inventario, delivery y pedidos; lote V4 (V4–V7: ofertas, combos, "lleva N paga M").
