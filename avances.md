@@ -25,6 +25,17 @@
 - La BD local quedó con los datos de prueba de la colección Postman; para volver al seed, recrearla o restaurar un dump de `backups/`.
 - Grafo: `graphify-out/` + `.graphifyignore` (excluye `.claude/`, `graphify-out/`, `backups/`).
 
+## Frontend (Hito 2) · Landing (2026-10-25)
+- `frontend/`: Angular 21 (standalone, signals, zoneless, rutas lazy, CSS plano, sin SSR). Rutas: `/` landing y `/catalogo` provisional (prueba de View Transitions). No conecta con la API todavía.
+- Dependencias: `gsap@3.15.0` (licencia "no charge", uso comercial permitido) y `lenis@1.3.27` (MIT). `playwright` solo en devDependencies (scripts en `frontend/scripts/`, capturas en `frontend/capturas/`, ignorada por git; nunca entra al bundle).
+- Landing completa: barra de anuncio, nav (transparente→sólida, menú móvil a pantalla completa), hero, presentación, categorías, combos y promociones, cómo pedir, zonas/horario/contacto y pie con espacio reservado para avisos legales. Paleta y tipografías como variables CSS (`src/styles/tokens.css`, único lugar con hex).
+- Todo lo editable está en `src/app/core/config.ts`: **para activar el video del hero basta con poner la URL en `HERO.videoUrl`** (más `videoMobileUrl`, `videoWebmUrl`, posters). `HeroVideo` solo carga video si hay URL, movimiento permitido y sin ahorro de datos; si falla vuelve al poster.
+- Animaciones: solo transform/opacity, GSAP+ScrollTrigger (reveals, parallax), Lenis (scroll suave, desactivado con reduced-motion), View Transitions del router, hero con CSS.
+- Verificación: 12 tests (Vitest) en verde, `ng build` de producción OK (~65 KB iniciales transferidos), capturas con Playwright a 360/768/1440 px sin scroll horizontal ni errores de consola, menú móvil (foco, Escape, navegación) y reveals con movimiento normal comprobados.
+- Placeholders sintéticos (a reemplazar): `public/media/hero-poster*.svg`, `product-placeholder.svg`, ilustración "sin foto" de categorías/promos.
+- Decisiones: nav de escritorio desde 1200 px (por debajo, menú hamburguesa); cigarros fuera de categorías hasta que el asesor confirme; carrito del nav deshabilitado hasta que exista; enlaces legales como "pendientes" (sin páginas aún); promos de la landing son ejemplos rotulados, sin precios.
+- Pendiente: probar en celular real por red local, `DESIGN.md` y contrato de dirección (`/impeccable document`), crítica/auditoría (`critique`, `audit`), pulido de movimiento, assets reales de Lucía.
+
 ## Pendientes antes de producción
 Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principales:
 - Cuenta real de la dueña y desactivar el `admin` del seed; respaldar `DNI_ENCRYPTION_KEY` y usar claves nuevas.
