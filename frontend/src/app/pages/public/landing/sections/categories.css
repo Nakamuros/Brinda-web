@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+.cats {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  padding-block: var(--space-9);
+  background: var(--bg-alt);
+}
+/* Brillo lento de fondo: una sola capa, solo transform, estático con reduced-motion */
+.ambient::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 70vmax;
+  height: 70vmax;
+  left: -20vmax;
+  top: -25vmax;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--brass) 20%, transparent), transparent);
+  animation: drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes drift {
+  to {
+    transform: translate3d(38vmax, 18vmax, 0);
+  }
+}
+
+.title {
+  margin-bottom: var(--space-7);
+  text-align: center;
+  font-size: var(--step-3);
+  font-weight: 400;
+}
+
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(62%, 15rem);
+  gap: var(--space-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  padding-inline: var(--gutter);
+  padding-bottom: var(--space-4);
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.tile {
+  scroll-snap-align: start;
+}
+.tile a {
+  position: relative;
+  display: grid;
+  align-content: end;
+  aspect-ratio: 3 / 4;
+  overflow: clip;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--tint, var(--brass)) 34%, var(--bg)),
+    color-mix(in srgb, var(--tint, var(--brass)) 8%, var(--bg-deep))
+  );
+  text-decoration: none;
+  transition:
+    border-color 0.4s ease,
+    transform 0.6s var(--ease-out);
+}
+.tile a:hover {
+  border-color: var(--brass);
+  transform: translateY(-4px);
+}
+.media {
+  position: absolute;
+  inset: 0 0 4.5rem;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+}
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.ph {
+  width: 38%;
+  max-width: 5.5rem;
+  opacity: 0.85;
+  transition: transform 0.7s var(--ease-out);
+}
+.tile a:hover .ph,
+.tile a:hover img {
+  transform: scale(1.06) translateY(-4px);
+}
+.name {
+  position: relative;
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  text-align: center;
+  color: var(--cream);
+  background: linear-gradient(to top, color-mix(in srgb, var(--bg-deep) 88%, transparent), transparent);
+}
+
+[data-cat='cervezas'] {
+  --tint: var(--brass);
+}
+[data-cat='vinos'] {
+  --tint: var(--cta);
+}
+[data-cat='destilados'] {
+  --tint: var(--promo);
+}
+[data-cat='licores'] {
+  --tint: var(--bg-alt);
+}
+[data-cat='mezcladores'] {
+  --tint: var(--teal);
+}
+[data-cat='snacks'] {
+  --tint: var(--stone);
+}
+
+@media (min-width: 48rem) {
+  .rail {
+    grid-auto-columns: min(30%, 15rem);
+  }
+}
+@media (min-width: 64rem) {
+  .rail {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-columns: auto;
+    overflow: visible;
+    max-width: 76rem;
+    margin-inline: auto;
+  }
+}

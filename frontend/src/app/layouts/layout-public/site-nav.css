@@ -1,0 +1,215 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--nav-h);
+  view-transition-name: site-nav;
+}
+
+.nav {
+  position: relative;
+  height: var(--nav-h);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease;
+}
+.nav.scrolled {
+  background: var(--bg);
+  border-bottom-color: var(--line-soft);
+}
+
+.bar {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 3rem 1fr 3rem;
+  align-items: center;
+  height: var(--nav-h);
+  padding-inline: calc(var(--gutter) - 0.5rem);
+  max-width: 96rem;
+  margin-inline: auto;
+}
+
+.toggle,
+.cart {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--cream);
+  cursor: pointer;
+}
+.cart:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+.cart {
+  justify-self: end;
+}
+
+.burger {
+  position: relative;
+  width: 1.5rem;
+  height: 1rem;
+}
+.burger i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: var(--cream);
+  transition: transform 0.45s var(--ease-out);
+}
+.burger i:first-child {
+  top: 0.2rem;
+}
+.burger i:last-child {
+  top: 0.7rem;
+}
+.open .burger i:first-child {
+  transform: translateY(0.25rem) rotate(45deg);
+}
+.open .burger i:last-child {
+  transform: translateY(-0.25rem) rotate(-45deg);
+}
+
+.brand {
+  justify-self: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  text-decoration: none;
+  color: var(--cream);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s var(--ease-out);
+}
+.scrolled .brand {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.links {
+  display: none;
+}
+
+/* Menú de pantalla completa (celular y tablet) */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  padding: calc(var(--nav-h) + var(--space-5)) var(--gutter) var(--space-7);
+  background: var(--bg-alt);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
+}
+.open .menu {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.menu ul {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 28rem;
+  margin-inline: auto;
+  width: 100%;
+}
+.menu li {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.7s var(--ease-out);
+}
+.open .menu li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.08s * var(--i) + 0.12s);
+}
+.menu a {
+  display: block;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 400;
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--cream);
+}
+.menu a:hover {
+  color: var(--brass);
+}
+
+@media (min-width: 75rem) {
+  .bar {
+    grid-template-columns: 1fr auto 1fr;
+  }
+  .toggle,
+  .menu {
+    display: none;
+  }
+  .brand {
+    grid-column: 1;
+    justify-self: start;
+    grid-row: 1;
+  }
+  .links {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .cart {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .links ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.25rem, 2.2vw, 2.5rem);
+  }
+  .links a {
+    position: relative;
+    display: inline-block;
+    padding: var(--space-2) 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--cream);
+  }
+  .links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--brass);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .links a:hover::after,
+  .links a.is-active::after {
+    transform: scaleX(1);
+  }
+}

@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+.intro {
+  position: relative;
+  overflow: clip;
+  padding-block: var(--space-9) var(--space-8);
+  background: var(--bg);
+}
+.mark {
+  position: absolute;
+  right: -22%;
+  top: 8%;
+  width: min(34rem, 86vw);
+  color: var(--brass);
+  opacity: 0.11;
+  pointer-events: none;
+}
+.inner {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-7);
+  text-align: center;
+}
+.text {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-6);
+}
+.title {
+  font-size: var(--step-3);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+.title .accent {
+  font-size: 0.94em;
+}
+.line {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+.line > span {
+  display: block;
+}
+.body {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-5);
+}
+.meta {
+  font-size: var(--step--1);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.lead {
+  max-width: 44ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-1);
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+.product {
+  margin: 0;
+  width: min(100%, 26rem);
+  overflow: clip;
+  /* La copa se funde con el fondo de la sección */
+  mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
+}
+.product img {
+  width: 100%;
+  height: auto;
+  will-change: transform;
+}
+
+@media (min-width: 64rem) {
+  .inner {
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: var(--space-8);
+    text-align: left;
+  }
+  .text,
+  .body {
+    justify-items: start;
+  }
+  .mark {
+    right: -4%;
+    top: 4%;
+    width: 34rem;
+    opacity: 0.1;
+  }
+  .product {
+    justify-self: center;
+    width: min(100%, 30rem);
+  }
+}

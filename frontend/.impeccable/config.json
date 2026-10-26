@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/pages/public/landing/sections/hero-video.html"
+        ],
+        "createdAt": "2026-10-26T00:47:53.811Z",
+        "reason": "falso positivo: src enlazado a signal posterSrc() (config.ts), no vacio"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/pages/public/landing/sections/categories.ts"
+        ],
+        "createdAt": "2026-10-26T00:50:56.163Z",
+        "reason": "falso positivo: img dentro de @if con src no vacio (IMAGES.categories)"
+      }
+    ]
+  }
+}

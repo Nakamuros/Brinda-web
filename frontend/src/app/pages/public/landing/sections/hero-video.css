@@ -1,0 +1,21 @@
+:host {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.video {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.video.ready {
+  opacity: 1;
+}

@@ -1,0 +1,56 @@
+.footer {
+  background: var(--bg-deep);
+  border-top: 1px solid var(--line);
+  padding-block: var(--space-8) var(--space-6);
+}
+.inner {
+  display: grid;
+  gap: var(--space-6);
+  justify-items: center;
+  text-align: center;
+}
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-2);
+  letter-spacing: 0.42em;
+  padding-left: 0.42em;
+  text-decoration: none;
+}
+.tagline {
+  margin-top: var(--space-2);
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--text-soft);
+}
+.legal-links ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3) var(--space-6);
+}
+.pending {
+  font-size: var(--step--1);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  cursor: not-allowed;
+  padding-block: var(--space-2);
+  display: inline-block;
+}
+.notices {
+  width: 100%;
+  max-width: 44rem;
+  padding: var(--space-4) var(--space-5);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+.reserved {
+  font-size: var(--step--1);
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+.copy {
+  font-size: var(--step--1);
+  color: var(--text-soft);
+}

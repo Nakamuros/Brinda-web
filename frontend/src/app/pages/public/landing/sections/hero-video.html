@@ -1,0 +1,25 @@
+@if (posterSrc()) {
+  <img class="poster" [src]="posterSrc()" alt="" aria-hidden="true" decoding="async" fetchpriority="high" />
+}
+@if (showVideo()) {
+  <video
+    class="video"
+    [class.ready]="ready()"
+    [attr.poster]="posterSrc() || null"
+    muted
+    loop
+    autoplay
+    playsinline
+    preload="metadata"
+    disablepictureinpicture
+    aria-hidden="true"
+    tabindex="-1"
+    (canplay)="ready.set(true)"
+    (error)="failed.set(true)"
+  >
+    @if (webmSrc()) {
+      <source [src]="webmSrc()" type="video/webm" />
+    }
+    <source [src]="videoSrc()" type="video/mp4" />
+  </video>
+}

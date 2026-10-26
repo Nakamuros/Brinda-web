@@ -1,0 +1,25 @@
+<section class="hero" aria-labelledby="hero-title">
+  <app-hero-video
+    [src]="hero.videoUrl"
+    [mobileSrc]="hero.videoMobileUrl"
+    [webmSrc]="hero.videoWebmUrl"
+    [poster]="hero.posterUrl"
+    [posterMobile]="hero.posterMobileUrl"
+  />
+  <div class="shade" aria-hidden="true"></div>
+
+  <div class="content">
+    <p class="wordmark e1">{{ brand }}</p>
+    <span class="rule e2" aria-hidden="true"></span>
+    <h1 id="hero-title" class="title">
+      <span class="line l1"><span>Tu <span class="accent">brindis</span>,</span></span>
+      <span class="line l2"><span>a domicilio</span></span>
+    </h1>
+    <p class="sub e4">Licorería con delivery en Lima. Pide por WhatsApp y paga con Yape o Plin.</p>
+    <a class="btn btn-ghost e5" routerLink="/catalogo">Pedir ahora</a>
+  </div>
+
+  <a class="scroll e6" routerLink="/" fragment="presentacion" aria-label="Bajar a la siguiente sección">
+    <span class="track" aria-hidden="true"><i></i></span>
+  </a>
+</section>

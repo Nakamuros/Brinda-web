@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <!-- Poster sintético (placeholder). Reemplazar por la foto/frame definitivo (WebP/AVIF, 1920x1080) en core/config.ts -->
+  <defs>
+    <radialGradient id="warm" cx="72%" cy="46%" r="46%">
+      <stop offset="0" stop-color="#e0a35a" stop-opacity=".78"/>
+      <stop offset=".35" stop-color="#b2864f" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#431821" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cool" cx="14%" cy="78%" r="42%">
+      <stop offset="0" stop-color="#00585e" stop-opacity=".62"/>
+      <stop offset="1" stop-color="#00585e" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b0e15"/>
+      <stop offset=".55" stop-color="#431821"/>
+      <stop offset="1" stop-color="#2a0f18"/>
+    </linearGradient>
+    <radialGradient id="flame" cx="50%" cy="62%" r="50%">
+      <stop offset="0" stop-color="#fff8ed"/>
+      <stop offset=".45" stop-color="#f2c27e"/>
+      <stop offset="1" stop-color="#ca5a4e" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="50%" cy="50%" r="75%">
+      <stop offset=".55" stop-color="#2a0f18" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2a0f18" stop-opacity=".78"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="soft2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 .93  0 0 0 0 .82  0 0 0 .55 0"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#base)"/>
+  <rect width="1920" height="1080" fill="url(#cool)"/>
+  <rect width="1920" height="1080" fill="url(#warm)"/>
+  <!-- bokeh -->
+  <g filter="url(#soft)" opacity=".7">
+    <circle cx="1090" cy="330" r="64" fill="#e0a35a" opacity=".5"/>
+    <circle cx="1640" cy="250" r="86" fill="#b2864f" opacity=".42"/>
+    <circle cx="1760" cy="560" r="58" fill="#ca5a4e" opacity=".42"/>
+    <circle cx="880" cy="610" r="48" fill="#b2864f" opacity=".4"/>
+    <circle cx="260" cy="300" r="74" fill="#00585e" opacity=".5"/>
+    <circle cx="470" cy="760" r="56" fill="#00585e" opacity=".42"/>
+  </g>
+  <g filter="url(#soft2)" opacity=".8">
+    <circle cx="1230" cy="160" r="26" fill="#f2c27e" opacity=".55"/>
+    <circle cx="1530" cy="420" r="30" fill="#f2c27e" opacity=".4"/>
+    <circle cx="1010" cy="760" r="22" fill="#ca5a4e" opacity=".5"/>
+  </g>
+  <!-- vela en primer plano -->
+  <g transform="translate(1385 520)">
+    <ellipse cx="0" cy="-26" rx="150" ry="170" fill="url(#flame)" opacity=".55" filter="url(#soft)"/>
+    <rect x="-30" y="40" width="60" height="520" rx="6" fill="#fff8ed" opacity=".86"/>
+    <rect x="-30" y="40" width="60" height="520" rx="6" fill="#b2864f" opacity=".26"/>
+    <path d="M0 32 C-30 -6 -22 -64 0 -118 C22 -64 30 -6 0 32Z" fill="url(#flame)"/>
+    <ellipse cx="0" cy="-6" rx="9" ry="20" fill="#fff8ed"/>
+  </g>
+  <rect width="1920" height="1080" fill="url(#vig)"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity=".16"/>
+</svg>

@@ -1,0 +1,33 @@
+<footer class="footer">
+  <div class="container inner">
+    <div class="id">
+      <a class="brand" routerLink="/">{{ brand }}</a>
+      <p class="tagline">{{ tagline }}</p>
+    </div>
+
+    <nav class="legal-links" aria-label="Información legal">
+      <ul>
+        @for (label of pendingLinks; track label) {
+          <li>
+            <span class="pending" title="Disponible pronto">{{ label }}</span>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    @if (legal.showPlaceholder) {
+      <div class="notices" role="note">
+        @if (legal.noticesText) {
+          <p>{{ legal.noticesText }}</p>
+        } @else {
+          <p class="reserved">
+            Espacio reservado para los avisos legales sobre la venta de licor y tabaco. El texto lo entrega el asesor
+            legal.
+          </p>
+        }
+      </div>
+    }
+
+    <p class="copy">© {{ year }} {{ brand }}. Todos los derechos reservados.</p>
+  </div>
+</footer>

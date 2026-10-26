@@ -1,0 +1,54 @@
+<header class="nav" [class.scrolled]="scrolled() || open()" [class.open]="open()">
+  <div class="bar">
+    <button
+      #toggleBtn
+      type="button"
+      class="toggle"
+      [attr.aria-expanded]="open()"
+      aria-controls="menu-movil"
+      (click)="toggle()"
+    >
+      <span class="sr-only">{{ open() ? 'Cerrar menú' : 'Abrir menú' }}</span>
+      <span class="burger" aria-hidden="true"><i></i><i></i></span>
+    </button>
+
+    <a class="brand" routerLink="/" aria-label="BRINDA, ir al inicio" (click)="close()">{{ brand }}</a>
+
+    <nav class="links" aria-label="Principal">
+      <ul>
+        @for (item of items; track item.label) {
+          <li>
+            <a
+              [routerLink]="item.link"
+              [fragment]="item.fragment"
+              [class.is-active]="isActive(item)"
+              [attr.aria-current]="isActive(item) ? 'page' : null"
+              >{{ item.label }}</a
+            >
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <button type="button" class="cart" disabled title="El carrito estará disponible pronto">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 4h2.2l2 11h10.4l2-8H6.4" />
+        <circle cx="9" cy="19.5" r="1.3" />
+        <circle cx="17" cy="19.5" r="1.3" />
+      </svg>
+      <span class="sr-only">Carrito, 0 productos (disponible pronto)</span>
+    </button>
+  </div>
+
+  <div id="menu-movil" #menu class="menu" [attr.aria-hidden]="!open()" [attr.inert]="open() ? null : ''">
+    <nav aria-label="Menú móvil">
+      <ul>
+        @for (item of items; track item.label; let i = $index) {
+          <li [style.--i]="i">
+            <a [routerLink]="item.link" [fragment]="item.fragment" (click)="close()">{{ item.label }}</a>
+          </li>
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
