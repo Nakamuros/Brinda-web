@@ -1,30 +1,23 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { IMAGES } from '../../../../core/config';
-import { BrindisMark } from '../../../../shared/brindis-mark';
 import { ParallaxDirective } from '../../../../shared/parallax.directive';
 import { RevealDirective } from '../../../../shared/reveal.directive';
 
+/** Presentación: la copa (producto de ejemplo) y una frase. El CTA vive en el hero y en la barra fija. */
 @Component({
   selector: 'app-intro',
-  imports: [RouterLink, RevealDirective, ParallaxDirective, BrindisMark],
+  imports: [RevealDirective, ParallaxDirective],
   template: `
     <section id="presentacion" class="intro" aria-labelledby="intro-title">
-      <app-brindis-mark class="mark" />
       <div class="container inner">
         <div class="text">
           <h2 id="intro-title" class="title" appReveal="lines">
             <span class="line"><span>brinda en casa,</span></span>
             <span class="line"><span><span class="accent">sin</span> salir</span></span>
           </h2>
-          <div class="body" appReveal="stagger" [revealDelay]="0.25">
-            <p class="meta">Delivery en Lima · Sin local, solo para tu puerta</p>
-            <p class="lead">
-              Cervezas, vinos y destilados para la ocasión que sea. Eliges, nos escribes por WhatsApp, pagas con Yape o
-              Plin y llegamos a tu dirección.
-            </p>
-            <a class="btn btn-ghost" routerLink="/catalogo">Pedir ahora</a>
-          </div>
+          <p class="lead" appReveal [revealDelay]="0.25">
+            Cervezas, vinos y destilados para la ocasión que sea, a tu puerta en Lima.
+          </p>
         </div>
 
         <figure class="product" appReveal>

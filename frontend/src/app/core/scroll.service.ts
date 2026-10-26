@@ -13,6 +13,10 @@ export class ScrollService {
 
   /** true cuando la página bajó lo suficiente para que la navegación pase a fondo sólido. */
   readonly scrolled = signal(false);
+  /** true cuando el hero quedó atrás: aparece la barra fija "Pedir" en celular. */
+  readonly pastHero = signal(false);
+  /** true mientras el CTA de "Cómo pedir" está a la vista: la barra fija se oculta para no duplicarlo. */
+  readonly ctaInView = signal(false);
 
   start(): void {
     if (this.started || typeof window === 'undefined') {
@@ -21,7 +25,10 @@ export class ScrollService {
     this.started = true;
     gsap.registerPlugin(ScrollTrigger);
 
-    const update = () => this.scrolled.set(window.scrollY > 40);
+    const update = () => {
+      this.scrolled.set(window.scrollY > 40);
+      this.pastHero.set(window.scrollY > window.innerHeight * 0.75);
+    };
     window.addEventListener('scroll', update, { passive: true });
     update();
 

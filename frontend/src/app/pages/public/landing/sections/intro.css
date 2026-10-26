@@ -4,29 +4,19 @@
 .intro {
   position: relative;
   overflow: clip;
-  padding-block: var(--space-9) var(--space-8);
+  padding-block: var(--space-8) var(--space-7);
   background: var(--bg);
 }
-.mark {
-  position: absolute;
-  right: -22%;
-  top: 8%;
-  width: min(34rem, 86vw);
-  color: var(--brass);
-  opacity: 0.11;
-  pointer-events: none;
-}
 .inner {
-  position: relative;
   display: grid;
   justify-items: center;
-  gap: var(--space-7);
+  gap: var(--space-6);
   text-align: center;
 }
 .text {
   display: grid;
   justify-items: center;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 .title {
   font-size: var(--step-3);
@@ -46,28 +36,17 @@
 .line > span {
   display: block;
 }
-.body {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-5);
-}
-.meta {
-  font-size: var(--step--1);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--cream);
-}
 .lead {
-  max-width: 44ch;
+  max-width: 36ch;
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--step-1);
-  line-height: 1.65;
+  line-height: 1.6;
   color: var(--text-soft);
 }
 .product {
   margin: 0;
-  width: min(100%, 26rem);
+  width: min(100%, 22rem);
   overflow: clip;
   /* La copa se funde con el fondo de la sección */
   mask-image: linear-gradient(to bottom, black 62%, transparent 100%);
@@ -80,23 +59,16 @@
 
 @media (min-width: 64rem) {
   .inner {
-    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     gap: var(--space-8);
     text-align: left;
   }
-  .text,
-  .body {
+  .text {
     justify-items: start;
-  }
-  .mark {
-    right: -4%;
-    top: 4%;
-    width: 34rem;
-    opacity: 0.1;
   }
   .product {
     justify-self: center;
-    width: min(100%, 30rem);
+    width: min(100%, 26rem);
   }
 }

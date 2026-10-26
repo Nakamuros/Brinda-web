@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { HOW_TO_ORDER } from '../../../../core/config';
+import { HideOrderBarDirective } from '../../../../shared/hide-order-bar.directive';
 import { RevealDirective } from '../../../../shared/reveal.directive';
 
 @Component({
   selector: 'app-how-to-order',
-  imports: [RevealDirective],
+  imports: [RouterLink, RevealDirective, HideOrderBarDirective],
   template: `
-    <section id="como-pedir" class="how" aria-labelledby="how-title">
+    <section id="como-pedir" class="how candle-edge" aria-labelledby="how-title">
       <div class="container">
         <h2 id="how-title" class="title" appReveal>Cómo pedir</h2>
         <ol class="steps" appReveal="stagger">
@@ -18,6 +20,9 @@ import { RevealDirective } from '../../../../shared/reveal.directive';
             </li>
           }
         </ol>
+        <div class="cta" appReveal appHideOrderBar>
+          <a class="btn btn-cta" routerLink="/catalogo">Pedir ahora</a>
+        </div>
       </div>
     </section>
   `,

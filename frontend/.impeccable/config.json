@@ -20,6 +20,24 @@
         ],
         "createdAt": "2026-10-26T00:50:56.163Z",
         "reason": "falso positivo: img dentro de @if con src no vacio (IMAGES.categories)"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/pages/public/landing/sections/hero.html"
+        ],
+        "createdAt": "2026-10-26T01:42:56.190Z",
+        "reason": "falso positivo: src enlazado a IMAGES.introProduct (config.ts), no vacio"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/pages/public/landing/sections/intro.ts"
+        ],
+        "createdAt": "2026-10-26T02:08:23.020Z",
+        "reason": "falso positivo: src enlazado a IMAGES.introProduct (config.ts), no vacio"
       }
     ]
   }

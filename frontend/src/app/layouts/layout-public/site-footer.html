@@ -5,6 +5,8 @@
       <p class="tagline">{{ tagline }}</p>
     </div>
 
+    <p class="age"><span class="badge" aria-hidden="true">+18</span> Venta solo para mayores de 18 años.</p>
+
     <nav class="legal-links" aria-label="Información legal">
       <ul>
         @for (label of pendingLinks; track label) {
@@ -15,7 +17,7 @@
       </ul>
     </nav>
 
-    @if (legal.showPlaceholder) {
+    @if (showNotice) {
       <div class="notices" role="note">
         @if (legal.noticesText) {
           <p>{{ legal.noticesText }}</p>

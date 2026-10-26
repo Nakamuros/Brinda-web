@@ -10,7 +10,7 @@
   min-height: calc(100svh - var(--announce-h));
   /* El hero pasa por debajo de la navegación transparente */
   margin-top: calc(var(--nav-h) * -1);
-  padding: calc(var(--nav-h) + var(--space-6)) var(--gutter) calc(var(--space-9) * 0.7);
+  padding: calc(var(--nav-h) + var(--space-6)) var(--gutter) var(--space-7);
   text-align: center;
   overflow: clip;
 }
@@ -21,15 +21,22 @@
   z-index: -1;
   background:
     linear-gradient(to bottom, color-mix(in srgb, var(--bg) 70%, transparent), transparent 28%),
-    radial-gradient(ellipse 70% 48% at 50% 52%, color-mix(in srgb, var(--bg-deep) 62%, transparent), transparent 72%),
-    linear-gradient(to top, var(--bg), transparent 26%);
+    radial-gradient(ellipse 70% 48% at 50% 40%, color-mix(in srgb, var(--bg-deep) 62%, transparent), transparent 72%),
+    linear-gradient(to top, var(--bg), transparent 22%);
+}
+
+.inner {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  max-width: 76rem;
 }
 
 .content {
   display: grid;
   justify-items: center;
   gap: var(--space-5);
-  max-width: 46rem;
+  max-width: 40rem;
 }
 
 .wordmark {
@@ -51,7 +58,7 @@
 }
 
 .title {
-  font-size: var(--step-4);
+  font-size: clamp(2.5rem, 1.4rem + 4.4vw, 4.75rem);
   font-weight: 700;
   line-height: 1.04;
   letter-spacing: -0.015em;
@@ -89,7 +96,7 @@
   position: absolute;
   left: 50%;
   bottom: var(--space-5);
-  display: grid;
+  display: none;
   place-items: center;
   width: 3rem;
   height: 4rem;
@@ -183,5 +190,11 @@
 @media (min-width: 48rem) {
   .content {
     gap: var(--space-6);
+  }
+}
+
+@media (min-width: 64rem) {
+  .scroll {
+    display: grid;
   }
 }

@@ -80,6 +80,9 @@
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   justify-self: center;
   font-family: var(--font-display);
   font-weight: 700;
@@ -189,7 +192,7 @@
   .links a {
     position: relative;
     display: inline-block;
-    padding: var(--space-2) 0;
+    padding: 0.8rem 0;
     font-size: 0.78rem;
     letter-spacing: 0.17em;
     text-transform: uppercase;
@@ -201,7 +204,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 0.55rem;
     height: 1px;
     background: var(--brass);
     transform: scaleX(0);

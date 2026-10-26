@@ -1,35 +1,30 @@
 import { Component } from '@angular/core';
-import { CONTACT, PENDING } from '../../../../core/config';
+import { buildColumns, InfoColumn } from '../../../../core/info';
 import { RevealDirective } from '../../../../shared/reveal.directive';
 
+/**
+ * Zonas, horario y contacto. En producción solo se muestran las columnas con datos reales;
+ * los marcadores "Por confirmar" se ven únicamente en desarrollo (SHOW_PENDING).
+ */
 @Component({
   selector: 'app-info-columns',
   imports: [RevealDirective],
   template: `
-    <section id="zonas" class="info ambient" aria-labelledby="info-title">
+    <section id="zonas" class="info ambient candle-edge" aria-labelledby="info-title">
       <div class="container">
         <h2 id="info-title" class="sr-only">Zonas de entrega, horario y contacto</h2>
-        <div class="cols" appReveal="stagger">
-          <div class="col">
-            <h3>Zonas de entrega</h3>
-            <p [class.pending]="zones === pending">{{ zones }}</p>
-          </div>
-          <div class="col">
-            <h3>Horario</h3>
-            <p [class.pending]="hours === pending">{{ hours }}</p>
-          </div>
-          <div id="contacto" class="col">
-            <h3>Contacto</h3>
-            <p>WhatsApp</p>
-            @if (whatsappHref) {
-              <a class="btn btn-cta" [href]="whatsappHref" target="_blank" rel="noopener noreferrer"
-                >Escribir por WhatsApp</a
-              >
-            } @else {
-              <p class="pending">Número por confirmar</p>
-              <button type="button" class="btn btn-cta" disabled>WhatsApp disponible pronto</button>
-            }
-          </div>
+        <div class="cols" [class.single]="columns.length === 1" appReveal="stagger">
+          @for (c of columns; track c.title) {
+            <div class="col" [attr.id]="c.id ?? null">
+              <h3>{{ c.title }}</h3>
+              <p [class.pending]="c.pending">{{ c.text }}</p>
+              @if (c.href) {
+                <a class="btn btn-cta" [href]="c.href" target="_blank" rel="noopener noreferrer"
+                  >Escribir por WhatsApp</a
+                >
+              }
+            </div>
+          }
         </div>
       </div>
     </section>
@@ -37,10 +32,5 @@ import { RevealDirective } from '../../../../shared/reveal.directive';
   styleUrl: './info-columns.css',
 })
 export class InfoColumns {
-  protected readonly pending = PENDING;
-  protected readonly zones = CONTACT.zones;
-  protected readonly hours = CONTACT.hours;
-  protected readonly whatsappHref = CONTACT.whatsappNumber
-    ? `https://wa.me/${CONTACT.whatsappNumber}?text=${encodeURIComponent(CONTACT.whatsappMessage)}`
-    : '';
+  protected readonly columns: InfoColumn[] = buildColumns();
 }

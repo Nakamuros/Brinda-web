@@ -2,6 +2,8 @@
   display: block;
 }
 .how {
+  position: relative;
+  isolation: isolate;
   padding-block: var(--space-9);
   background: var(--bg);
 }
@@ -38,6 +40,15 @@ h3 {
 .step p {
   color: var(--text-soft);
   max-width: 34ch;
+}
+.cta {
+  display: grid;
+  justify-items: center;
+  margin-top: var(--space-8);
+}
+.cta .btn {
+  min-width: min(100%, 18rem);
+  min-height: 3.25rem;
 }
 
 @media (min-width: 48rem) {

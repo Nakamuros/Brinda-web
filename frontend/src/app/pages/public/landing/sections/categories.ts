@@ -8,9 +8,10 @@ import { RevealDirective } from '../../../../shared/reveal.directive';
   selector: 'app-categories',
   imports: [RouterLink, RevealDirective, BottlePlaceholder],
   template: `
-    <section id="categorias" class="cats ambient" aria-labelledby="cats-title">
+    <section id="categorias" class="cats ambient candle-edge" aria-labelledby="cats-title">
       <div class="container">
         <h2 id="cats-title" class="title" appReveal>Para cada ocasión</h2>
+        <p class="hint" aria-hidden="true">Desliza para ver más</p>
       </div>
       <ul class="rail" appReveal="stagger" aria-label="Categorías">
         @for (c of categories; track c.id) {

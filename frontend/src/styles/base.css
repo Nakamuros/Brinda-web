@@ -134,6 +134,21 @@ textarea {
   color: var(--brass);
 }
 
+/* Luz de vela en el borde superior de una sección: el calor del hero baja a las transiciones */
+.candle-edge::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto 0;
+  height: clamp(9rem, 22vw, 15rem);
+  background: radial-gradient(
+    ellipse 55% 100% at 50% 0%,
+    color-mix(in srgb, var(--brass) 24%, transparent),
+    transparent 76%
+  );
+  pointer-events: none;
+}
+
 /* Botones */
 .btn {
   display: inline-flex;

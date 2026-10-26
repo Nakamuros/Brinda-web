@@ -21,7 +21,8 @@ export class MediaPrefs {
     this.reducedMotion.set(motion.matches);
     motion.addEventListener('change', (e) => this.reducedMotion.set(e.matches));
 
-    const mobile = window.matchMedia('(max-width: 47.99rem)');
+    // Celular y tablet: hero a una columna, con el poster vertical y el video liviano.
+    const mobile = window.matchMedia('(max-width: 63.99rem)');
     this.isMobile.set(mobile.matches);
     mobile.addEventListener('change', (e) => this.isMobile.set(e.matches));
 
