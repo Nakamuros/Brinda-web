@@ -116,24 +116,6 @@
   background: linear-gradient(to top, color-mix(in srgb, var(--bg-deep) 88%, transparent), transparent);
 }
 
-[data-cat='cervezas'] {
-  --tint: var(--brass);
-}
-[data-cat='vinos'] {
-  --tint: var(--cta);
-}
-[data-cat='destilados'] {
-  --tint: var(--promo);
-}
-[data-cat='licores'] {
-  --tint: var(--bg-alt);
-}
-[data-cat='mezcladores'] {
-  --tint: var(--teal);
-}
-[data-cat='snacks'] {
-  --tint: var(--stone);
-}
 
 @media (min-width: 48rem) {
   .rail {

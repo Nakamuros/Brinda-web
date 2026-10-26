@@ -22,7 +22,9 @@ async function render() {
 describe('SiteNav', () => {
   it('muestra los seis enlaces principales', async () => {
     const f = await render();
-    const labels = [...f.nativeElement.querySelectorAll('.links a')].map((a) => (a as HTMLElement).textContent?.trim());
+    const labels = [...f.nativeElement.querySelectorAll('.links a')].map((a) =>
+      (a as HTMLElement).textContent?.trim(),
+    );
     expect(labels).toEqual([
       'Inicio',
       'Catálogo',
@@ -45,8 +47,11 @@ describe('SiteNav', () => {
     expect(btn.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('el carrito está deshabilitado mientras no exista', async () => {
+  it('el carrito enlaza a /carrito y no muestra contador vacío', async () => {
     const f = await render();
-    expect((f.nativeElement.querySelector('button.cart') as HTMLButtonElement).disabled).toBe(true);
+    const link: HTMLAnchorElement = f.nativeElement.querySelector('a.cart');
+    expect(link.getAttribute('href')).toBe('/carrito');
+    expect(link.getAttribute('aria-label')).toBe('Carrito, 0 productos');
+    expect(f.nativeElement.querySelector('.cart-count')).toBeNull();
   });
 });

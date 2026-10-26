@@ -14,10 +14,12 @@ export const routes: Routes = [
       {
         path: 'catalogo',
         title: 'Catálogo · BRINDA',
-        loadComponent: () =>
-          import('./pages/public/catalogo-provisional/catalogo-provisional').then(
-            (m) => m.CatalogoProvisional,
-          ),
+        loadComponent: () => import('./pages/public/catalogo/catalogo').then((m) => m.Catalogo),
+      },
+      {
+        path: 'carrito',
+        title: 'Carrito · BRINDA',
+        loadComponent: () => import('./pages/public/carrito/carrito').then((m) => m.Carrito),
       },
     ],
   },

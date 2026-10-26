@@ -16,7 +16,7 @@ import { RevealDirective } from '../../../../shared/reveal.directive';
       <ul class="rail" appReveal="stagger" aria-label="Categorías">
         @for (c of categories; track c.id) {
           <li class="tile" [attr.data-cat]="c.id">
-            <a routerLink="/catalogo" [attr.aria-label]="'Ver ' + c.name + ' en el catálogo'">
+            <a routerLink="/catalogo" [queryParams]="{ categoria: c.id }" [attr.aria-label]="'Ver ' + c.name + ' en el catálogo'">
               <span class="media">
                 @if (image(c.id); as src) {
                   <img [src]="src" [alt]="c.name" loading="lazy" decoding="async" />

@@ -235,3 +235,31 @@ textarea {
     animation: none !important;
   }
 }
+
+/* Fondo bloqueado mientras hay un menú o un detalle abierto */
+html.menu-open {
+  overflow: hidden;
+}
+
+/* Tinte de cada categoría (fichas de la landing, tarjetas y detalle del catálogo) */
+[data-cat='cervezas'] {
+  --tint: var(--brass);
+}
+[data-cat='vinos'] {
+  --tint: var(--cta);
+}
+[data-cat='destilados'] {
+  --tint: var(--promo);
+}
+[data-cat='licores'] {
+  --tint: var(--bg-alt);
+}
+[data-cat='mezcladores'] {
+  --tint: var(--teal);
+}
+[data-cat='snacks'] {
+  --tint: var(--stone);
+}
+[data-cat='combos-y-promociones'] {
+  --tint: var(--teal);
+}

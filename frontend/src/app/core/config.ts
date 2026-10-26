@@ -12,6 +12,23 @@ export const PENDING = 'Por confirmar';
  */
 export const SHOW_PENDING = isDevMode();
 
+/** Base de la API. Relativa: en desarrollo la atiende el proxy de `proxy.conf.json` (→ localhost:8080). */
+export const API_URL = '/api/v1';
+
+/**
+ * Catálogo de ejemplo (`core/catalog.mock.ts`), solo para trabajar el diseño sin backend:
+ * en desarrollo, `localStorage.setItem('brinda.mock', '1')` y recargar. Nunca se activa en producción.
+ */
+export const USE_MOCK_CATALOG = isDevMode() && readFlag('brinda.mock');
+
+function readFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export const SITE = {
   name: 'BRINDA',
   tagline: 'Licorería a domicilio en Lima',
@@ -57,7 +74,10 @@ export const CATEGORIES = [
 
 export const HOW_TO_ORDER = [
   { title: 'Elige', text: 'Arma tu carrito con cervezas, vinos, destilados y combos.' },
-  { title: 'Envía por WhatsApp', text: 'Tu pedido recibe un código corto y se abre el chat con el mensaje listo.' },
+  {
+    title: 'Envía por WhatsApp',
+    text: 'Tu pedido recibe un código corto y se abre el chat con el mensaje listo.',
+  },
   { title: 'Paga con Yape o Plin', text: 'Confirmamos tu pago y salimos a tu dirección.' },
 ] as const;
 

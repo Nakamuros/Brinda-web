@@ -1,0 +1,102 @@
+<section class="head candle-edge" aria-labelledby="cart-title">
+  <div class="container">
+    <h1 id="cart-title" class="title" appReveal="lines">
+      <span class="line"
+        ><span>Tu <span class="accent">carrito</span></span></span
+      >
+    </h1>
+  </div>
+</section>
+
+<div class="container body">
+  @if (cart.lines().length === 0) {
+    <app-state-panel
+      title="Tu carrito está vacío"
+      text="Elige algo de la selección y aparecerá aquí."
+    >
+      <a class="btn btn-ghost" routerLink="/catalogo">Ver el catálogo</a>
+    </app-state-panel>
+  } @else {
+    <div class="layout">
+      <ul class="rows" aria-label="Productos en el carrito">
+        @for (r of rows(); track r.line.productId; let i = $index) {
+          <li
+            class="row"
+            appRise
+            [riseIndex]="i"
+            [class.gone]="!r.line.available"
+            [attr.data-cat]="r.line.categorySlug"
+          >
+            <span class="thumb" aria-hidden="true">
+              @if (r.line.imageUrl; as src) {
+                <img [src]="src" alt="" loading="lazy" decoding="async" />
+              } @else {
+                <app-bottle-placeholder class="ph" />
+              }
+            </span>
+
+            <div class="main">
+              <p class="name">{{ r.line.name }}</p>
+              @if (r.line.available) {
+                <p class="unit">
+                  {{ r.unit }} c/u
+                  @if (r.was) {
+                    <s class="was"><span class="sr-only">Antes </span>{{ r.was }}</s>
+                  }
+                </p>
+                @if (r.free) {
+                  <p class="note">{{ r.promo }}: {{ r.free }} gratis</p>
+                }
+              } @else {
+                <p class="note">Ya no está disponible. Quítalo para continuar.</p>
+              }
+              <button type="button" class="link" (click)="cart.remove(r.line.productId)">
+                Quitar<span class="sr-only"> {{ r.line.name }}</span>
+              </button>
+            </div>
+
+            @if (r.line.available) {
+              <div class="qty">
+                <app-qty-stepper
+                  [qty]="r.line.quantity"
+                  [label]="r.line.name"
+                  (inc)="cart.setQty(r.line.productId, r.line.quantity + 1)"
+                  (dec)="cart.setQty(r.line.productId, r.line.quantity - 1)"
+                />
+              </div>
+              <p class="total">{{ r.total }}</p>
+            }
+          </li>
+        }
+      </ul>
+
+      <aside class="summary" aria-labelledby="sum-title">
+        <h2 id="sum-title" class="sum-title">Resumen</h2>
+        <dl class="sum">
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{{ gross() }}</dd>
+          </div>
+          @if (cart.totals().discount > 0) {
+            <div>
+              <dt>Promoción</dt>
+              <dd>−{{ discount() }}</dd>
+            </div>
+          }
+          <div class="sum-total">
+            <dt>Total estimado</dt>
+            <dd>{{ net() }}</dd>
+          </div>
+        </dl>
+        <p class="fine">
+          Sin delivery. La tarifa depende de tu distrito y el total final lo confirma el servidor al
+          enviar tu pedido.
+        </p>
+        <div class="sum-actions">
+          <a class="btn btn-ghost" routerLink="/catalogo">Seguir comprando</a>
+          <button type="button" class="link" (click)="cart.clear()">Vaciar carrito</button>
+        </div>
+      </aside>
+    </div>
+  }
+</div>

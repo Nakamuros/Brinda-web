@@ -1,0 +1,162 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  overflow: clip;
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color 0.4s ease,
+    transform 0.6s var(--ease-out);
+}
+.card:hover {
+  border-color: var(--brass);
+  transform: translateY(-4px);
+}
+.open {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.open:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Agregar / cantidad: franja al pie de la tarjeta */
+.actions {
+  border-top: 1px solid var(--line-soft);
+}
+.add {
+  width: 100%;
+  min-height: 2.75rem;
+  font-family: var(--font-text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream);
+  cursor: pointer;
+  background: none;
+  border: 0;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+.add:hover {
+  color: var(--bg);
+  background: var(--cream);
+}
+.add:active {
+  background: color-mix(in srgb, var(--cream) 85%, var(--bg));
+}
+.add:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Fotografía: fondo teñido por categoría, igual que las fichas de la landing */
+.media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 4.6;
+  padding: var(--space-5);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--tint, var(--brass)) 30%, var(--bg)),
+    color-mix(in srgb, var(--tint, var(--brass)) 7%, var(--bg-deep))
+  );
+}
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.7s var(--ease-out);
+}
+.ph {
+  width: 34%;
+  max-width: 4.75rem;
+  opacity: 0.85;
+  transition: transform 0.7s var(--ease-out);
+}
+.card:hover .ph,
+.card:hover img {
+  transform: scale(1.06) translateY(-4px);
+}
+.sold-out .media > :not(.badge) {
+  opacity: 0.4;
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  max-width: calc(100% - var(--space-4));
+  padding: 0.25rem 0.5rem;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: color-mix(in srgb, var(--bg-deep) 90%, transparent);
+}
+/* Promo: texto marrón sobre crema con filete terracota (la terracota con crema no llega a 4.5:1) */
+.badge-promo {
+  background: var(--cream);
+  color: var(--bg);
+  border-color: var(--promo);
+}
+.badge-combo {
+  background: var(--teal);
+  border-color: var(--line-soft);
+}
+
+.info {
+  display: grid;
+  align-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+.name {
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  font-weight: 700;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.now {
+  font-size: var(--step-1);
+  font-weight: 500;
+}
+.was {
+  font-size: var(--step--1);
+  color: var(--text-soft);
+  text-decoration-color: var(--promo);
+}
+
+@media (min-width: 48rem) {
+  .info {
+    padding: var(--space-4) var(--space-5) var(--space-5);
+  }
+}
