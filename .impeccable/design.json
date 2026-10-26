@@ -1,0 +1,334 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T02:20:30.449500Z",
+  "title": "Design System: BRINDA",
+  "extensions": {
+    "colorMeta": {
+      "midnight-brown": {
+        "role": "neutral",
+        "displayName": "Marrón medianoche",
+        "canonical": "#431821",
+        "tonalRamp": [
+          "#130709",
+          "#1e0b0f",
+          "#2a0f14",
+          "#36131a",
+          "#431821",
+          "#725258",
+          "#a18c90",
+          "#d6ccce"
+        ]
+      },
+      "deep-plum": {
+        "role": "neutral",
+        "displayName": "Ciruela profunda",
+        "canonical": "#4b1e3a",
+        "tonalRamp": [
+          "#150810",
+          "#220e1a",
+          "#2e1324",
+          "#3c182e",
+          "#4b1e3a",
+          "#78566b",
+          "#a58e9c",
+          "#d7ced4"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Crema",
+        "canonical": "#fbf4e1",
+        "tonalRamp": [
+          "#46443f",
+          "#716e65",
+          "#9c978c",
+          "#c9c3b4",
+          "#fbf4e1",
+          "#fcf7e8",
+          "#fdfaf0",
+          "#fefdf8"
+        ]
+      },
+      "ivory": {
+        "role": "neutral",
+        "displayName": "Marfil",
+        "canonical": "#fff8ed",
+        "tonalRamp": [
+          "#474542",
+          "#73706b",
+          "#9e9a93",
+          "#ccc6be",
+          "#fff8ed",
+          "#fffaf2",
+          "#fffcf6",
+          "#fffdfb"
+        ]
+      },
+      "brass": {
+        "role": "secondary",
+        "displayName": "Dorado ámbar (latón)",
+        "canonical": "#b2864f",
+        "tonalRamp": [
+          "#322616",
+          "#503c24",
+          "#6e5331",
+          "#8e6b3f",
+          "#b2864f",
+          "#c5a47b",
+          "#d8c2a7",
+          "#eee4d8"
+        ]
+      },
+      "burgundy-cta": {
+        "role": "primary",
+        "displayName": "Burdeos BRINDA",
+        "canonical": "#a1163b",
+        "tonalRamp": [
+          "#2d0611",
+          "#480a1b",
+          "#640e25",
+          "#81122f",
+          "#a1163b",
+          "#b8506c",
+          "#d08a9d",
+          "#eaccd4"
+        ]
+      },
+      "terracotta-promo": {
+        "role": "tertiary",
+        "displayName": "Terracota de promo",
+        "canonical": "#ca5a4e",
+        "tonalRamp": [
+          "#391916",
+          "#5b2823",
+          "#7d3830",
+          "#a2483e",
+          "#ca5a4e",
+          "#d7837a",
+          "#e4aca6",
+          "#f3dbd8"
+        ]
+      },
+      "petrol-teal": {
+        "role": "tertiary",
+        "displayName": "Verde azulado petróleo",
+        "canonical": "#00585e",
+        "tonalRamp": [
+          "#00191a",
+          "#00282a",
+          "#00373a",
+          "#00464b",
+          "#00585e",
+          "#408286",
+          "#80acae",
+          "#c7dadc"
+        ]
+      },
+      "stone": {
+        "role": "neutral",
+        "displayName": "Gris piedra",
+        "canonical": "#7d7267",
+        "tonalRamp": [
+          "#23201d",
+          "#38332e",
+          "#4e4740",
+          "#645b52",
+          "#7d7267",
+          "#9e958d",
+          "#beb8b3",
+          "#e2e0de"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Titular del hero. Libre Baskerville 700."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección en peso normal."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de pasos y nombres de categoría."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Subtítulos y frases de presentación en cursiva."
+      },
+      "accent": {
+        "displayName": "Accent",
+        "purpose": "Limelight: una o dos palabras de un titular."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido en Jost."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Botones, menú de escritorio y avisos en mayúsculas espaciadas."
+      }
+    },
+    "shadows": [
+      {
+        "name": "soft",
+        "value": "0 1px 2px rgba(0,0,0,.22), 0 14px 38px -12px rgba(0,0,0,.48)",
+        "purpose": "Tarjetas claras sobre fondos de color (hoy sin usar)."
+      },
+      {
+        "name": "candle-edge",
+        "value": "radial-gradient(ellipse 55% 100% at 50% 0%, rgba(178,134,79,.24), transparent 76%)",
+        "purpose": "Resplandor de latón en el borde superior de una sección (capa estática)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Easing exponencial de entradas, reveals y hover."
+      },
+      {
+        "name": "hero-stagger",
+        "value": "1.1s, retrasos 0.15s a 1.9s",
+        "purpose": "Entrada escalonada del hero (transform y opacity)."
+      },
+      {
+        "name": "reveal",
+        "value": "1.1s a 1.25s expo.out, y 28 a 32px",
+        "purpose": "Aparición al entrar en pantalla (GSAP ScrollTrigger)."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "tablet",
+        "value": "48rem"
+      },
+      {
+        "name": "desktop",
+        "value": "64rem"
+      },
+      {
+        "name": "nav-desktop",
+        "value": "75rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Botón de contorno fino del hero y las franjas: se rellena de crema al pasar el ratón.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">Pedir ahora</a>",
+      "css": ".ds-btn-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 28px;border:1px solid var(--cream,#fbf4e1);border-radius:6px;background:transparent;color:var(--cream,#fbf4e1);font:500 13px/1 Jost,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:transform .35s cubic-bezier(.16,1,.3,1),background-color .25s,color .25s}.ds-btn-ghost:hover{background:var(--cream,#fbf4e1);color:var(--midnight,#431821);transform:translateY(-2px)}.ds-btn-ghost:focus-visible{outline:2px solid var(--cream,#fbf4e1);outline-offset:3px}.ds-btn-ghost:active{transform:translateY(1px) scale(.99)}"
+    },
+    {
+      "name": "CTA Button",
+      "kind": "button",
+      "refersTo": "button-cta",
+      "description": "La acción real de pedir: burdeos sólido con filete de latón.",
+      "html": "<a class=\"ds-btn-cta\" href=\"#\">Pedir ahora</a>",
+      "css": ".ds-btn-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 28px;border:1px solid var(--brass,#b2864f);border-radius:6px;background:var(--cta,#a1163b);color:var(--cream,#fbf4e1);font:500 13px/1 Jost,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:transform .35s cubic-bezier(.16,1,.3,1),background-color .25s}.ds-btn-cta:hover{background:color-mix(in srgb,var(--cta,#a1163b) 88%,var(--cream,#fbf4e1));transform:translateY(-2px)}.ds-btn-cta:focus-visible{outline:2px solid var(--cream,#fbf4e1);outline-offset:3px}.ds-btn-cta:active{transform:translateY(1px) scale(.99)}"
+    },
+    {
+      "name": "Desktop Nav Link",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "Enlace del menú de escritorio con subrayado de latón que se dibuja al pasar el ratón.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link is-active\" href=\"#\">Inicio</a><a class=\"ds-nav-link\" href=\"#\">Catálogo</a><a class=\"ds-nav-link\" href=\"#\">Cómo pedir</a></nav>",
+      "css": ".ds-nav{display:flex;gap:32px;padding:8px 24px;background:var(--midnight,#431821)}.ds-nav-link{position:relative;display:inline-block;padding:12.8px 0;font:400 12.5px/1.6 Jost,system-ui,sans-serif;letter-spacing:.17em;text-transform:uppercase;text-decoration:none;color:var(--cream,#fbf4e1)}.ds-nav-link::after{content:'';position:absolute;left:0;right:0;bottom:8.8px;height:1px;background:var(--brass,#b2864f);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.16,1,.3,1)}.ds-nav-link:hover::after,.ds-nav-link.is-active::after{transform:scaleX(1)}.ds-nav-link:focus-visible{outline:2px solid var(--cream,#fbf4e1);outline-offset:3px}"
+    },
+    {
+      "name": "Category Tile",
+      "kind": "card",
+      "refersTo": "category-tile",
+      "description": "Ficha de categoría: degradado teñido, botella genérica y nombre en serif al pie.",
+      "html": "<a class=\"ds-tile\" href=\"#\"><span class=\"ds-tile-media\"><svg viewBox=\"0 0 120 220\" width=\"40\" height=\"72\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M52 8h16v30c0 10 22 22 22 56v110a8 8 0 0 1-8 8H38a8 8 0 0 1-8-8V94c0-34 22-46 22-56z\"/><path d=\"M30 118h60M30 168h60\" opacity=\".55\"/></svg></span><span class=\"ds-tile-name\">Vinos</span></a>",
+      "css": ".ds-tile{position:relative;display:grid;align-content:end;width:180px;aspect-ratio:3/4;overflow:hidden;border:1px solid color-mix(in srgb,var(--brass,#b2864f) 28%,transparent);border-radius:12px;background:linear-gradient(to bottom,color-mix(in srgb,var(--cta,#a1163b) 34%,var(--midnight,#431821)),color-mix(in srgb,var(--cta,#a1163b) 8%,#2a0f18));text-decoration:none;color:var(--cream,#fbf4e1);transition:border-color .4s,transform .6s cubic-bezier(.16,1,.3,1)}.ds-tile:hover{border-color:var(--brass,#b2864f);transform:translateY(-4px)}.ds-tile:focus-visible{outline:2px solid var(--cream,#fbf4e1);outline-offset:3px}.ds-tile-media{position:absolute;inset:0 0 72px;display:grid;place-items:center;color:var(--brass,#b2864f);opacity:.85}.ds-tile-name{position:relative;padding:32px 16px 16px;text-align:center;font:400 18px/1.25 'Libre Baskerville',Georgia,serif;background:linear-gradient(to top,rgba(42,15,24,.88),transparent)}"
+    },
+    {
+      "name": "Order Bar",
+      "kind": "custom",
+      "refersTo": "order-bar",
+      "description": "Barra fija móvil con el CTA de pedir de ancho completo.",
+      "html": "<div class=\"ds-bar\"><a class=\"ds-bar-btn\" href=\"#\">Pedir ahora</a></div>",
+      "css": ".ds-bar{padding:12px 20px;background:color-mix(in srgb,#2a0f18 96%,transparent);border-top:1px solid color-mix(in srgb,var(--brass,#b2864f) 55%,transparent)}.ds-bar-btn{display:flex;align-items:center;justify-content:center;min-height:48px;border:1px solid var(--brass,#b2864f);border-radius:6px;background:var(--cta,#a1163b);color:var(--cream,#fbf4e1);font:500 13px/1 Jost,system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;text-decoration:none}.ds-bar-btn:focus-visible{outline:2px solid var(--cream,#fbf4e1);outline-offset:3px}"
+    },
+    {
+      "name": "Age Notice",
+      "kind": "chip",
+      "refersTo": "age-badge",
+      "description": "Sello +18 con la línea de venta solo para mayores, en el pie.",
+      "html": "<p class=\"ds-age\"><span class=\"ds-age-badge\" aria-hidden=\"true\">+18</span> Venta solo para mayores de 18 años.</p>",
+      "css": ".ds-age{display:inline-flex;align-items:center;gap:12px;margin:0;color:var(--cream,#fbf4e1);font:400 16px/1.6 Jost,system-ui,sans-serif}.ds-age-badge{display:inline-grid;place-items:center;min-width:44px;height:44px;border:1px solid var(--brass,#b2864f);border-radius:50%;font:700 13px/1 'Libre Baskerville',Georgia,serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Salón a Media Luz",
+    "overview": "**Creative North Star: \"El Salón a Media Luz\"**\n\nBRINDA es una licorería de barrio de Lima que solo reparte. Su sistema visual es un bar de autor a la luz de una vela: casi todo es oscuro, cálido y quieto, y la única luz que brilla es el latón. El ambiente es íntimo, sobrio y cálido: mucho espacio vacío, pocas piezas por pantalla, una sola columna, nada que grite. La luz de la vela nace en el hero y baja, apenas como un resplandor, a cada cambio de sección.\n\nLa densidad es baja y el ritmo es editorial. Los títulos van en una serif de libro (Libre Baskerville), una o dos palabras del titular en la tipografía de cartel Limelight, y el texto en Jost, una sans geométrica y sobria. El color se reparte por campos de región entera (marrón medianoche, ciruela, un solo bloque verde azulado), no como acentos sueltos. El lujo es discreto: líneas finas de latón en lugar de sombras, botones de contorno en lugar de bloques llenos.",
+    "keyCharacteristics": [
+      "Oscuro por defecto: marrón medianoche como fondo, ciruela para alternar, crema como texto.",
+      "Latón solo para líneas, filetes, íconos y títulos grandes; nunca como fondo ni texto pequeño.",
+      "La vela (halo, bokeh, resplandor en los bordes de sección) es la firma; el hero tiene un solo protagonista.",
+      "El burdeos es la acción: solo los botones de pedir.",
+      "Movimiento sobrio: entrada escalonada y reveals por scroll, siempre con alternativa estática."
+    ],
+    "rules": [
+      {
+        "name": "The Brass Is Light Rule",
+        "body": "El latón es la luz de la escena, no pintura. Solo líneas, filetes, íconos y texto grande; si aparece como fondo o como texto pequeño, está mal.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Action Color Rule",
+        "body": "El burdeos es la acción y nada más. Ninguna otra superficie ni etiqueta lo usa.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tokens Only Rule",
+        "body": "Ningún hex suelto fuera de `tokens.css`; todo lo demás sale de las variables o de `color-mix` sobre ellas.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Words Rule",
+        "body": "Limelight solo en una o dos palabras de un titular. Si hay más, deja de ser un acento.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Case Rule",
+        "body": "Las mayúsculas espaciadas son para etiquetas y botones; los títulos van en minúscula y mayúscula inicial. Sin sobretítulos encima de los titulares.",
+        "section": "typography"
+      },
+      {
+        "name": "The Thumb Rule",
+        "body": "En celular la acción principal vive abajo: la barra fija \"Pedir ahora\" aparece al dejar atrás el hero y se oculta mientras el botón de \"Cómo pedir\" está a la vista.",
+        "section": "layout"
+      },
+      {
+        "name": "The Candle Edge Rule",
+        "body": "La luz baja desde el hero a los cambios de sección como un resplandor; es estático, de una sola capa y nunca compite con el contenido.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar el burdeos (#a1163b) con texto crema y filete de latón solo para acciones de pedir.",
+      "Do reservar el latón (#b2864f) para líneas, filetes, íconos y texto grande (≥24px, o 19px en negrita).",
+      "Do poner una o dos palabras de un titular en Limelight, y nada más.",
+      "Do mantener el hero con un solo protagonista: la vela con su halo y su bokeh.",
+      "Do animar solo `transform` y `opacity`, con entrada desde un estado ya visible, y dar una versión estática con `prefers-reduced-motion`.",
+      "Do verificar cada pantalla a 360, 768 y 1440px y dejar los objetivos táctiles en 44px o más.",
+      "Do definir todo color como token en `tokens.css` y derivar los matices con `color-mix`."
+    ],
+    "donts": [
+      "Don't usar el latón como fondo, ni como texto pequeño sobre crema (2.98:1).",
+      "Don't usar gris piedra como texto, ni terracota con texto crema pequeño (3.76:1).",
+      "Don't poner gradientes en el texto, ni sombras duras de desplazamiento fijo, ni halos sin desplazamiento como profundidad.",
+      "Don't repetir el mismo ícono de botella como identidad de cada categoría una vez haya fotos reales; hasta entonces, sin recortes propios por categoría.",
+      "Don't inventar productos, precios, horarios, distritos ni promociones de ejemplo; los marcadores internos (\"Por confirmar\") solo existen en desarrollo.",
+      "Don't mostrar cigarros hasta que el asesor lo confirme, ni redactar avisos legales por cuenta propia.",
+      "Don't añadir sobretítulos encima de los titulares, ni numerar secciones que no sean una secuencia real (solo \"Cómo pedir\").",
+      "Don't convertir el sistema en una tienda de ofertas: nada de rojo y amarillo promocional ni cuenta regresiva."
+    ]
+  }
+}
