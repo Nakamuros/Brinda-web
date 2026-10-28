@@ -1,1400 +1,1778 @@
 {
   "backend/pom.xml": {
-    "mtime": 1792441461.3073792,
-    "seen": 1792977902.5541983,
-    "ast_hash": "2c0cdd30430859de78f3eda37b4220dd",
+    "mtime": 1793202976.2807755,
+    "seen": 1793206179.0640378,
+    "ast_hash": "671acd42bdb273b455dbedde6bb3f511",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/BrindaApplication.java": {
-    "mtime": 1792425135.4403248,
-    "seen": 1792977902.5542047,
-    "ast_hash": "264194e46c20ef86d390ff172b14518b",
+    "mtime": 1792702216.3899238,
+    "seen": 1793206179.0640438,
+    "ast_hash": "d32756fe1172e713e0120bfc7572ab9a",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/controller/AuthController.java": {
-    "mtime": 1792682302.7511744,
-    "seen": 1792977902.554208,
+    "mtime": 1792702216.3934422,
+    "seen": 1793206179.0640483,
     "ast_hash": "cb416893c12f67608b7b2bbdf08649ec",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/dto/ChangePasswordRequest.java": {
-    "mtime": 1792425173.3812652,
-    "seen": 1792977902.5542097,
-    "ast_hash": "312086f5a102caeb5a083ee4ca72b7c1",
+    "mtime": 1792702216.3944495,
+    "seen": 1793206179.064053,
+    "ast_hash": "6533419a035d5bebdf619f38de04a5fa",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/dto/LoginRequest.java": {
-    "mtime": 1792425173.1747508,
-    "seen": 1792977902.5542116,
-    "ast_hash": "67d4fc0eed27048dcabad3d9a8443f51",
+    "mtime": 1792702216.3954477,
+    "seen": 1793206179.0640564,
+    "ast_hash": "7c4958cff7c022c1cd617ab4197eab60",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/dto/UserResponse.java": {
-    "mtime": 1792425173.4670234,
-    "seen": 1792977902.554213,
-    "ast_hash": "6c5a164679e2118c356dc1d13deda5b0",
+    "mtime": 1792702216.3954477,
+    "seen": 1793206179.0640597,
+    "ast_hash": "3032adb7999f8f60ced71bda3c580b71",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/model/Role.java": {
-    "mtime": 1792425172.8162274,
-    "seen": 1792977902.554215,
-    "ast_hash": "12cd78118441ce5c04bafb8c1ad191bd",
+    "mtime": 1792702216.3964472,
+    "seen": 1793206179.064064,
+    "ast_hash": "0bf9f42f99b4f7b4230960db5699104c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/model/User.java": {
-    "mtime": 1792682302.747252,
-    "seen": 1792977902.5542161,
+    "mtime": 1792702216.3974473,
+    "seen": 1793206179.0640671,
     "ast_hash": "77d5bf01277ec822921612339ae10b39",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/repository/UserRepository.java": {
-    "mtime": 1792441453.8102708,
-    "seen": 1792977902.5542176,
+    "mtime": 1792702216.3994477,
+    "seen": 1793206179.064071,
     "ast_hash": "d22dc5f63689a004122e795c95b40328",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/security/AuthenticatedUser.java": {
-    "mtime": 1792425174.2392623,
-    "seen": 1792977902.554219,
-    "ast_hash": "7276828b70c1457aaf0b0112b388f06c",
+    "mtime": 1792702216.4014482,
+    "seen": 1793206179.064074,
+    "ast_hash": "c96268b64aeb05653d755384328a73be",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/security/JwtAuthenticationFilter.java": {
-    "mtime": 1792682302.7511744,
-    "seen": 1792977902.5542204,
+    "mtime": 1792702216.4014482,
+    "seen": 1793206179.0640774,
     "ast_hash": "ad3d124c197c766a37d88f47bb399b65",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/security/JwtProperties.java": {
-    "mtime": 1792425173.6829412,
-    "seen": 1792977902.554222,
-    "ast_hash": "b8fac7927c2092d3eda0bf0abfaf1ad7",
+    "mtime": 1792702216.402448,
+    "seen": 1793206179.0640805,
+    "ast_hash": "2c33fa934c054b895bd955b054db08eb",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/security/JwtService.java": {
-    "mtime": 1792682302.747252,
-    "seen": 1792977902.5542233,
+    "mtime": 1792702216.402448,
+    "seen": 1793206179.0640845,
     "ast_hash": "c8dc5e6d273d678ba73045ba9dc54e89",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/security/SecurityProperties.java": {
-    "mtime": 1792430155.8802052,
-    "seen": 1792977902.5542247,
-    "ast_hash": "1f5b52c3c1d7fbc1a9d33927369a3780",
+    "mtime": 1793203175.0882132,
+    "seen": 1793206179.0640874,
+    "ast_hash": "d25f6f5fa80ec3dc3e2c936af46b894f",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/auth/service/AuthService.java": {
-    "mtime": 1792682302.7511744,
-    "seen": 1792977902.5542262,
+    "mtime": 1792702216.4044533,
+    "seen": 1793206179.0640898,
     "ast_hash": "3ed7c70feee2850c59c4fc3ea26fcade",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/controller/CatalogAdminController.java": {
-    "mtime": 1792442738.7252061,
-    "seen": 1792977902.5542278,
+    "mtime": 1792702216.4064577,
+    "seen": 1793206179.064093,
     "ast_hash": "c0e53856e5462ed8e4b0daf0cf9dca20",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/controller/CatalogController.java": {
-    "mtime": 1792439697.8599005,
-    "seen": 1792977902.554229,
+    "mtime": 1792702216.407456,
+    "seen": 1793206179.0640965,
     "ast_hash": "3cc605a646a56d0c49b438f4acbad67a",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/AdminProductResponse.java": {
-    "mtime": 1792681858.7424228,
-    "seen": 1792977902.5542302,
+    "mtime": 1792702216.4084551,
+    "seen": 1793206179.0640996,
     "ast_hash": "a6a859c4d8e6e76ac093bbed76ac03aa",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/CategoryRequest.java": {
-    "mtime": 1792425287.5349584,
-    "seen": 1792977902.554232,
-    "ast_hash": "2ff531886ef7cab2212a3c3736f614c6",
+    "mtime": 1792702216.409959,
+    "seen": 1793206179.0641026,
+    "ast_hash": "ef883c7e6ccd8585b049087658de50c5",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/CategoryResponse.java": {
-    "mtime": 1792425287.6000679,
-    "seen": 1792977902.554233,
-    "ast_hash": "8afed1a5aa105ce532db96b6a8cbd587",
+    "mtime": 1792702216.409959,
+    "seen": 1793206179.0641057,
+    "ast_hash": "d4fd10672371bc3049576f7a6a859f84",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/OfferRequest.java": {
-    "mtime": 1792440690.8114724,
-    "seen": 1792977902.5542343,
-    "ast_hash": "80fceec921b6da9a40b15575b26e1532",
+    "mtime": 1792702216.4109664,
+    "seen": 1793206179.0641093,
+    "ast_hash": "abdef3f8f41de0a90351c69855a69b94",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/PageResponse.java": {
-    "mtime": 1792425288.1261065,
-    "seen": 1792977902.5542357,
-    "ast_hash": "2fd37320c2c1b9385dfcb892de0edba2",
+    "mtime": 1792702216.4119687,
+    "seen": 1793206179.064113,
+    "ast_hash": "ba363a6bbdb961f9db554bcd9379bf13",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/ProductRequest.java": {
-    "mtime": 1792440690.8793647,
-    "seen": 1792977902.5542374,
+    "mtime": 1792702216.4119687,
+    "seen": 1793206179.0641167,
     "ast_hash": "17927b8b83cfd6a3389b7fdaf580e27f",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/ProductVisibility.java": {
-    "mtime": 1792439714.1831088,
-    "seen": 1792977902.5542388,
-    "ast_hash": "e16b2dc96be17c3627feaec4af77f2aa",
+    "mtime": 1792702216.4119687,
+    "seen": 1793206179.0641193,
+    "ast_hash": "6ba9bfd5241ea90deda88c7370bc1879",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/PromoRequest.java": {
-    "mtime": 1792442701.632042,
-    "seen": 1792977902.5542402,
-    "ast_hash": "e210729434a74306c43583537a4b6e42",
+    "mtime": 1792702216.4134774,
+    "seen": 1793206179.064123,
+    "ast_hash": "4f89075798e6122daf7d9ed3c1dd4d9d",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/PublicProductResponse.java": {
-    "mtime": 1792681858.7424228,
-    "seen": 1792977902.5542414,
+    "mtime": 1792702216.4144907,
+    "seen": 1793206179.0641263,
     "ast_hash": "1e278e7c6b35502ac01f44dc852d4bdc",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/dto/VisibilityRequest.java": {
-    "mtime": 1792439714.208815,
-    "seen": 1792977902.5542428,
-    "ast_hash": "00f7f23a885f231094a25ea03f5a480b",
+    "mtime": 1792702216.4154892,
+    "seen": 1793206179.0641294,
+    "ast_hash": "9f19b2b083eba41ae225925a77c16108",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/model/Category.java": {
-    "mtime": 1792425208.1190066,
-    "seen": 1792977902.554244,
-    "ast_hash": "3f4eb93d8da985d1ac505c21ef59ca1a",
+    "mtime": 1792702216.4164877,
+    "seen": 1793206179.064134,
+    "ast_hash": "ab0e1eee41d05a192c7d05149e6cc89b",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/model/OfferRule.java": {
-    "mtime": 1792440676.4345965,
-    "seen": 1792977902.5542457,
-    "ast_hash": "c4b14880c901ae08e39fbeafe6423b2e",
+    "mtime": 1792702216.4164877,
+    "seen": 1793206179.064137,
+    "ast_hash": "0200ce930207e01e9412acaa8bedcb77",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/model/Product.java": {
-    "mtime": 1792442738.595598,
-    "seen": 1792977902.5542474,
+    "mtime": 1792702216.417487,
+    "seen": 1793206179.0641403,
     "ast_hash": "f306ede1e804a7d5da0ee47087c9e014",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/model/ProductType.java": {
-    "mtime": 1792442167.34471,
-    "seen": 1792977902.5542488,
-    "ast_hash": "f224dd89c2b94991639f60e74f13875c",
+    "mtime": 1792702216.4184866,
+    "seen": 1793206179.0641446,
+    "ast_hash": "cc53dbcd61d02f5dc45489c85f6ecc23",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/model/PromoRule.java": {
-    "mtime": 1792442701.3287547,
-    "seen": 1792977902.55425,
-    "ast_hash": "ea7aeff17a8b530fe7a1908f56da8948",
+    "mtime": 1792702216.4184866,
+    "seen": 1793206179.0641477,
+    "ast_hash": "12a195c2af4422db4dadcb220f2d234f",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/repository/CategoryRepository.java": {
-    "mtime": 1792425208.2644372,
-    "seen": 1792977902.5542514,
-    "ast_hash": "81e3731a98349a33bb91bcb6ffc6345f",
+    "mtime": 1792702216.4204905,
+    "seen": 1793206179.0641515,
+    "ast_hash": "8ab99e4ae092b6ced8ddbc5ed697b341",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/repository/ProductRepository.java": {
-    "mtime": 1792429976.1212537,
-    "seen": 1792977902.5542529,
-    "ast_hash": "dd4285a3348964a0a82064d7d5299fbd",
+    "mtime": 1792702216.4209995,
+    "seen": 1793206179.064156,
+    "ast_hash": "3c80e82d6681a67cfcea8a386903df6e",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/repository/ProductSpecifications.java": {
-    "mtime": 1792442738.6067004,
-    "seen": 1792977902.5542543,
+    "mtime": 1792702216.4220078,
+    "seen": 1793206179.0641603,
     "ast_hash": "b1c72fef14b7ed275a42e5b85fdad509",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/service/CatalogAdminService.java": {
-    "mtime": 1792442738.706698,
-    "seen": 1792977902.5542557,
+    "mtime": 1792702216.4235144,
+    "seen": 1793206179.0641637,
     "ast_hash": "7d4cceff44e051dd97d7f88316c92226",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/catalog/service/CatalogService.java": {
-    "mtime": 1792442246.5212345,
-    "seen": 1792977902.554257,
+    "mtime": 1792702216.4235144,
+    "seen": 1793206179.064167,
     "ast_hash": "5f2babdb0a15491b5693c2615c00b4bb",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/controller/ComboAdminController.java": {
-    "mtime": 1792442228.5872352,
-    "seen": 1792977902.5542583,
-    "ast_hash": "eb7f610f2fb5c158bccd51b596eab5ba",
+    "mtime": 1792702216.425521,
+    "seen": 1793206179.0641701,
+    "ast_hash": "abe5f134371b57848c40eeff8c3efcd4",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/dto/BuildComboRequest.java": {
-    "mtime": 1792442182.4914427,
-    "seen": 1792977902.5542598,
-    "ast_hash": "24d04a6ee4d1ec52a3bf147a63dee5b5",
+    "mtime": 1792702216.4265258,
+    "seen": 1793206179.0641732,
+    "ast_hash": "aa0032988eb7cb51eb3ebe2dd7c0e8aa",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/dto/ComboDetailResponse.java": {
-    "mtime": 1792442182.544747,
-    "seen": 1792977902.554261,
-    "ast_hash": "f05e7574d6c88184b0f56f9c316055b4",
+    "mtime": 1792702216.427527,
+    "seen": 1793206179.064176,
+    "ast_hash": "7845e7ae9d66fc20388b104b62720c30",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/dto/ComboUpdateRequest.java": {
-    "mtime": 1792442182.5183625,
-    "seen": 1792977902.5542626,
-    "ast_hash": "14c495d317496dcb710e2ce523c76755",
+    "mtime": 1792702216.427527,
+    "seen": 1793206179.0641816,
+    "ast_hash": "f365d6d92896d4841d9c5115138f18fb",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/dto/CreateComboRequest.java": {
-    "mtime": 1792442182.4653158,
-    "seen": 1792977902.5542638,
-    "ast_hash": "19129086539af475e0d2344a93ec74de",
+    "mtime": 1792702216.428523,
+    "seen": 1793206179.0641856,
+    "ast_hash": "d9de246d3868dbf5a97b91a32981fd4a",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/model/ComboItem.java": {
-    "mtime": 1792442182.4105477,
-    "seen": 1792977902.554265,
-    "ast_hash": "4a3f5dcbd91a01785bd2fa04f5967c58",
+    "mtime": 1792702216.429523,
+    "seen": 1793206179.0641894,
+    "ast_hash": "ac9ef78392763f8438f3ca1d782db9bc",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/repository/ComboItemRepository.java": {
-    "mtime": 1792442182.4380271,
-    "seen": 1792977902.5542672,
-    "ast_hash": "e8552f5cce1d2c1ac8d3d64765706613",
+    "mtime": 1792702216.4305208,
+    "seen": 1793206179.0641925,
+    "ast_hash": "c4a9ca7a3a0d9ec4bf88b84c5d3df656",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/service/ComboCalculator.java": {
-    "mtime": 1792442182.571923,
-    "seen": 1792977902.5542684,
-    "ast_hash": "c3201ac22ed2713b75c79a9d032a17bb",
+    "mtime": 1792702216.4325218,
+    "seen": 1793206179.0641959,
+    "ast_hash": "63b826fe3fffb8f9aab9f5416a9564cf",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/combo/service/ComboService.java": {
-    "mtime": 1792442228.5077417,
-    "seen": 1792977902.55427,
-    "ast_hash": "489b645d8b58d74068b7b0e6fd4aeb7b",
+    "mtime": 1792702216.4335277,
+    "seen": 1793206179.0641992,
+    "ast_hash": "064b1ee747192e5146033fead58ddcdf",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/config/ClockConfig.java": {
-    "mtime": 1792440676.4090056,
-    "seen": 1792977902.5542712,
-    "ast_hash": "9b47b186eba113a6da0e12183d60ec3d",
+    "mtime": 1792702216.4345384,
+    "seen": 1793206179.0642762,
+    "ast_hash": "4ddec57b9927bde668fb544baa2362a1",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/config/ProdSeedGuard.java": {
-    "mtime": 1792441453.7178931,
-    "seen": 1792977902.5542724,
-    "ast_hash": "83b7cbc41d960c7d509cb8aa21397444",
+    "mtime": 1792702216.4355352,
+    "seen": 1793206179.0642796,
+    "ast_hash": "bba9581388bedd81d9b8f7a277ddf1fc",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/config/SchedulingConfig.java": {
-    "mtime": 1792430155.9362974,
-    "seen": 1792977902.554274,
-    "ast_hash": "ea48bb1cfba1565256dbc9fdcfc6d799",
+    "mtime": 1792702216.4365335,
+    "seen": 1793206179.064283,
+    "ast_hash": "43dce2c5f29762ff49c0d17e34f1eaed",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/config/SecurityConfig.java": {
-    "mtime": 1792430156.114477,
-    "seen": 1792977902.5542755,
-    "ast_hash": "738b50bf78b1b146f275a291786633c5",
+    "mtime": 1793203175.0877042,
+    "seen": 1793206179.0642867,
+    "ast_hash": "a343571d68707b2118dab669620e5a72",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/controller/DeliveryAdminController.java": {
-    "mtime": 1792430038.5531538,
-    "seen": 1792977902.5542772,
-    "ast_hash": "a0a4e47292c8ca4a75d6caed52986566",
+    "mtime": 1792702216.4385326,
+    "seen": 1793206179.06429,
+    "ast_hash": "30a68adab4bc9e32f83903ef859c7c7f",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/controller/DeliveryController.java": {
-    "mtime": 1792430038.370755,
-    "seen": 1792977902.5542789,
-    "ast_hash": "ccaea4108f777ae8f46cf8ef6ba5f267",
+    "mtime": 1792702216.4385326,
+    "seen": 1793206179.0642934,
+    "ast_hash": "18e8b263876f7a3712f347549a13beeb",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/dto/DistrictRequest.java": {
-    "mtime": 1792430037.538424,
-    "seen": 1792977902.5542803,
-    "ast_hash": "30df4fb2fa090ef941303ac2cab7928f",
+    "mtime": 1792702216.439535,
+    "seen": 1793206179.0642972,
+    "ast_hash": "1b6e55577c7f14f3152557a6a29563a6",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/dto/DistrictResponse.java": {
-    "mtime": 1792430037.6019654,
-    "seen": 1792977902.5542815,
-    "ast_hash": "3b9cb07f665713bb8b084615cafe0032",
+    "mtime": 1792702216.4410472,
+    "seen": 1793206179.0643308,
+    "ast_hash": "4ff7b86291addb64abad996f6a506767",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/dto/PublicDistrictResponse.java": {
-    "mtime": 1792430037.808133,
-    "seen": 1792977902.554283,
-    "ast_hash": "33cae1ffc9a1c482dbf189d47b9d27f0",
+    "mtime": 1792702216.4420547,
+    "seen": 1793206179.064341,
+    "ast_hash": "6be4dc18d15bf1b572d80d8132742944",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/dto/ZoneRequest.java": {
-    "mtime": 1792430037.354798,
-    "seen": 1792977902.5542843,
-    "ast_hash": "022df2c69414f788dd33c165495b00ca",
+    "mtime": 1792702216.4420547,
+    "seen": 1793206179.0643466,
+    "ast_hash": "b88c3dba4e174ac07e559e5ccacce6b6",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/dto/ZoneResponse.java": {
-    "mtime": 1792430037.9869912,
-    "seen": 1792977902.5542855,
-    "ast_hash": "dd0aebf3446dda96f9fcaa3cc9a5a7f2",
+    "mtime": 1792702216.4435606,
+    "seen": 1793206179.0643504,
+    "ast_hash": "a7a44fb41b55af2db80302708d084809",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/model/DeliveryZone.java": {
-    "mtime": 1792430036.8507175,
-    "seen": 1792977902.5542872,
-    "ast_hash": "09565cbec475d356a0a397c45aca3db6",
+    "mtime": 1792702216.4445648,
+    "seen": 1793206179.0643535,
+    "ast_hash": "215265db91d0caf59f33fff2afdea73d",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/model/District.java": {
-    "mtime": 1792430036.910679,
-    "seen": 1792977902.5542884,
-    "ast_hash": "0e63a9da987eea8875b87aeb246a5fe2",
+    "mtime": 1792702216.4445648,
+    "seen": 1793206179.0643568,
+    "ast_hash": "3e8f45f07bac4e7c4244c49ff5f4e840",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/repository/DeliveryZoneRepository.java": {
-    "mtime": 1792430037.1111436,
-    "seen": 1792977902.5542896,
-    "ast_hash": "4d85310ef590309c0e426b846d67835a",
+    "mtime": 1792702216.4455655,
+    "seen": 1793206179.0643618,
+    "ast_hash": "a7f9253853fc2a1448f117da8530f16c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/repository/DistrictRepository.java": {
-    "mtime": 1792430037.1694148,
-    "seen": 1792977902.5542912,
-    "ast_hash": "a9ee6e1d4153a4b61e0ab1399edb2023",
+    "mtime": 1792702216.4465654,
+    "seen": 1793206179.0643656,
+    "ast_hash": "b2f71902a727d7e105d3e9670b6c487c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/service/DeliveryAdminService.java": {
-    "mtime": 1792439714.3363044,
-    "seen": 1792977902.5542924,
+    "mtime": 1792702216.4485676,
+    "seen": 1793206179.064369,
     "ast_hash": "dc2082fd3d1be6c5aa18079097f5ab3d",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/delivery/service/DeliveryService.java": {
-    "mtime": 1792430038.069831,
-    "seen": 1792977902.5542939,
-    "ast_hash": "a8445ddea2fb5463cc85930ed9761b12",
+    "mtime": 1792702216.4495685,
+    "seen": 1793206179.0643725,
+    "ast_hash": "04594dce55e5ec8b4d49a09569d53121",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/controller/InventoryAdminController.java": {
-    "mtime": 1792439726.469277,
-    "seen": 1792977902.5542953,
+    "mtime": 1792702216.4515655,
+    "seen": 1793206179.0643759,
     "ast_hash": "c947957d5f9a2cfb8266ce126a201c9a",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/dto/AdjustRequest.java": {
-    "mtime": 1792430003.7130325,
-    "seen": 1792977902.5542965,
-    "ast_hash": "9e73646de343c115e1ecbbbc0036aff5",
+    "mtime": 1792702216.4525661,
+    "seen": 1793206179.064379,
+    "ast_hash": "ab318753f69baf468d1c1c7c1137f7ea",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/dto/MovementResponse.java": {
-    "mtime": 1792442167.4304333,
-    "seen": 1792977902.5542982,
+    "mtime": 1792702216.4535663,
+    "seen": 1793206179.0643828,
     "ast_hash": "87ee905420fab366e47102b08ffd93a5",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/dto/RestockBatchRequest.java": {
-    "mtime": 1792439726.3685906,
-    "seen": 1792977902.5542994,
-    "ast_hash": "46835b99cc6c44556b60e247c1db6ac8",
+    "mtime": 1792702216.4545712,
+    "seen": 1793206179.0643864,
+    "ast_hash": "6433ebd15a6a22aa7f3ea5ecdb55326d",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/dto/RestockRequest.java": {
-    "mtime": 1792430003.5168605,
-    "seen": 1792977902.5543008,
-    "ast_hash": "d619fdca906ee7bc2b8c1c9a7436ea81",
+    "mtime": 1792702216.4555686,
+    "seen": 1793206179.0643895,
+    "ast_hash": "9347c317450e4b778be8a5afd28ab484",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/model/MovementType.java": {
-    "mtime": 1792442167.4144588,
-    "seen": 1792977902.5543022,
+    "mtime": 1792702216.4555686,
+    "seen": 1793206179.0643928,
     "ast_hash": "4d5a5564845f36247ab382637e64c524",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/model/StockMovement.java": {
-    "mtime": 1792442167.423597,
-    "seen": 1792977902.5543034,
+    "mtime": 1792702216.457076,
+    "seen": 1793206179.0643961,
     "ast_hash": "5491aed9964fc1b2d581679937b01259",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/repository/StockMovementRepository.java": {
-    "mtime": 1792430003.2718148,
-    "seen": 1792977902.554305,
-    "ast_hash": "dd6caa9876a82a8c305f9a513c67c5bc",
+    "mtime": 1792702216.4580834,
+    "seen": 1793206179.0644,
+    "ast_hash": "71417d307fa9d77e6d2c900e8567b66e",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/service/InventoryService.java": {
-    "mtime": 1792442167.5254247,
-    "seen": 1792977902.5543063,
+    "mtime": 1792702216.4590828,
+    "seen": 1793206179.064404,
     "ast_hash": "88270dcfe1a669ff2f6a002a0b187ad3",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/inventory/service/StockLine.java": {
-    "mtime": 1792430003.9572866,
-    "seen": 1792977902.554308,
-    "ast_hash": "902e1f1aa5183a109d16a942b5872c08",
+    "mtime": 1792702216.4600837,
+    "seen": 1793206179.0644076,
+    "ast_hash": "9a5a1334b94bac48bdae045aeded2719",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/config/OrderProperties.java": {
-    "mtime": 1792681822.2545328,
-    "seen": 1792977902.5543094,
+    "mtime": 1792702216.4620833,
+    "seen": 1793206179.0644112,
     "ast_hash": "891a039ebf529a54b662adb09fbe46b0",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/controller/OrderAdminController.java": {
-    "mtime": 1792430131.3594184,
-    "seen": 1792977902.5543106,
-    "ast_hash": "a9b5dab06ec3214432fef259ac7679fe",
+    "mtime": 1792702216.463591,
+    "seen": 1793206179.064415,
+    "ast_hash": "e9a0d999261ba6af009ce7a37f8bffe9",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/controller/OrderController.java": {
-    "mtime": 1792430131.1946442,
-    "seen": 1792977902.5543122,
-    "ast_hash": "130d5a16ae614a44c9fc919aa2b8744b",
+    "mtime": 1792702216.4645982,
+    "seen": 1793206179.064419,
+    "ast_hash": "7219f85600375bfce3ec0aa2ffae1b22",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/CancelOrderRequest.java": {
-    "mtime": 1792430091.434791,
-    "seen": 1792977902.5543134,
-    "ast_hash": "fd502a48d2ef471b2fb01f9eb30f02e3",
+    "mtime": 1792702216.4655972,
+    "seen": 1793206179.064423,
+    "ast_hash": "82ab85b4b46bf9de6d4798e99d3b60be",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/CreateOrderRequest.java": {
-    "mtime": 1792681822.253529,
-    "seen": 1792977902.5543149,
+    "mtime": 1792702216.4655972,
+    "seen": 1793206179.0644267,
     "ast_hash": "07170afba9de033d3315079ef233c3fe",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/CreatedOrderResponse.java": {
-    "mtime": 1792442738.7562497,
-    "seen": 1792977902.5543163,
+    "mtime": 1792702216.4665976,
+    "seen": 1793206179.0644305,
     "ast_hash": "9a699574adffc5a5dad9b1059730eb70",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/OrderDetailResponse.java": {
-    "mtime": 1792442738.7639122,
-    "seen": 1792977902.5543177,
+    "mtime": 1792702216.4675999,
+    "seen": 1793206179.0644338,
     "ast_hash": "4450f06610342592b0510391114f46e8",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/OrderSummaryResponse.java": {
-    "mtime": 1792430091.5005817,
-    "seen": 1792977902.5543191,
-    "ast_hash": "be75295fe8285b6cdf61d8b19928ac64",
+    "mtime": 1792702216.4685996,
+    "seen": 1793206179.0644372,
+    "ast_hash": "d9d3b37affb8353db925b134ad7ace01",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/PendingCountResponse.java": {
-    "mtime": 1792430091.9187727,
-    "seen": 1792977902.5543206,
-    "ast_hash": "77552e133689570ff624b489396cfb51",
+    "mtime": 1792702216.4685996,
+    "seen": 1793206179.0644403,
+    "ast_hash": "1ae84eda2653e61a055c550ec899bda8",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/dto/TextResponse.java": {
-    "mtime": 1792430091.7340565,
-    "seen": 1792977902.554322,
-    "ast_hash": "89273186f94c4843a03e6e64a365c3b0",
+    "mtime": 1792702216.4695964,
+    "seen": 1793206179.0644436,
+    "ast_hash": "8841ac8198a3adcd3300ea3ffcbc2cfe",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/Order.java": {
-    "mtime": 1792430068.0715969,
-    "seen": 1792977902.5543234,
-    "ast_hash": "54e0bf784dc6c4dbd2cc0b2ac8aa2c7b",
+    "mtime": 1792702216.4705963,
+    "seen": 1793206179.0644474,
+    "ast_hash": "147e55dce0907f34032632abc92b7c79",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/OrderChannel.java": {
-    "mtime": 1792430068.0222611,
-    "seen": 1792977902.554325,
-    "ast_hash": "1435aa51ca27957d96e8d5e332763e8c",
+    "mtime": 1792702216.4715977,
+    "seen": 1793206179.0644517,
+    "ast_hash": "f012811c920fe8eb763ed29275698581",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/OrderItem.java": {
-    "mtime": 1792442738.595598,
-    "seen": 1792977902.5543263,
+    "mtime": 1792702216.4715977,
+    "seen": 1793206179.0644546,
     "ast_hash": "bb7d8023b907c1229b0620cf682d9969",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/OrderStatus.java": {
-    "mtime": 1792430067.7746582,
-    "seen": 1792977902.554329,
-    "ast_hash": "b7bb4b080fba73d4c1d0d6dc1725ede5",
+    "mtime": 1792702216.4725966,
+    "seen": 1793206179.0644586,
+    "ast_hash": "b4b0d0f28fd3dcf9605c4ebbe5afdc6e",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/PaymentMethod.java": {
-    "mtime": 1792430067.8339944,
-    "seen": 1792977902.5543303,
-    "ast_hash": "526a545a4fb8ebc9ff1ebbb8d86cf555",
+    "mtime": 1792702216.4725966,
+    "seen": 1793206179.0644627,
+    "ast_hash": "0618b42aa0f4755304d2426749c26b36",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/model/PromoType.java": {
-    "mtime": 1792440725.5775535,
-    "seen": 1792977902.5543315,
-    "ast_hash": "753459e15f5ec152fec0accf6d61128e",
+    "mtime": 1792702216.4735994,
+    "seen": 1793206179.0644665,
+    "ast_hash": "90f462b5922c382df9c7203336471132",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/repository/OrderRepository.java": {
-    "mtime": 1792430068.3441105,
-    "seen": 1792977902.554333,
-    "ast_hash": "7a1d7bdc1ae4ca1c49fd5ca6fca9b244",
+    "mtime": 1792702216.474598,
+    "seen": 1793206179.0644705,
+    "ast_hash": "4297eac774c68cb6eee8e712e287e838",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/BuyXPayYCalculator.java": {
-    "mtime": 1792442701.567855,
-    "seen": 1792977902.5543344,
-    "ast_hash": "7cbd7ba45ad22bd6559991cc9cacfb74",
+    "mtime": 1792702216.4755988,
+    "seen": 1793206179.0644743,
+    "ast_hash": "6cd372a538151583256de8fb20a68253",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderAdminService.java": {
-    "mtime": 1792682332.923401,
-    "seen": 1792977902.5543358,
+    "mtime": 1792702216.476599,
+    "seen": 1793206179.0644786,
     "ast_hash": "3f1a96d2a0a01271be65db9ad5d31c76",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderCodeGenerator.java": {
-    "mtime": 1792430069.0064068,
-    "seen": 1792977902.554337,
-    "ast_hash": "eda2d16ba85184775e106fccf7abfe5d",
+    "mtime": 1792702216.478598,
+    "seen": 1793206179.064482,
+    "ast_hash": "7107a7f2bbe9fb84b983980f063b5e83",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderComboContents.java": {
-    "mtime": 1792682316.289523,
-    "seen": 1792977902.5543385,
-    "ast_hash": "cdd2c521815417b8df77db24de3a8303",
+    "mtime": 1792702216.478598,
+    "seen": 1793206179.064485,
+    "ast_hash": "00225f1a7436aa947e5e5ef0bd416b99",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderExpirationJob.java": {
-    "mtime": 1792430131.1199586,
-    "seen": 1792977902.55434,
-    "ast_hash": "c2ae8649f8d11bcc21940915e23e7c78",
+    "mtime": 1792702216.4795969,
+    "seen": 1793206179.0644886,
+    "ast_hash": "d718e387f3b334b5cf61842c31d8c393",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderLineText.java": {
-    "mtime": 1792682316.3438828,
-    "seen": 1792977902.5543413,
+    "mtime": 1792702216.4795969,
+    "seen": 1793206179.064492,
     "ast_hash": "e282a44c4828836a36cc0f0ef9433981",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/OrderService.java": {
-    "mtime": 1792681822.253529,
-    "seen": 1792977902.5543427,
+    "mtime": 1792702216.4805973,
+    "seen": 1793206179.064495,
     "ast_hash": "3eec545c59ac5ffe58def0a90f3042c9",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/order/service/WhatsAppMessageBuilder.java": {
-    "mtime": 1792682316.3438828,
-    "seen": 1792977902.5543442,
+    "mtime": 1792702216.4815967,
+    "seen": 1793206179.0644987,
     "ast_hash": "db592e2f09b6e1144dd07add40de4389",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/audit/AuditLog.java": {
-    "mtime": 1792439686.3526506,
-    "seen": 1792977902.5543454,
+    "mtime": 1792702216.483598,
+    "seen": 1793206179.0645027,
     "ast_hash": "57c059d4c1e1167307b344b23bd1fd60",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/audit/AuditLogRepository.java": {
-    "mtime": 1792425135.6968796,
-    "seen": 1792977902.5543468,
-    "ast_hash": "983a1137e23a22900f48ac73425578c4",
+    "mtime": 1792702216.483598,
+    "seen": 1793206179.0645065,
+    "ast_hash": "ec9b801108edba2b5a5364c8cd30a6e8",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/audit/AuditService.java": {
-    "mtime": 1792439686.4346192,
-    "seen": 1792977902.554348,
-    "ast_hash": "a2b52ceb53c1513e82d7690f844a828d",
+    "mtime": 1792702216.4845984,
+    "seen": 1793206179.0645103,
+    "ast_hash": "94559af7f3ce4488e8cfa868f0b14f88",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/crypto/CryptoProperties.java": {
-    "mtime": 1792430068.7567263,
-    "seen": 1792977902.5543497,
-    "ast_hash": "113adb5f980cd63f7e330493edd7fa87",
+    "mtime": 1792702216.4855967,
+    "seen": 1793206179.064515,
+    "ast_hash": "e180095e21084cf6f49454b959b88ab2",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/crypto/DniCipher.java": {
-    "mtime": 1792430068.8235996,
-    "seen": 1792977902.5543509,
-    "ast_hash": "f379f6a11f5471dc77188d277c8c6428",
+    "mtime": 1792702216.4865983,
+    "seen": 1793206179.0645196,
+    "ast_hash": "393e1cde36637b51ba9c08d131147d4f",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/exception/BusinessRuleException.java": {
-    "mtime": 1792425136.3772223,
-    "seen": 1792977902.554352,
-    "ast_hash": "8dc4614dde199d57aa1a9f22e6673ce7",
+    "mtime": 1792702216.4875965,
+    "seen": 1793206179.0645235,
+    "ast_hash": "009060e3622f473eee21f3a3ae2660a9",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/exception/ErrorResponse.java": {
-    "mtime": 1792425136.043823,
-    "seen": 1792977902.5543537,
-    "ast_hash": "40b0e89975de781675e7b3e206bf7e4e",
+    "mtime": 1792702216.4885967,
+    "seen": 1793206179.0645275,
+    "ast_hash": "1c9ed1706f5b54fd0697e27c88e8d1c6",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/exception/GlobalExceptionHandler.java": {
-    "mtime": 1792425136.6473372,
-    "seen": 1792977902.554355,
-    "ast_hash": "6c42f6e000e69b1be5a1e2c1a02ea6b1",
+    "mtime": 1792702216.4895978,
+    "seen": 1793206179.064531,
+    "ast_hash": "ad5579a813ddc61c28c6a4e26c15f7f0",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/exception/InvalidCredentialsException.java": {
-    "mtime": 1792425136.5836053,
-    "seen": 1792977902.5543563,
-    "ast_hash": "ec37ebc411bf4b0926670e459743ce43",
+    "mtime": 1792702216.490598,
+    "seen": 1793206179.0645344,
+    "ast_hash": "a632299a63b9120483676d066058562e",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/exception/ResourceNotFoundException.java": {
-    "mtime": 1792425136.3139052,
-    "seen": 1792977902.5543578,
-    "ast_hash": "dd36e2e3be3a4221fed6cc03d8bcceb7",
+    "mtime": 1792702216.490598,
+    "seen": 1793206179.064538,
+    "ast_hash": "ff07e346190ba040f1e415298b8ba09c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/image/ImageProperties.java": {
-    "mtime": 1792681858.643932,
-    "seen": 1792977902.554359,
-    "ast_hash": "859174dfdde3f153547004169cd1ec0d",
+    "mtime": 1792702216.4917035,
+    "seen": 1793206179.064542,
+    "ast_hash": "20b66624baf8e05b109815a9ce8ddcae",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/image/ImageUrlSerializer.java": {
-    "mtime": 1792681858.689513,
-    "seen": 1792977902.5543604,
-    "ast_hash": "3e47f9fbd7cc115648f76e1447238275",
+    "mtime": 1792702216.4927013,
+    "seen": 1793206179.0645459,
+    "ast_hash": "5693b68e739ea57f2c24c28f22481f8c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/image/ImageUrls.java": {
-    "mtime": 1792681858.6679506,
-    "seen": 1792977902.5543616,
-    "ast_hash": "8127b718c07baf262c3224dc60317d4a",
+    "mtime": 1792702216.4937,
+    "seen": 1793206179.06455,
+    "ast_hash": "62e9f517e2386b5c38c70498363f1744",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/model/Auditable.java": {
-    "mtime": 1792425135.535988,
-    "seen": 1792977902.5543633,
-    "ast_hash": "65a2e92beab2e7f505502de4967acb25",
+    "mtime": 1792702216.4947026,
+    "seen": 1793206179.064572,
+    "ast_hash": "7db34742d3f4aad78976d26465eeb38c",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/security/RateLimitFilter.java": {
-    "mtime": 1792430155.685737,
-    "seen": 1792977902.5543644,
-    "ast_hash": "92114f33338358f610d780c1dcf9777b",
+    "mtime": 1793203175.0882132,
+    "seen": 1793206179.0645769,
+    "ast_hash": "810f78fe4d3e386a6afe4b796506b7ea",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/security/SlidingWindowLimiter.java": {
-    "mtime": 1792430155.6217456,
-    "seen": 1792977902.5543656,
-    "ast_hash": "0f02ecc73824a42365d9920c006cf6f4",
+    "mtime": 1792702216.4967034,
+    "seen": 1793206179.0645795,
+    "ast_hash": "eb07f4c12252b68dfb32365ccefc3ad2",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/util/ClientIp.java": {
-    "mtime": 1792425136.9413936,
-    "seen": 1792977902.5543673,
-    "ast_hash": "a312e29192454d451dfa1c9e65100a5f",
+    "mtime": 1792702216.497702,
+    "seen": 1793206179.0645826,
+    "ast_hash": "9a79d4da51ce8550c8d942ba9cb12eb7",
     "semantic_hash": ""
   },
   "backend/src/main/java/com/brinda/api/shared/util/SlugUtil.java": {
-    "mtime": 1792442167.3885705,
-    "seen": 1792977902.5543685,
+    "mtime": 1792702216.4987025,
+    "seen": 1793206179.0645862,
     "ast_hash": "4ab55f29869764f4abc75d090f0fda02",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/auth/JwtServiceTest.java": {
-    "mtime": 1792682339.7065456,
-    "seen": 1792977902.5543697,
-    "ast_hash": "d3a31d0f3457c64949a2279b85814fde",
+    "mtime": 1792702216.5060563,
+    "seen": 1793206179.06459,
+    "ast_hash": "33c2eacde52946f7f2371d674e98cf48",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/catalog/OfferRuleTest.java": {
-    "mtime": 1792440747.4007583,
-    "seen": 1792977902.5543714,
-    "ast_hash": "acfc16560b184d254bbb1cca07236cd0",
+    "mtime": 1792702216.5070543,
+    "seen": 1793206179.0645933,
+    "ast_hash": "255f76bef43a45f50b7a5ca90d25b743",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/catalog/PromoRuleTest.java": {
-    "mtime": 1792442771.2658727,
-    "seen": 1792977902.5543725,
-    "ast_hash": "65e9621a6a79e112f349a2a24a36406c",
+    "mtime": 1792702216.5070543,
+    "seen": 1793206179.064597,
+    "ast_hash": "2d144663783a1395a50820a2a0ce28d0",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/catalog/PublicProductResponseTest.java": {
-    "mtime": 1792440747.5418346,
-    "seen": 1792977902.5543742,
+    "mtime": 1792702216.5080547,
+    "seen": 1793206179.0646005,
     "ast_hash": "24ebc10f592e06bb3fbbc99f30713ff2",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/combo/ComboCalculatorTest.java": {
-    "mtime": 1792442264.228781,
-    "seen": 1792977902.5543756,
-    "ast_hash": "3bc3ff2494035055987dd29956c97a00",
+    "mtime": 1792702216.509058,
+    "seen": 1793206179.064604,
+    "ast_hash": "e645e21a5544ac34398e54398b6bde75",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/config/MigrationsSeedGuardTest.java": {
-    "mtime": 1792441453.8437178,
-    "seen": 1792977902.554377,
-    "ast_hash": "b2b46437aad4f63e1e979638bca09bb3",
+    "mtime": 1792702216.5110602,
+    "seen": 1793206179.0646257,
+    "ast_hash": "78f76becd2626a5ec7ce1a790f50de53",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/order/BuyXPayYCalculatorTest.java": {
-    "mtime": 1792442771.2020807,
-    "seen": 1792977902.5543785,
-    "ast_hash": "1a601bf07332b647713a0822e8fcee23",
+    "mtime": 1792702216.5120547,
+    "seen": 1793206179.064629,
+    "ast_hash": "0a48a7758e2f557b0e950766c464d98c",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/order/CreateOrderRequestDniTest.java": {
-    "mtime": 1792681875.335127,
-    "seen": 1792977902.5543797,
-    "ast_hash": "75de753c4571376dfe17655aea2afca3",
+    "mtime": 1792702216.5120547,
+    "seen": 1793206179.064633,
+    "ast_hash": "2c138dc9664e5964c823e0ce0a4cf32b",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/order/service/OrderLineTextTest.java": {
-    "mtime": 1792682360.7104928,
-    "seen": 1792977902.5543811,
+    "mtime": 1792702216.513562,
+    "seen": 1793206179.064638,
     "ast_hash": "d775c05062bcea2e574d524af097083f",
     "semantic_hash": ""
   },
   "backend/src/test/java/com/brinda/api/shared/ImageUrlsTest.java": {
-    "mtime": 1792681875.3104825,
-    "seen": 1792977902.5543823,
-    "ast_hash": "446cd9a38b0a7a38c32db8d1928accd1",
+    "mtime": 1792702216.514568,
+    "seen": 1793206179.0646422,
+    "ast_hash": "89c572f27257ca079b5e9ccfe7b9e8da",
     "semantic_hash": ""
   },
   "brinda-db/docker-compose.yaml": {
-    "mtime": 1792421700.0974555,
-    "seen": 1792977902.5543838,
+    "mtime": 1792702216.5155673,
+    "seen": 1793206179.0650105,
     "ast_hash": "42ff6a49b0236fba31b6ad8db52a6676",
     "semantic_hash": ""
   },
   "database/migrations/V1__schema.sql": {
-    "mtime": 1792420187.726002,
-    "seen": 1792977902.5543852,
-    "ast_hash": "fee546cb7121cc1ba5ddb3e00727e47c",
+    "mtime": 1792702216.5185688,
+    "seen": 1793206179.0646503,
+    "ast_hash": "00097587b3abdd8b51217256ecab1f61",
     "semantic_hash": ""
   },
   "database/migrations/V2__indexes_triggers.sql": {
-    "mtime": 1792420187.9361181,
-    "seen": 1792977902.5543864,
-    "ast_hash": "ed15fd516130f39333fbb3b066b51c5f",
+    "mtime": 1792702216.5185688,
+    "seen": 1793206179.064654,
+    "ast_hash": "4b2544031ef1a467177ae073068e157a",
     "semantic_hash": ""
   },
   "database/migrations/V4__audit_details_reference_data.sql": {
-    "mtime": 1792439666.5966043,
-    "seen": 1792977902.554388,
-    "ast_hash": "6df491e9fe192df0ce41c0eb3948fd56",
+    "mtime": 1792702216.5195692,
+    "seen": 1793206179.0646582,
+    "ast_hash": "0e896eae891036ef08c0cf1f1c03779f",
     "semantic_hash": ""
   },
   "database/migrations/V5__offers_end_date.sql": {
-    "mtime": 1792440676.3836365,
-    "seen": 1792977902.5543892,
-    "ast_hash": "4a546a8c8b254a61fde92e599a63c6b7",
+    "mtime": 1792702216.520569,
+    "seen": 1793206179.0646613,
+    "ast_hash": "40ed0e6a6dff138b3ccab5bb862eebd5",
     "semantic_hash": ""
   },
   "database/migrations/V6__combos.sql": {
-    "mtime": 1792442133.7548065,
-    "seen": 1792977902.5543904,
-    "ast_hash": "6893f94b8a0468b1f04a0b81dc06374f",
+    "mtime": 1792702216.520569,
+    "seen": 1793206179.0646653,
+    "ast_hash": "042ef8fcff6be7075bb9e87332826422",
     "semantic_hash": ""
   },
   "database/migrations/V7__buy_x_pay_y.sql": {
-    "mtime": 1792442701.250583,
-    "seen": 1792977902.5543919,
-    "ast_hash": "2f0a6a61de0d19b020fa8d1016bae746",
+    "mtime": 1792702216.5216613,
+    "seen": 1793206179.0646694,
+    "ast_hash": "a26780b0497143ef461de28a3311ded8",
     "semantic_hash": ""
   },
   "database/migrations/V8__dni_always_required.sql": {
-    "mtime": 1792681821.9755826,
-    "seen": 1792977902.5543933,
-    "ast_hash": "6f5dd091ea0fe535a5b2a350c59f4481",
+    "mtime": 1792702216.5216613,
+    "seen": 1793206179.0646725,
+    "ast_hash": "f6b8afdfdd3cbe866ac750cd1e87060e",
     "semantic_hash": ""
   },
   "database/migrations/V9__users_token_version.sql": {
-    "mtime": 1792682302.688134,
-    "seen": 1792977902.5543947,
-    "ast_hash": "a478e5f0125e877c609327db14ef31db",
+    "mtime": 1792702216.5226624,
+    "seen": 1793206179.0646765,
+    "ast_hash": "4837edd06e5f4993d9ab1f702be17f8b",
     "semantic_hash": ""
   },
   "database/seed-dev/V3__seed_data.sql": {
-    "mtime": 1792420214.1924272,
-    "seen": 1792977902.554396,
-    "ast_hash": "8f7318ab36b15f8d1d74760727abb74b",
+    "mtime": 1792702216.5236628,
+    "seen": 1793206179.0646808,
+    "ast_hash": "e442f34f1a625a38290ec9c403e11c5e",
     "semantic_hash": ""
   },
   "database/setup/01_create_roles.sql": {
-    "mtime": 1792972799.307048,
-    "seen": 1792977902.5543973,
+    "mtime": 1792711649.2146206,
+    "seen": 1793206179.0646853,
     "ast_hash": "386ae899c2187cf426f162ba4d3288a3",
     "semantic_hash": ""
   },
   "database/setup/02_grants.sql": {
-    "mtime": 1792442525.380227,
-    "seen": 1792977902.5543988,
-    "ast_hash": "88278ec1eb2bfea224dae941476ccefc",
+    "mtime": 1793202969.5611007,
+    "seen": 1793206179.0646887,
+    "ast_hash": "3b8e398a4d0516de4776ffcf31b66035",
     "semantic_hash": ""
   },
   "database/templates/update_image_urls.sql": {
-    "mtime": 1792681875.2841613,
-    "seen": 1792977902.5544,
-    "ast_hash": "fe0e4f6f11835e303d7b72eaaa24800f",
+    "mtime": 1792702216.5276613,
+    "seen": 1793206179.064692,
+    "ast_hash": "d9804ac7f7713402c6262caccf32a21e",
     "semantic_hash": ""
   },
   "frontend/.impeccable/config.json": {
-    "mtime": 1792980503.0204544,
-    "seen": 1792981012.4904087,
-    "ast_hash": "cdaadd12b83410cf13996d294aff50a4",
+    "mtime": 1793199392.576318,
+    "seen": 1793206179.0646958,
+    "ast_hash": "4fdea2f58de833e9a0d890bbb37d5722",
     "semantic_hash": ""
   },
   "frontend/angular.json": {
-    "mtime": 1793041206.7857523,
-    "seen": 1793045761.21035,
-    "ast_hash": "094c861b7d9f0fda31cf70aef38ff957",
+    "mtime": 1793202496.3573222,
+    "seen": 1793206179.0646987,
+    "ast_hash": "0d4e1552a0eade5f966619df68a382d2",
     "semantic_hash": ""
   },
   "frontend/package.json": {
-    "mtime": 1792975432.496873,
-    "seen": 1792977902.554404,
-    "ast_hash": "bc61321ae819af938eba2db87e4ef486",
+    "mtime": 1793199392.5906758,
+    "seen": 1793206179.0647018,
+    "ast_hash": "e791f133134de5a2901f0e8facbb959b",
     "semantic_hash": ""
   },
   "frontend/scripts/capture.mjs": {
-    "mtime": 1792975724.3963356,
-    "seen": 1792977902.5544057,
-    "ast_hash": "6528f4278a6a29de7c8520dc146a587f",
+    "mtime": 1793201832.8857527,
+    "seen": 1793206179.0647137,
+    "ast_hash": "670cd1ce35722df40079f7b208b6a17f",
     "semantic_hash": ""
   },
   "frontend/scripts/menu.mjs": {
-    "mtime": 1792975985.6562428,
-    "seen": 1792977902.554407,
-    "ast_hash": "88dfc02f3dc3100bd8b4b799dd4bce60",
+    "mtime": 1793201833.1141417,
+    "seen": 1793206179.0647302,
+    "ast_hash": "437ed267c5d0a8e3b0550ba278885f3f",
     "semantic_hash": ""
   },
   "frontend/src/app/app.config.ts": {
-    "mtime": 1793041207.408764,
-    "seen": 1793045761.2103672,
-    "ast_hash": "bfc0995a90ba2dcbceb273fe84359c54",
+    "mtime": 1793199392.6073463,
+    "seen": 1793206179.0647695,
+    "ast_hash": "b26e3b22cb1155911099b51118eca67b",
     "semantic_hash": ""
   },
   "frontend/src/app/app.routes.ts": {
-    "mtime": 1793045489.0551379,
-    "seen": 1793045761.2103689,
-    "ast_hash": "f793653377f23a0c2fa5bbaa95e5895b",
+    "mtime": 1793204908.209953,
+    "seen": 1793206179.064773,
+    "ast_hash": "6ecfa591a4f1a8c34654f4d2d1a89087",
     "semantic_hash": ""
   },
   "frontend/src/app/app.ts": {
-    "mtime": 1792975599.1111932,
-    "seen": 1792977902.554411,
-    "ast_hash": "8e9b0e5186c1649432b93b18f118fb53",
+    "mtime": 1793199392.6083438,
+    "seen": 1793206179.0647757,
+    "ast_hash": "16086e220a68f1420528fda989538e0c",
     "semantic_hash": ""
   },
   "frontend/src/app/core/config.ts": {
-    "mtime": 1793041207.409769,
-    "seen": 1793045761.2103734,
-    "ast_hash": "851fd50d9247b562cb6a4c421eb5a9df",
+    "mtime": 1793201841.5922754,
+    "seen": 1793206179.064785,
+    "ast_hash": "fa3e25fd8236f57394082c40d6d79fbe",
     "semantic_hash": ""
   },
   "frontend/src/app/core/media-prefs.ts": {
-    "mtime": 1792979024.195132,
-    "seen": 1792981012.490429,
+    "mtime": 1793199392.6148152,
+    "seen": 1793206179.0647907,
     "ast_hash": "11e3bfb04ef452b3ff53e9c743d1f9a2",
     "semantic_hash": ""
   },
   "frontend/src/app/core/scroll.service.ts": {
-    "mtime": 1792980502.898034,
-    "seen": 1792981012.4904304,
-    "ast_hash": "4efed28074424bf1343af9c28e7d4c07",
+    "mtime": 1793201857.3144252,
+    "seen": 1793206179.064794,
+    "ast_hash": "98cc12d6114cf7d4f034f1c48c27c42b",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/announcement-bar.ts": {
-    "mtime": 1792978917.1162217,
-    "seen": 1792981012.490432,
-    "ast_hash": "af6ffc6af23bfd56532220779e99610b",
+    "mtime": 1793199392.6178257,
+    "seen": 1793206179.0648038,
+    "ast_hash": "6dc3763744c2b3d41edd817e500e1146",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/layout-public.ts": {
-    "mtime": 1793040255.2695675,
-    "seen": 1793045761.2103815,
-    "ast_hash": "a2e474c66c9942380724d4e817f38fda",
+    "mtime": 1793201865.2756112,
+    "seen": 1793206179.0648065,
+    "ast_hash": "e4aaf187f9f5efdaa39de1323034e755",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/site-footer.ts": {
-    "mtime": 1792978975.2449877,
-    "seen": 1792981012.4904351,
-    "ast_hash": "e73cc4a26898c5f5acbec17840148fb5",
+    "mtime": 1793201874.9555142,
+    "seen": 1793206179.0648105,
+    "ast_hash": "4749dffa3b28813175df37b8d3cbc152",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/site-nav.spec.ts": {
-    "mtime": 1793040292.1895037,
-    "seen": 1793045761.2103848,
-    "ast_hash": "de44bd35b7e38714d7d0aabff0d75044",
+    "mtime": 1793199392.6248682,
+    "seen": 1793206179.0648139,
+    "ast_hash": "c71b9cc9ff02d35f54d0b965ad3b1d46",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/site-nav.ts": {
-    "mtime": 1793041213.2205555,
-    "seen": 1793045761.2103865,
-    "ast_hash": "576e0170d239ae07f879d5ae16bb7a44",
+    "mtime": 1793199392.6248682,
+    "seen": 1793206179.064817,
+    "ast_hash": "e5397b8ed67f3ad5b1a3d7c366a0182f",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/landing.ts": {
-    "mtime": 1792980502.8866172,
-    "seen": 1792981012.490442,
+    "mtime": 1793199392.6384115,
+    "seen": 1793206179.0648458,
     "ast_hash": "c23e44287386c1aea63515b704d7997e",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/categories.ts": {
-    "mtime": 1793039331.6815293,
-    "seen": 1793045761.210401,
+    "mtime": 1793199392.64062,
+    "seen": 1793206179.064849,
     "ast_hash": "556883770adb59e09843e2e98647f01c",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/hero-video.spec.ts": {
-    "mtime": 1792975709.5350728,
-    "seen": 1792977902.5544274,
-    "ast_hash": "de764219d91ba0a925264f3d9b731102",
+    "mtime": 1793199392.6436262,
+    "seen": 1793206179.0648522,
+    "ast_hash": "dd1aec015dd345f67393f99e7d4a2e45",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/hero-video.ts": {
-    "mtime": 1792975662.4643648,
-    "seen": 1792977902.5544288,
-    "ast_hash": "982eb8c3da69f9f7d6fd96b8a35c4598",
+    "mtime": 1793199392.6446288,
+    "seen": 1793206179.064855,
+    "ast_hash": "09fb5e827deae09e3f8818a0a6f33d11",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/hero.ts": {
-    "mtime": 1792980448.2850645,
-    "seen": 1792981012.4904482,
+    "mtime": 1793199392.646625,
+    "seen": 1793206179.0648584,
     "ast_hash": "c241721cb7364a1f0f0ea5c84d6825e3",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/how-to-order.ts": {
-    "mtime": 1792980502.9295943,
-    "seen": 1792981012.4904497,
+    "mtime": 1793199392.6486268,
+    "seen": 1793206179.064862,
     "ast_hash": "a4a5695f075be82aeb16df5561f09ade",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/info-columns.ts": {
-    "mtime": 1792980502.8866172,
-    "seen": 1792981012.490451,
+    "mtime": 1793199392.6506786,
+    "seen": 1793206179.064865,
     "ast_hash": "b3b1f184a91dd7ecdef55fcde70e9902",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/intro.ts": {
-    "mtime": 1792980474.5767567,
-    "seen": 1792981012.4904525,
-    "ast_hash": "d2e94fad64ab8469f7d95029ee0fa9c6",
+    "mtime": 1793199392.651392,
+    "seen": 1793206179.0648682,
+    "ast_hash": "d21b7f0378af0389451e9bedf007b5d3",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/promos.ts": {
-    "mtime": 1792980502.8866172,
-    "seen": 1792981012.490454,
+    "mtime": 1793199392.6524,
+    "seen": 1793206179.0648708,
     "ast_hash": "2cd6c8bff24e7e7df1a139b96e85305b",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/bottle-placeholder.ts": {
-    "mtime": 1793039939.9132068,
-    "seen": 1793045761.2104237,
+    "mtime": 1793199392.6649556,
+    "seen": 1793206179.0649035,
     "ast_hash": "827884f7eaf94605b47d5a62b99c2688",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/brindis-mark.ts": {
-    "mtime": 1793039939.9151845,
-    "seen": 1793045761.2104251,
+    "mtime": 1793199392.6659613,
+    "seen": 1793206179.064907,
     "ast_hash": "c32def5822a58c019929d1aca4e664e0",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/parallax.directive.ts": {
-    "mtime": 1793039939.9181905,
-    "seen": 1793045761.2104342,
+    "mtime": 1793199392.6714773,
+    "seen": 1793206179.0649323,
     "ast_hash": "15e6fc009565fa9f97b26d130761d8d6",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/reveal.directive.ts": {
-    "mtime": 1793039939.9191902,
-    "seen": 1793045761.210441,
+    "mtime": 1793199392.678649,
+    "seen": 1793206179.064949,
     "ast_hash": "bbd1a8bfd909aa1f1c8294ec76e4f8ab",
     "semantic_hash": ""
   },
   "frontend/src/main.ts": {
-    "mtime": 1792975349.1035204,
-    "seen": 1792977902.5544424,
+    "mtime": 1793199392.680736,
+    "seen": 1793206179.0649588,
     "ast_hash": "1289536d6d8f94242a4ffc598d094633",
     "semantic_hash": ""
   },
   "frontend/tsconfig.app.json": {
-    "mtime": 1792975349.0948892,
-    "seen": 1792977902.554444,
+    "mtime": 1793199392.685773,
+    "seen": 1793206179.0649624,
     "ast_hash": "f0ed6c81d0a374939052cff4567f713f",
     "semantic_hash": ""
   },
   "frontend/tsconfig.json": {
-    "mtime": 1792975349.0919688,
-    "seen": 1792977902.554447,
+    "mtime": 1793199392.686779,
+    "seen": 1793206179.0649655,
     "ast_hash": "46e70ba7bf6d021351390882a69f0ba9",
     "semantic_hash": ""
   },
   "frontend/tsconfig.spec.json": {
-    "mtime": 1792975349.096447,
-    "seen": 1792977902.5544484,
+    "mtime": 1793199392.686779,
+    "seen": 1793206179.064969,
     "ast_hash": "bd7d8d4dcf7261c37c6a35a892af2f35",
     "semantic_hash": ""
   },
   "postman/BRINDA.local.postman_environment.json": {
-    "mtime": 1792684759.2349772,
-    "seen": 1792977902.55445,
+    "mtime": 1792702216.5286622,
+    "seen": 1793206179.064972,
     "ast_hash": "8745b63906eecf76ffcec1c2e4bf0d6c",
     "semantic_hash": ""
   },
   "postman/BRINDA.postman_collection.json": {
-    "mtime": 1792684067.5260844,
-    "seen": 1792977902.5544512,
-    "ast_hash": "c60a1955d03e02734a8761ca73ef7639",
+    "mtime": 1793204580.7922165,
+    "seen": 1793206179.0649748,
+    "ast_hash": "e1601bafc0440f638b5ea397569495b3",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1793045721.527072,
-    "seen": 1793045761.2104557,
-    "ast_hash": "c2c1dae5e2aa8f3e8c4ef8ee068af1d0",
+    "mtime": 1793199392.5627458,
+    "seen": 1793206179.0649784,
+    "ast_hash": "4ec59c615d8d252819cbd63225c3dee7",
     "semantic_hash": ""
   },
   "CONTEXTO-BRINDA.md": {
-    "mtime": 1793045731.4730625,
-    "seen": 1793045761.210457,
-    "ast_hash": "f9da7951d424bae099a0abba3baa7833",
+    "mtime": 1793206154.8457355,
+    "seen": 1793206179.0649815,
+    "ast_hash": "f475dd4950f59cd9e7b937faf10b42e7",
     "semantic_hash": ""
   },
   "FRONTEND-BRIEF-BRINDA.md": {
-    "mtime": 1792975027.6639714,
-    "seen": 1792977902.5544553,
-    "ast_hash": "3e74a605ab0970c6a782cd1063bf007f",
+    "mtime": 1793199392.5677607,
+    "seen": 1793206179.064989,
+    "ast_hash": "e1487182e96468d470cb782242c1d2e0",
     "semantic_hash": ""
   },
   "PRODUCT.md": {
-    "mtime": 1792974684.921171,
-    "seen": 1792977902.5544565,
-    "ast_hash": "d7b36fbeed840b4416f16419ea3ca2c4",
+    "mtime": 1793199392.5677607,
+    "seen": 1793206179.0649924,
+    "ast_hash": "9de3c24bd78047b61245b636e03476e1",
     "semantic_hash": ""
   },
   "PROMPT-CLI-V4.md": {
-    "mtime": 1792439461.684384,
-    "seen": 1792977902.5544581,
-    "ast_hash": "f50848209d7c7cae7d6d857d94ee4e8c",
+    "mtime": 1792702216.380914,
+    "seen": 1793206179.064997,
+    "ast_hash": "c707a9f81f16a816cbaffac372b62994",
     "semantic_hash": ""
   },
   "avances.md": {
-    "mtime": 1793045663.0294216,
-    "seen": 1793045761.2104666,
-    "ast_hash": "ffd37435abe8666de49d8b6821edecb3",
+    "mtime": 1793206154.8437335,
+    "seen": 1793206179.0650039,
+    "ast_hash": "0636d3f3d62a81438d20494ceb539134",
     "semantic_hash": ""
   },
   "backend/ENDPOINTS.md": {
-    "mtime": 1792681920.7713156,
-    "seen": 1792977902.5544608,
-    "ast_hash": "cb3186f1f9504eff64ad0454a680d396",
+    "mtime": 1793204773.9605374,
+    "seen": 1793206179.0650067,
+    "ast_hash": "d153608ddd3c8ae9c01c07a7dd18ddd0",
     "semantic_hash": ""
   },
   "database/README.md": {
-    "mtime": 1792972799.301007,
-    "seen": 1792977902.5544622,
-    "ast_hash": "be274240dc575d93f8eaf143a1960586",
+    "mtime": 1793206154.8497324,
+    "seen": 1793206179.0650134,
+    "ast_hash": "fe603aa880cf771df1f3764754fb8def",
     "semantic_hash": ""
   },
   "frontend/README.md": {
-    "mtime": 1792975349.0851178,
-    "seen": 1792977902.5544634,
+    "mtime": 1793199392.5866485,
+    "seen": 1793206179.0650265,
     "ast_hash": "53e719fc7f67be6e16027dbb90edaa15",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/site-footer.html": {
-    "mtime": 1792979563.98813,
-    "seen": 1792981012.4904969,
-    "ast_hash": "f4c4d59d1f9692b943855cba69be31d3",
+    "mtime": 1793201874.9565215,
+    "seen": 1793206179.0650353,
+    "ast_hash": "537c4028e557427033e3169481f0a718",
     "semantic_hash": ""
   },
   "frontend/src/app/layouts/layout-public/site-nav.html": {
-    "mtime": 1793041259.8413196,
-    "seen": 1793045761.2104795,
-    "ast_hash": "43a6df23f20500348c10b54d98393aef",
+    "mtime": 1793199392.6238627,
+    "seen": 1793206179.0650387,
+    "ast_hash": "a4848b81179c828d7af0aa203d49bbdf",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/hero-video.html": {
-    "mtime": 1792975662.7754934,
-    "seen": 1792977902.5544677,
-    "ast_hash": "f9f084f1908efabc12097d138450da74",
+    "mtime": 1793199392.6426277,
+    "seen": 1793206179.06505,
+    "ast_hash": "5b3dea8af9129d56c1f2f5ba1a013a9e",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/landing/sections/hero.html": {
-    "mtime": 1792980448.2870781,
-    "seen": 1792981012.4905019,
+    "mtime": 1793199392.6456273,
+    "seen": 1793206179.0650826,
     "ast_hash": "3f68e467ef64ab92b4195b71c8faf977",
     "semantic_hash": ""
   },
   "frontend/src/index.html": {
-    "mtime": 1792975559.9440403,
-    "seen": 1792977902.5544703,
-    "ast_hash": "721ee40eaac699f75ed6186573e1d6e6",
+    "mtime": 1793199392.680736,
+    "seen": 1793206179.0651019,
+    "ast_hash": "d79e92aa9a57c4dc5752c1d6f74192cd",
     "semantic_hash": ""
   },
   "postman/README.md": {
-    "mtime": 1792684759.2349772,
-    "seen": 1792977902.5544717,
-    "ast_hash": "f5ca537acba5dc8bc0a1171d2c3442fd",
+    "mtime": 1793206154.8487325,
+    "seen": 1793206179.0651052,
+    "ast_hash": "6692b3228215b2cb8e221d974610b219",
     "semantic_hash": ""
   },
   "readme.md": {
-    "mtime": 1793045688.417966,
-    "seen": 1793045761.210493,
-    "ast_hash": "84a968571602110090b4595f82cfb45f",
+    "mtime": 1793206154.8477361,
+    "seen": 1793206179.065109,
+    "ast_hash": "c6f337dc988d5885413d96e513358eaf",
     "semantic_hash": ""
   },
   "frontend/scripts/prod-check.mjs": {
-    "mtime": 1792980516.58678,
-    "seen": 1792981012.4904184,
-    "ast_hash": "9b396521e2be9a8b4ff23c4f761087e0",
+    "mtime": 1793201833.2247975,
+    "seen": 1793206179.064737,
+    "ast_hash": "60a59feb09d409c9574bc18866eae948",
     "semantic_hash": ""
   },
   "frontend/src/app/core/info.ts": {
-    "mtime": 1792980475.266167,
-    "seen": 1792981012.490427,
-    "ast_hash": "a8145a07883db169868e1425bd5b0edb",
+    "mtime": 1793199392.6133049,
+    "seen": 1793206179.0647874,
+    "ast_hash": "5169f4117b3283239ef30b90ffa8a73c",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/hide-order-bar.directive.ts": {
-    "mtime": 1793039939.9161901,
-    "seen": 1793045761.21043,
+    "mtime": 1793199392.6679614,
+    "seen": 1793206179.0649185,
     "ast_hash": "44dff2ce1556fcc79372575dfb8c4da8",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/order-bar.spec.ts": {
-    "mtime": 1793039939.9171913,
-    "seen": 1793045761.2104316,
+    "mtime": 1793199392.6694684,
+    "seen": 1793206179.0649257,
     "ast_hash": "1266e42c66e84a2b672daedbe810cfb4",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/order-bar.ts": {
-    "mtime": 1793039939.9171913,
-    "seen": 1793045761.210433,
+    "mtime": 1793199392.6704824,
+    "seen": 1793206179.064929,
     "ast_hash": "ec77469321f830906711709d11df1577",
     "semantic_hash": ""
   },
   "frontend/.impeccable/critique/2026-10-26T01-33-07Z__src-app-pages-public-landing-landing-ts.md": {
-    "mtime": 1792978387.1731038,
-    "seen": 1792981012.4904907,
-    "ast_hash": "fad3a43bcf32ffeacaf072cb7edba9cf",
+    "mtime": 1793199392.5783179,
+    "seen": 1793206179.065017,
+    "ast_hash": "807a86e1e5136a417419654427ca9648",
     "semantic_hash": ""
   },
   "frontend/.impeccable/critique/2026-10-26T01-47-10Z__src-app-pages-public-landing-landing-ts.md": {
-    "mtime": 1792979230.6457956,
-    "seen": 1792981012.490492,
-    "ast_hash": "8acabd0c525b75eddbffdc77dbed644d",
+    "mtime": 1793199392.5806456,
+    "seen": 1793206179.0650203,
+    "ast_hash": "fad2ff5cea8ad1631dfa0b5f9cb9ba7b",
     "semantic_hash": ""
   },
   "frontend/.impeccable/critique/2026-10-26T01-59-53Z__src-app-pages-public-landing-landing-ts.md": {
-    "mtime": 1792979993.207189,
-    "seen": 1792981012.4904938,
-    "ast_hash": "c4e6b5f21a0cf08fc469d3e9083a5fe2",
+    "mtime": 1793199392.581645,
+    "seen": 1793206179.0650234,
+    "ast_hash": "b601d27b84f1cdedb329eb4f020eda29",
     "semantic_hash": ""
   },
   ".impeccable/design.json": {
-    "mtime": 1792981230.447547,
-    "seen": 1793045761.2100594,
+    "mtime": 1793199392.5617542,
+    "seen": 1793206179.0640228,
     "ast_hash": "b3885d7f49ca2eceeaabdb61103c0b51",
     "semantic_hash": ""
   },
   "frontend/proxy.conf.json": {
-    "mtime": 1793041206.6526704,
-    "seen": 1793045761.210354,
-    "ast_hash": "ed98749363315022c3ee8d0bf26fa8fb",
+    "mtime": 1793199392.5921826,
+    "seen": 1793206179.0647047,
+    "ast_hash": "ab4847253355dbd43d809162253c5c04",
     "semantic_hash": ""
   },
   "frontend/scripts/carrito.mjs": {
-    "mtime": 1793041250.282715,
-    "seen": 1793045761.2103574,
-    "ast_hash": "9fd069b2b5b7a2ae2796d8e248e90071",
+    "mtime": 1793201832.9434505,
+    "seen": 1793206179.0647163,
+    "ast_hash": "bd894711d93eb15633f7d8d96c3a9d3f",
     "semantic_hash": ""
   },
   "frontend/scripts/catalogo-api.mjs": {
-    "mtime": 1793041283.2819805,
-    "seen": 1793045761.2103593,
-    "ast_hash": "e2c26d838533cf6387caac08ea59b950",
+    "mtime": 1793201833.0017958,
+    "seen": 1793206179.06472,
+    "ast_hash": "d108feead4671b5fb80bb4281433ccf4",
     "semantic_hash": ""
   },
   "frontend/scripts/catalogo.mjs": {
-    "mtime": 1793041250.353524,
-    "seen": 1793045761.2103605,
-    "ast_hash": "dc4027ff60d7f4080b8d870de32650da",
+    "mtime": 1793201833.0556705,
+    "seen": 1793206179.0647237,
+    "ast_hash": "d2952071591c93bf3993a3c5236e4e75",
     "semantic_hash": ""
   },
   "frontend/scripts/pedido.mjs": {
-    "mtime": 1793042237.388881,
-    "seen": 1793045761.2103636,
-    "ast_hash": "fc26cbe726e3080edfe0dcbe71663325",
+    "mtime": 1793201833.1704934,
+    "seen": 1793206179.0647335,
+    "ast_hash": "8504b20be64d6b3e013c266ec9b82372",
     "semantic_hash": ""
   },
   "frontend/src/app/core/catalog.mock.ts": {
-    "mtime": 1793039453.822103,
-    "seen": 1793045761.2103722,
-    "ast_hash": "a33ed49c1be0e7ead9664f1b35f0317c",
+    "mtime": 1793199392.6093402,
+    "seen": 1793206179.0647824,
+    "ast_hash": "17d8c3f526ff76cecf7bd44b59ae699f",
     "semantic_hash": ""
   },
   "frontend/src/app/models/cart-line.ts": {
-    "mtime": 1793040190.1311896,
-    "seen": 1793045761.2103877,
-    "ast_hash": "51286629b7da1df3ed68cb875096a2f1",
+    "mtime": 1793199392.6268704,
+    "seen": 1793206179.06482,
+    "ast_hash": "a0055722d0143632a1fa2d6ab69d7985",
     "semantic_hash": ""
   },
   "frontend/src/app/models/category.ts": {
-    "mtime": 1793039177.6707733,
-    "seen": 1793045761.2103891,
-    "ast_hash": "fb1b073f21566506de6840f9661557f4",
+    "mtime": 1793199392.6278713,
+    "seen": 1793206179.0648234,
+    "ast_hash": "2e938255e086d72ecf3093e6adfaee91",
     "semantic_hash": ""
   },
   "frontend/src/app/models/district.ts": {
-    "mtime": 1793042031.9621248,
-    "seen": 1793045761.2103906,
-    "ast_hash": "5ba13e8088f73577c038bffbad4135aa",
+    "mtime": 1793199392.6278713,
+    "seen": 1793206179.0648258,
+    "ast_hash": "cf26e71605197af4fc6e7ae559c27d8e",
     "semantic_hash": ""
   },
   "frontend/src/app/models/page.ts": {
-    "mtime": 1793041225.5832026,
-    "seen": 1793045761.210392,
-    "ast_hash": "de2d3d9b83f3ba8ca0bf2d705eb05b56",
+    "mtime": 1793199392.6293776,
+    "seen": 1793206179.0648286,
+    "ast_hash": "1a43e53640113044010028f43f032f0a",
     "semantic_hash": ""
   },
   "frontend/src/app/models/product.ts": {
-    "mtime": 1793039177.3332753,
-    "seen": 1793045761.2103937,
-    "ast_hash": "fe9deb0132c9a0d43553170964cbe2be",
+    "mtime": 1793199392.6293776,
+    "seen": 1793206179.064832,
+    "ast_hash": "a846e31702ceb9570dd0e9a324c4fdc0",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/carrito/carrito.ts": {
-    "mtime": 1793040351.7080915,
-    "seen": 1793045761.210395,
-    "ast_hash": "8a73dfed36f1d86db93ff9873bf55a93",
+    "mtime": 1793201874.9585235,
+    "seen": 1793206179.0648355,
+    "ast_hash": "5182ad5d91c51864d2ac782851e80943",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/catalogo/catalogo-soon.ts": {
-    "mtime": 1793039487.8720777,
-    "seen": 1793045761.2103965,
-    "ast_hash": "87903554759f8c0dc45aa4fb962e3262",
+    "mtime": 1793199392.6348941,
+    "seen": 1793206179.0648384,
+    "ast_hash": "fe4ad6dd52421ddc3278bc4bb345c610",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/catalogo/catalogo.ts": {
-    "mtime": 1793041259.7563357,
-    "seen": 1793045761.2103982,
-    "ast_hash": "b4d1623ce828a9d99d33fafc86d89230",
+    "mtime": 1793199392.6369016,
+    "seen": 1793206179.0648425,
+    "ast_hash": "a85f406be31f05f85476313e267fa886",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/pedido/pedido.spec.ts": {
-    "mtime": 1793042205.5417197,
-    "seen": 1793045761.2104142,
-    "ast_hash": "5f68e936d4ec5c0105d64a2f5c4281a4",
+    "mtime": 1793199392.6569302,
+    "seen": 1793206179.0648801,
+    "ast_hash": "729b6f1bcccea0fbd07ce01b3624d743",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/pedido/pedido.ts": {
-    "mtime": 1793042098.8113704,
-    "seen": 1793045761.2104156,
-    "ast_hash": "2f2656d3d80392d2e603a128e6ea5de5",
+    "mtime": 1793201889.2204227,
+    "seen": 1793206179.0648832,
+    "ast_hash": "6196b2f9a938fb77184d8e03a9f6bed2",
     "semantic_hash": ""
   },
   "frontend/src/app/services/cart.service.spec.ts": {
-    "mtime": 1793040208.4708364,
-    "seen": 1793045761.2104168,
-    "ast_hash": "002ff0792c01e47a4b56a6714f9d4738",
+    "mtime": 1793199392.6594343,
+    "seen": 1793206179.0648863,
+    "ast_hash": "cce9d3f01447ae853d976b31a8a06f5f",
     "semantic_hash": ""
   },
   "frontend/src/app/services/cart.service.ts": {
-    "mtime": 1793040292.1240249,
-    "seen": 1793045761.2104182,
-    "ast_hash": "7f41e1622a9b44b16a590a350ac908b8",
+    "mtime": 1793199392.6594343,
+    "seen": 1793206179.0648897,
+    "ast_hash": "132aea4b7f887b247a2ddf9b9d86b0ad",
     "semantic_hash": ""
   },
   "frontend/src/app/services/catalog.service.spec.ts": {
-    "mtime": 1793041259.6543634,
-    "seen": 1793045761.2104197,
-    "ast_hash": "6836770708fcf8f181ad66847df68dea",
+    "mtime": 1793199392.6614416,
+    "seen": 1793206179.064893,
+    "ast_hash": "2ca0d3abbab230da559467c39bb1158c",
     "semantic_hash": ""
   },
   "frontend/src/app/services/catalog.service.ts": {
-    "mtime": 1793041259.6776311,
-    "seen": 1793045761.2104208,
-    "ast_hash": "7f531de4bc1dfc102e5c4e3b95394687",
+    "mtime": 1793199392.6624517,
+    "seen": 1793206179.0648966,
+    "ast_hash": "cbe7c33e465d81cd2908e54795764c11",
     "semantic_hash": ""
   },
   "frontend/src/app/services/delivery.service.ts": {
-    "mtime": 1793042098.8548398,
-    "seen": 1793045761.2104223,
-    "ast_hash": "a1cc7beb2423107f5de1150cbb42dc4e",
+    "mtime": 1793199392.66345,
+    "seen": 1793206179.0649002,
+    "ast_hash": "f34dbb6827dca606d679053bdb1d951d",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/form-field.ts": {
-    "mtime": 1793042098.8392,
-    "seen": 1793045761.2104266,
-    "ast_hash": "02bef2d7529abbf013cf5215ac855965",
+    "mtime": 1793199392.6659613,
+    "seen": 1793206179.0649107,
+    "ast_hash": "b2839ac2a4ec9c0ca7e11218e24592eb",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/format.ts": {
-    "mtime": 1793039453.812229,
-    "seen": 1793045761.2104282,
-    "ast_hash": "7ce0e42a2240e21cac40af75298ed706",
+    "mtime": 1793199392.6679614,
+    "seen": 1793206179.0649142,
+    "ast_hash": "4eb134bdb3dd3c38716569aabff78fe2",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/product-card.ts": {
-    "mtime": 1793040291.9999392,
-    "seen": 1793045761.2104356,
-    "ast_hash": "1179a3396ea487cdcf4123de9963df92",
+    "mtime": 1793199392.672651,
+    "seen": 1793206179.0649357,
+    "ast_hash": "6cd3cc8b573672f4b67e54f07ccbe29a",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/product-detail.ts": {
-    "mtime": 1793040292.068079,
-    "seen": 1793045761.210437,
-    "ast_hash": "d827721a2b4e1b73d00ccfe3c7262316",
+    "mtime": 1793199392.6746492,
+    "seen": 1793206179.0649385,
+    "ast_hash": "8bc5c7f5b68047000be8ebef44026829",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/product-skeleton.ts": {
-    "mtime": 1793039399.541355,
-    "seen": 1793045761.2104385,
-    "ast_hash": "1a2e94ad01875972a3e0d614269b9bf7",
+    "mtime": 1793199392.676651,
+    "seen": 1793206179.0649416,
+    "ast_hash": "2386aaacc8990bf537ba1033a5db3b5a",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/qty-stepper.ts": {
-    "mtime": 1793040291.9444795,
-    "seen": 1793045761.2104397,
-    "ast_hash": "71e236825af2525ad7475f2821ad8f0f",
+    "mtime": 1793199392.6776516,
+    "seen": 1793206179.0649455,
+    "ast_hash": "bcd6b82bd52cb6b8e7b5b1938dbb5330",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/rise.directive.ts": {
-    "mtime": 1793039213.1133177,
-    "seen": 1793045761.2104428,
-    "ast_hash": "bbbea781d0e9c67201a0b47c63e76ecc",
+    "mtime": 1793199392.678649,
+    "seen": 1793206179.0649521,
+    "ast_hash": "e097abac3ad19f6cd3a8c07f9bb76287",
     "semantic_hash": ""
   },
   "frontend/src/app/shared/state-panel.ts": {
-    "mtime": 1793039399.5141098,
-    "seen": 1793045761.2104442,
-    "ast_hash": "3ba37c0f7405faf13fc9b7702299add6",
+    "mtime": 1793199392.6796496,
+    "seen": 1793206179.0649557,
+    "ast_hash": "78f3a7fa0bdacaefce8ebf69165ba853",
     "semantic_hash": ""
   },
   "DESIGN.md": {
-    "mtime": 1793045721.527072,
-    "seen": 1793045761.2104585,
-    "ast_hash": "f40d4dcc3f0e83823480af0168fa0642",
+    "mtime": 1793206154.8602479,
+    "seen": 1793206179.0649855,
+    "ast_hash": "06cc82a1fb122096e10924d5af22f61b",
     "semantic_hash": ""
   },
   "PROMPT-INICIO-SESION.md": {
-    "mtime": 1793045746.662769,
-    "seen": 1793045761.210465,
-    "ast_hash": "37eec830485fd0b2f86e859d6e73e866",
+    "mtime": 1793206154.8467336,
+    "seen": 1793206179.0650008,
+    "ast_hash": "d614bba7f8dd23d83804261f002e83dc",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/carrito/carrito.html": {
-    "mtime": 1793045489.0830164,
-    "seen": 1793045761.2104812,
-    "ast_hash": "3198cd72096e43433e5efa6f77f48583",
+    "mtime": 1793201874.9585235,
+    "seen": 1793206179.0650425,
+    "ast_hash": "5054185cd16055af7a38b199f02b32c2",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/catalogo/catalogo.html": {
-    "mtime": 1793041232.8731742,
-    "seen": 1793045761.2104826,
-    "ast_hash": "2c4a3d73dc3f09243165c18deb9654ab",
+    "mtime": 1793199392.6369016,
+    "seen": 1793206179.065046,
+    "ast_hash": "bdbabfbdbe48ea2913467ccd15ae8c59",
     "semantic_hash": ""
   },
   "frontend/src/app/pages/public/pedido/pedido.html": {
-    "mtime": 1793042360.708245,
-    "seen": 1793045761.2104878,
-    "ast_hash": "78e591b4ed79943c17c04df2e5b8a152",
+    "mtime": 1793201874.959522,
+    "seen": 1793206179.0650976,
+    "ast_hash": "db873446157e03b113c94e6f45ab0cde",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/controller/ComplaintAdminController.java": {
+    "mtime": 1793204462.667014,
+    "seen": 1793206179.064202,
+    "ast_hash": "a2565a0d1f2a28539787970ee8fec4ee",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/controller/ComplaintController.java": {
+    "mtime": 1793203174.991125,
+    "seen": 1793206179.0642047,
+    "ast_hash": "695fc7d93686652ef47d3c4e97e11955",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/ComplaintCountsResponse.java": {
+    "mtime": 1793204462.6639402,
+    "seen": 1793206179.0642076,
+    "ast_hash": "a32d475a8a24eb8394a07d4c539dcf69",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/ComplaintDetailResponse.java": {
+    "mtime": 1793204462.6619413,
+    "seen": 1793206179.0642104,
+    "ast_hash": "76dde80e9a049edd223de0329bc44b40",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/ComplaintSummaryResponse.java": {
+    "mtime": 1793204462.6609416,
+    "seen": 1793206179.0642133,
+    "ast_hash": "902c5f765b8d5155b1f27b92095ee396",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/CreateComplaintRequest.java": {
+    "mtime": 1793203355.4013095,
+    "seen": 1793206179.0642157,
+    "ast_hash": "06f9849a6aec2e100bf15b73b01ffc0c",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/CreatedComplaintResponse.java": {
+    "mtime": 1793203174.9842405,
+    "seen": 1793206179.0642183,
+    "ast_hash": "ea89497b8913764584ab142296071a49",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/DeadlineInfo.java": {
+    "mtime": 1793204462.6572328,
+    "seen": 1793206179.0642204,
+    "ast_hash": "a3e6beb3a2786a400fe74064e6063099",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/EmailInfo.java": {
+    "mtime": 1793204462.6582437,
+    "seen": 1793206179.0642228,
+    "ast_hash": "73c0b2e9cdac062e78d2bc2c119ae166",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/RespondComplaintRequest.java": {
+    "mtime": 1793204462.6629398,
+    "seen": 1793206179.064225,
+    "ast_hash": "37aa35a28e86e83ceb7a503b0bb016fb",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/dto/ValidDocument.java": {
+    "mtime": 1793203355.3146336,
+    "seen": 1793206179.0642273,
+    "ast_hash": "fe33c9f2a6307c77cb83f8cc2b1a1e0c",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/Complaint.java": {
+    "mtime": 1793203776.1851964,
+    "seen": 1793206179.0642302,
+    "ast_hash": "b7e901c20c85ce7810a320efbd844207",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/ComplaintStatus.java": {
+    "mtime": 1793203080.0644133,
+    "seen": 1793206179.0642326,
+    "ast_hash": "778c89228faed2378d38ecfd7378d238",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/ComplaintType.java": {
+    "mtime": 1793203080.0624132,
+    "seen": 1793206179.0642352,
+    "ast_hash": "7a983a4fa62e16fcc0273419ec99e956",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/DocumentType.java": {
+    "mtime": 1793203080.0644133,
+    "seen": 1793206179.0642374,
+    "ast_hash": "527ebaef02ab74f9fe81640524c67d3d",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/EmailDelivery.java": {
+    "mtime": 1793203080.066412,
+    "seen": 1793206179.0642402,
+    "ast_hash": "e061f519b0938d8703509aef3dae94ec",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/EmailStatus.java": {
+    "mtime": 1793203080.0654116,
+    "seen": 1793206179.0642433,
+    "ast_hash": "993c361135d63b3d2087908c7719a290",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/model/GoodType.java": {
+    "mtime": 1793203080.0634143,
+    "seen": 1793206179.0642457,
+    "ast_hash": "7ec5f7ef13f4d4a8f80f8baf9cda91c6",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/repository/ComplaintNumberGenerator.java": {
+    "mtime": 1793203080.0704544,
+    "seen": 1793206179.0642483,
+    "ast_hash": "7d56766b4844c71d9f3c1d0a804fef5d",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/repository/ComplaintRepository.java": {
+    "mtime": 1793204462.749804,
+    "seen": 1793206179.0642507,
+    "ast_hash": "e642f6170c80405f22a14a5c1569dd51",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/BusinessDays.java": {
+    "mtime": 1793204462.6561897,
+    "seen": 1793206179.0642529,
+    "ast_hash": "b092d714ab222f819e7228b0316664ca",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintAdminService.java": {
+    "mtime": 1793204462.6659784,
+    "seen": 1793206179.0642555,
+    "ast_hash": "e5da860b65010ae9c613fb1a3b37ece6",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintDeadlines.java": {
+    "mtime": 1793204462.6582437,
+    "seen": 1793206179.064258,
+    "ast_hash": "4600395627501cc80ad1aa53c16ad46e",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintEmailRetryJob.java": {
+    "mtime": 1793203174.989619,
+    "seen": 1793206179.064261,
+    "ast_hash": "5010b6d6e9923d7fbab3d26f38e7688d",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintEmailTemplates.java": {
+    "mtime": 1793203174.9872577,
+    "seen": 1793206179.0642626,
+    "ast_hash": "cfe04bce7d6c61ebffe908cea1c13a7e",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintNotifier.java": {
+    "mtime": 1793203316.0225022,
+    "seen": 1793206179.064265,
+    "ast_hash": "0eb60038f94f6ffa7c97077bc1093266",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintPdfService.java": {
+    "mtime": 1793203254.875841,
+    "seen": 1793206179.0642676,
+    "ast_hash": "704d9639db795f730c658832f0f82b86",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintProperties.java": {
+    "mtime": 1793203174.9852457,
+    "seen": 1793206179.0642695,
+    "ast_hash": "b69f627c4c10608ea5672c7bd5d79eb2",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/complaint/service/ComplaintService.java": {
+    "mtime": 1793203174.988618,
+    "seen": 1793206179.0642724,
+    "ast_hash": "047bb8bdf5d6d28792988e88fb0cfee2",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/shared/mail/EmailMessage.java": {
+    "mtime": 1793203080.0593953,
+    "seen": 1793206179.064553,
+    "ast_hash": "bd3e883af5f3fd39c4cfcc2beb156774",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/shared/mail/EmailSendException.java": {
+    "mtime": 1793203080.0593953,
+    "seen": 1793206179.0645564,
+    "ast_hash": "2d7f8a97d351f456159b61430ce7f21d",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/shared/mail/EmailSender.java": {
+    "mtime": 1793203080.057303,
+    "seen": 1793206179.0645597,
+    "ast_hash": "47553e05bf727729e601aabca0044646",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/shared/mail/NoopEmailSender.java": {
+    "mtime": 1793203080.060403,
+    "seen": 1793206179.0645628,
+    "ast_hash": "1806f080f1c427a7ddb4eaa237984656",
+    "semantic_hash": ""
+  },
+  "backend/src/main/java/com/brinda/api/shared/mail/SendResult.java": {
+    "mtime": 1793203080.0583017,
+    "seen": 1793206179.0645678,
+    "ast_hash": "7f397e3e2e0f41e36ab0fe664623f2a0",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/ComplaintAdminTest.java": {
+    "mtime": 1793204508.8113952,
+    "seen": 1793206179.064607,
+    "ast_hash": "ffe03cacd5c1196e844aebc7622b84c8",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/ComplaintNotifierTest.java": {
+    "mtime": 1793203255.1083841,
+    "seen": 1793206179.06461,
+    "ast_hash": "9768e343fabc0b9f01dde43fbf75545d",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/ComplaintPdfServiceTest.java": {
+    "mtime": 1793203299.559898,
+    "seen": 1793206179.0646126,
+    "ast_hash": "8a972aae63bcee50ab45b6d3705fd6b6",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/ComplaintServiceTest.java": {
+    "mtime": 1793203255.1083841,
+    "seen": 1793206179.0646152,
+    "ast_hash": "320d3bd48e1bea0aa833e943975196a2",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/CreateComplaintRequestTest.java": {
+    "mtime": 1793203255.1063838,
+    "seen": 1793206179.0646179,
+    "ast_hash": "752334e9175338930ec3378bd9549e15",
+    "semantic_hash": ""
+  },
+  "backend/src/test/java/com/brinda/api/complaint/ReflectionHelper.java": {
+    "mtime": 1793203255.109383,
+    "seen": 1793206179.064621,
+    "ast_hash": "ff493c33311dd6a61dab6df8e5bca023",
+    "semantic_hash": ""
+  },
+  "database/migrations/V10__complaints.sql": {
+    "mtime": 1793202969.495413,
+    "seen": 1793206179.064646,
+    "ast_hash": "16f350c0da9124d602f4f5fec607cdf8",
+    "semantic_hash": ""
+  },
+  "frontend/scripts/admin.mjs": {
+    "mtime": 1793205235.5052748,
+    "seen": 1793206179.0647078,
+    "ast_hash": "9fe61546592af9fe5b002471d0e99513",
+    "semantic_hash": ""
+  },
+  "frontend/scripts/age.mjs": {
+    "mtime": 1793201832.6155746,
+    "seen": 1793206179.0647109,
+    "ast_hash": "3ce4ba3bb3550acfd8f79207cc6588f3",
+    "semantic_hash": ""
+  },
+  "frontend/scripts/legal.mjs": {
+    "mtime": 1793202114.9285429,
+    "seen": 1793206179.0647268,
+    "ast_hash": "1ee2cca25bdf740dec3e38a03b2d1656",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/admin-auth.service.ts": {
+    "mtime": 1793205893.0382607,
+    "seen": 1793206179.0647395,
+    "ast_hash": "d9bddd45957274b18df1b36e5e1171d1",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/admin.guard.ts": {
+    "mtime": 1793204908.1215615,
+    "seen": 1793206179.0647428,
+    "ast_hash": "076a7aeee29f080f25065d58ba8517e5",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/admin.spec.ts": {
+    "mtime": 1793204934.3529792,
+    "seen": 1793206179.064746,
+    "ast_hash": "83886cbb1faaaa759cf0228d39d9b3e3",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/cambiar-clave.ts": {
+    "mtime": 1793204908.1273036,
+    "seen": 1793206179.0647485,
+    "ast_hash": "c225f288751b7691cbf99df144673f2a",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/layout-admin.ts": {
+    "mtime": 1793204908.1247892,
+    "seen": 1793206179.0647519,
+    "ast_hash": "bb184193e34c628129d65800258341a6",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/login.ts": {
+    "mtime": 1793204908.126296,
+    "seen": 1793206179.0647545,
+    "ast_hash": "616f2febfdf65f40a302fccbc35bbbf7",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamo-detalle.ts": {
+    "mtime": 1793204908.1334963,
+    "seen": 1793206179.064757,
+    "ast_hash": "281bcb900913b38c9f869ecf426a7984",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamo.models.ts": {
+    "mtime": 1793204908.1283028,
+    "seen": 1793206179.06476,
+    "ast_hash": "597fffc9cdb1d4fb8b7e3daec8d43466",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamos-lista.ts": {
+    "mtime": 1793204908.1298103,
+    "seen": 1793206179.064763,
+    "ast_hash": "8e32193bfe98fc168af496b35c146726",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamos.service.ts": {
+    "mtime": 1793204908.1293035,
+    "seen": 1793206179.064766,
+    "ast_hash": "8a3483ba37f456c7fe4d99ff1380cd5a",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/core/age-gate.service.ts": {
+    "mtime": 1793201857.3591518,
+    "seen": 1793206179.0647786,
+    "ast_hash": "fa1880fb85309954727d45a90f380040",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/layouts/layout-public/age-gate.spec.ts": {
+    "mtime": 1793202180.9981794,
+    "seen": 1793206179.0647976,
+    "ast_hash": "1d9297207afb85ac0160f0398bb2cf8c",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/layouts/layout-public/age-gate.ts": {
+    "mtime": 1793202176.6586256,
+    "seen": 1793206179.0648005,
+    "ast_hash": "7f811bfe7dc5d8865323e795015da45f",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/pages/public/libro-reclamaciones/libro-reclamaciones.spec.ts": {
+    "mtime": 1793201992.861485,
+    "seen": 1793206179.0648735,
+    "ast_hash": "4a5ac108897786fbd95fc93e036efb07",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/pages/public/libro-reclamaciones/libro-reclamaciones.ts": {
+    "mtime": 1793201889.2990317,
+    "seen": 1793206179.0648763,
+    "ast_hash": "e60050befa61b444338e84a979980b10",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/shared/legal-notice.ts": {
+    "mtime": 1793201889.2214296,
+    "seen": 1793206179.0649216,
+    "ast_hash": "cac1cfa25599ddceb3ce08b508b68530",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamo-detalle.html": {
+    "mtime": 1793204908.1334963,
+    "seen": 1793206179.0650299,
+    "ast_hash": "4a8bdd6ff742e4419d1f4f9ffa9c02ad",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/admin/reclamos/reclamos-lista.html": {
+    "mtime": 1793204908.1314876,
+    "seen": 1793206179.0650322,
+    "ast_hash": "db6e6ca8aa6eeaf1e0c2728c49789760",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/pages/public/libro-reclamaciones/libro-reclamaciones.html": {
+    "mtime": 1793201889.3321803,
+    "seen": 1793206179.0650928,
+    "ast_hash": "75fdaf4f12a069226b57b47f69b58622",
     "semantic_hash": ""
   }
 }
