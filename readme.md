@@ -1,9 +1,9 @@
 # BRINDA
 
-Licorería con delivery en Lima. Catálogo público, carrito local y pedido que se cierra por WhatsApp con pago Yape/Plin. Panel de administración para la dueña (pendiente).
+Licorería con delivery en Lima. Catálogo público, carrito local y pedido que se cierra por WhatsApp con pago Yape/Plin. Libro de Reclamaciones virtual y panel de administración para la dueña (por ahora solo la sección de reclamos; el resto está pendiente).
 
 - **Backend:** Spring Boot 3.4.5 / Java 21 (`backend/`), PostgreSQL 16 en Docker (`brinda-db/`), migraciones en `backend/src/main/resources/db/migration`.
-- **Frontend:** Angular 21 (`frontend/`): landing, catálogo, carrito y checkout (formulario).
+- **Frontend:** Angular 21 (`frontend/`): landing, catálogo, carrito, checkout (formulario), avisos legales y panel `/admin` (solo reclamos).
 - **Estado y decisiones:** `avances.md`, `CONTEXTO-BRINDA.md` (secciones 18 y 19), `PRODUCT.md`, `DESIGN.md`.
 - **Retomar con Claude Code:** pegar el prompt de `PROMPT-INICIO-SESION.md`.
 
@@ -26,7 +26,7 @@ Comprobar: `docker ps` debe listar `brinda-db` como `Up`.
 ### 2. Backend (terminal 2)
 ```powershell
 cd backend
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.10.7-hotspot"
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot"
 mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 Espera la línea `Started BrindaApplication` (unos 10 s). Escucha en el puerto 8080. Lee su configuración de `backend/.env` (ignorado por git; no lo compartas ni lo imprimas). El perfil `local` carga el seed de desarrollo (5 productos, categorías, 20 distritos).
@@ -56,11 +56,11 @@ Mismo Wi‑Fi que la PC. Averigua la IP con `ipconfig` (IPv4) y abre `http://<es
 ## Pruebas
 ```powershell
 cd frontend
-npx ng test --no-watch     # 33 tests (Vitest), no necesita servidores
+npx ng test --no-watch     # 49 tests (Vitest), no necesita servidores
 npx ng build               # build de producción (debe salir sin avisos)
 
 cd ../backend
-mvn test                   # 45 tests unitarios (con JAVA_HOME en JDK 21)
+mvn test                   # 80 tests unitarios (con JAVA_HOME en JDK 21)
 ```
 Verificaciones en navegador (Playwright, en `frontend/`, con los servidores arriba; guardan capturas en `frontend/capturas/`, ignorada por git):
 ```powershell
@@ -68,8 +68,16 @@ node scripts/catalogo-api.mjs   # catálogo contra la API real (necesita backend
 node scripts/pedido.mjs         # checkout contra la API real (necesita backend)
 node scripts/catalogo.mjs       # catálogo con datos de ejemplo (solo ng serve)
 node scripts/carrito.mjs        # carrito con datos de ejemplo (solo ng serve)
+node scripts/legal.mjs          # control de edad, pie legal y /libro-de-reclamaciones (solo ng serve)
+node scripts/admin.mjs          # panel de reclamos contra la API real (backend + ng serve; lee la clave de backend/.env)
 ```
+Sin navegador de Playwright descargado, usa el Chrome instalado: `$env:PW_CHANNEL='chrome'; node scripts/legal.mjs`.
 En PowerShell, ejecútalas con `node`; Git Bash convierte `/` en rutas.
+
+## Panel de administración
+Entra en http://localhost:4200/admin/login con el usuario `admin`. La clave vigente de desarrollo está en `backend/.env` (variable `POSTMAN_ADMIN_NEW_PASSWORD`; no la compartas ni la imprimas). La cuenta se bloquea 15 minutos tras 5 fallos (se desbloquea con `UPDATE users SET locked_until = NULL, failed_attempts = 0 WHERE username = 'admin';`). Por ahora solo existe la sección **Reclamos**.
+
+Variable opcional del backend: `COMPLAINTS_OWNER_EMAIL` (aviso a la dueña por cada reclamo nuevo). El servicio de correo aún no está conectado: los correos quedan `PENDING`.
 
 ## Problemas comunes
 | Síntoma | Causa y solución |
@@ -78,6 +86,7 @@ En PowerShell, ejecútalas con `node`; Git Bash convierte `/` en rutas.
 | El catálogo muestra 27 productos que no son de la base | Quedó activa la bandera de ejemplo. En la consola del navegador: `localStorage.removeItem('brinda.mock')` y recarga. |
 | El carrito dice "Ya no está disponible" en productos viejos | Eran de la base de ejemplo; usa "Quitar" o "Vaciar carrito". |
 | `docker` no conecta | Docker Desktop no está abierto del todo. |
+| El panel dice "El servidor no responde" o "No se pudo ingresar" | El backend (8080) está apagado: `ng serve` solo no basta. Levanta la base y luego el backend. |
 | El puerto 5433 está ocupado | Hay otro Postgres. El contenedor viejo `intellimarket-postgres-1` (apagado) usa el mismo puerto: no lo inicies. |
 | El backend no arranca por Flyway o credenciales | Revisa que `brinda-db` esté `Up` y que existan `backend/.env` y `brinda-db/.env` (no se suben a git). |
 | `mvn` no encuentra Java 21 | Define `$env:JAVA_HOME` como arriba en esa terminal. |

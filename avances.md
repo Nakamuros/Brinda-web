@@ -3,12 +3,15 @@
 > Registro de estado. Se actualiza al terminar cada tarea. Decisiones: `CONTEXTO-BRINDA.md` (secciones 18 y 19).
 > Para retomar: arranque local en `readme.md` y prompt de inicio en `PROMPT-INICIO-SESION.md`.
 
-## Resumen (2026-10-26)
-- Backend: cerrado para el Hito 1 (Spring Boot, PostgreSQL, V1–V9).
-- Frontend (Angular 21): landing, **catálogo conectado a la API real**, **carrito local** y **checkout `/pedido` solo formulario** (el botón "Finalizar compra" aún no hace nada, a pedido del usuario).
-- Último commit de código: `5b1124d`; git limpio al cerrar la sesión. 33 tests (frontend) y build de producción sin avisos.
-- Servicios locales apagados al cerrar: Angular (4200), backend (8080) y el contenedor `brinda-db` (datos intactos en su volumen).
-- `DESIGN.md` actualizado con las piezas nuevas; su sidecar `.impeccable/design.json` no se regeneró (hacerlo con `/impeccable document` cuando convenga).
+## Resumen (2026-10-28)
+- Backend: Hito 1 cerrado (V1–V9) y **V10 (Libro de Reclamaciones) aplicada a la BD local**. 80 tests unitarios.
+- Frontend (Angular 21): landing, catálogo conectado a la API real, carrito local, checkout `/pedido` solo formulario ("Finalizar compra" aún no hace nada, a pedido del usuario), **cumplimiento legal** (control de edad, advertencia de alcohol, aviso de menores, logo del Libro en el pie) y **panel `/admin` solo con la sección de Reclamos** (login, cambio de clave, lista y detalle con respuesta). 49 tests y build de producción sin avisos.
+- **Libro de Reclamaciones:** Etapa A (backend público + PDF + correo de desarrollo) y Etapa B (panel) hechas y commiteadas. **Etapa C (formulario público en `/libro-de-reclamaciones`) NO está hecha**: la ruta sigue siendo solo estructura y **no puede salir a producción** hasta tener el formulario funcional y la confirmación del asesor (correo, conservación, firma, validez de la copia digital).
+- **El panel NO está completo:** solo existen login, cambio de clave y Reclamos. Faltan pedidos, productos, ofertas, combos, stock y zonas/distritos.
+- Git: todo commiteado, sin push (`git log -12`). Servicios locales apagados al cerrar: Angular (4200), backend (8080) y el contenedor `brinda-db` (datos intactos en su volumen).
+- **Siguiente sesión, primer punto: borrar los datos hardcodeados** (a precisar con el usuario al empezar; candidatos: `core/catalog.mock.ts`, las categorías de ejemplo de la landing en `core/config.ts`, textos de relleno, y los reclamos y pedidos de prueba de la BD local). Ver "Qué sigue".
+- `DESIGN.md` incluye las piezas nuevas (control de edad, avisos legales, logo del Libro, panel); su sidecar `.impeccable/design.json` no se regeneró (hacerlo con `/impeccable document` cuando convenga).
+- Grafo (`graphify-out/`) actualizado con el código (sin LLM): los `.md` no se reprocesaron semánticamente.
 
 ## Estado actual (2026-10-22) · Backend cerrado para el Hito 1
 
@@ -103,6 +106,15 @@
 - **Por confirmar con el asesor/INDECOPI:** criterio del CE, formato del correlativo y del código, validez de la copia digital y de la firma, redacción de los correos, plazo de conservación (≥2 años) y cómputo de días hábiles.
 - Siguiente: Etapa B (panel `/admin` de reclamos) y Etapa C (formulario público). La ruta `/libro-de-reclamaciones` sigue sin poder salir a producción hasta que el asesor confirme.
 
+### Etapa B (backend del panel de reclamos) · 2026-10-28
+- Commits de la Etapa A hechos (3: backend; Postman + docs; `angular.json`). Sin push.
+- Endpoints `/api/v1/admin/complaints` (rol admin; `token_version` lo exige el filtro JWT): lista sin datos personales con filtros (`status`, `type`, `q`, `deadline`), `counts`, detalle (único lugar donde sale el DNI/CE descifrado; auditado como `COMPLAINT_VIEW` sin el documento), `respond` (texto ≤1000 + fecha; cambia a `ANSWERED`, audita `RECEIVED -> ANSWERED`; no se edita una respuesta ya registrada) y `pdf` (auditado). No hay DELETE (405; la BD tampoco lo permite).
+- Plazo calculado en el backend (`BusinessDays`, `ComplaintDeadlines`): 15 días hábiles de lunes a viernes sobre la fecha de Lima; `SOON` ≤ 3 días hábiles. **Por confirmar con el asesor: feriados.**
+- Verificación: 80 tests de backend en verde (14 nuevos: días hábiles, plazos, lista sin documento, auditoría sin documento, respuesta y sus validaciones). Postman: carpeta `11b` (16 peticiones) y dos casos nuevos en la `12` (token anterior y sin cookie sobre reclamos); `12b` se movió antes de la `12`. Newman con las carpetas 00, 12b, 11b y 12 contra la API real: **42 peticiones, 50 aserciones, 0 fallos**. La carpeta 13 y la corrida completa quedan para el final de la Etapa C. En la BD, la auditoría trae `COMPLAINT_VIEW/RESPOND/PDF` con usuario e IP y 0 filas con el documento; 0 datos personales en logs. La clave del admin se leyó de `backend/.env` (`POSTMAN_ADMIN_NEW_PASSWORD`) sin imprimirla.
+- **Interfaz del panel (frontend, `src/app/admin/`)**: ruta `/admin` fuera del layout público (sin control de edad, carrito ni barra de pedir). `AdminAuth` (cookie HttpOnly; el token nunca llega al JS), `adminGuard` (sin sesión o sin rol admin → `/admin/login`; clave inicial sin cambiar → `/admin/cambiar-clave`), login, cambio de clave (mín. 12), lista `/admin/reclamos` (contadores Sin responder / Por vencer / Vencidos que funcionan como filtros, búsqueda por código o nombre, estado, tipo, paginación; el plazo vencido o por vencer se marca en terracota tenue con ícono y texto, no solo con color) y detalle `/admin/reclamos/:id` (las 4 secciones de la hoja con sus títulos literales, plazo, estado de los dos correos, descarga del PDF y formulario de respuesta con confirmación en dos pasos: "ya no se puede editar").
+- Verificación de la interfaz: 49 tests de frontend (8 nuevos: guard y plazos/fechas), build de producción sin avisos (~77.6 KB iniciales; chunks lazy: lista 3.8 KB, detalle 3.8 KB, layout 1.2 KB). `scripts/admin.mjs` (56 comprobaciones a 360/768/1440 contra la API real: guard, clave incorrecta, login, la lista no muestra DNI/teléfono/correo/dirección, contadores, búsqueda y filtro, plazos en rojo con respuestas simuladas, detalle con las 4 secciones, objetivos ≥44 px, sin scroll horizontal, responder con validación y confirmación, salir y volver a pedir login, consola limpia) en verde. Corre con `PW_CHANNEL=chrome node scripts/admin.mjs`; lee la clave de `backend/.env` sin imprimirla y deja 3 reclamos de prueba por corrida (el límite público es 3/min por IP).
+- Pendiente de decidir (preguntado al usuario): si el enlace de copia del consumidor debe caducar (ver el reporte de la Etapa B). Sin cambios de diseño de DESIGN.md (el panel usa los tokens y los estilos `.input`/`.btn` existentes).
+
 ## Pendientes antes de producción
 Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principales:
 - Cuenta real de la dueña y desactivar el `admin` del seed; respaldar `DNI_ENCRYPTION_KEY` y usar claves nuevas.
@@ -111,12 +123,17 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 - Datos reales de Lucía: tarifas, distritos, `WHATSAPP_NUMBER`, `YAPE_NUMBER`, `PLIN_NUMBER` (hoy son de prueba).
 
 ## Qué sigue
-1. **Pedido real (siguiente etapa del checkout):** al pulsar "Finalizar compra": validar todo el formulario (marcar errores), `POST /api/v1/orders` (items con `productId` y cantidad; el servidor recalcula precios y tarifa), manejar `429` (5 pedidos/min por IP) y errores amables, vaciar el carrito, pantalla `/pedido/:codigo` con el código corto, resumen, aviso de 20 min, cómo pagar (Yape/Plin) y "Enviar por WhatsApp" con la `whatsappUrl` de la respuesta.
-2. **Categorías y datos reales de Lucía:** las fichas de la landing (cervezas, vinos…) no coinciden con las categorías de la BD (Piscos y Whiskys, Snacks, Hielo y Bebidas, Combos y promociones); decidir las reales y, idealmente, leerlas de la API. Además: productos con fotos, WhatsApp/Yape/Plin, horario, distritos y tarifas reales, video del hero, y su cuenta de administradora.
-3. **Panel admin** (`/admin`): login y cambio de clave obligatorio, pedidos (confirmar/anular), productos, ofertas, combos, stock, zonas/distritos. Usa los estilos de formulario globales (`.input`, `.check`).
-4. **Legales y calidad:** enlaces a términos y privacidad en el checkout cuando el asesor entregue los textos; `/impeccable critique` y `audit` del catálogo/checkout (la landing quedó en 23/32); probar en celular real por red local.
-5. **Despliegue:** Angular en Vercel/Netlify, Spring Boot en Railway, Postgres gestionado, dominio en Cloudflare; resolver cómo llega `/api` al backend en producción (proxy del hosting o URL absoluta) y el CORS.
+0. **Borrar los datos hardcodeados** (pedido del usuario para la próxima sesión; precisar cuáles al empezar, sin borrar nada de la BD sin confirmar).
+1. **Etapa C del Libro de Reclamaciones:** formulario público en `/libro-de-reclamaciones` que reproduce la hoja (secciones, campos, orden y textos literales; sin campo de firma: el mecanismo lo define el asesor, constante "por confirmar" visible solo en desarrollo; DNI de 8 dígitos o CE de 8 a 12 alfanuméricos; sin exigir pedido). Al enviar: N° del reclamo, botón de descarga de la copia en PDF y aviso del correo (solo en desarrollo). Casilla de privacidad hacia `/privacidad`. Mantener el aviso "no puede salir a producción". Al cerrar la C: **correr la colección Postman completa** (clave de `backend/.env`, variable `POSTMAN_ADMIN_NEW_PASSWORD`, sin imprimirla) y **proponer** (sin ejecutar) la actualización del grafo.
+2. **Decidir la caducidad del enlace de copia:** propuesta 30 días desde el registro (sin migración: `filed_at + 30 días`; 404/410 después; ~10 líneas, 2 tests y un caso de Postman). Pendiente del OK del usuario; depende del asesor.
+3. **Pedido real (checkout):** al pulsar "Finalizar compra": validar, `POST /api/v1/orders`, manejar `429`, vaciar el carrito, pantalla `/pedido/:codigo` con aviso de 20 min y "Enviar por WhatsApp".
+4. **Categorías y datos reales de Lucía:** las fichas de la landing (cervezas, vinos…) no coinciden con las de la BD; además productos con fotos, WhatsApp/Yape/Plin, horario, distritos y tarifas reales, video del hero y su cuenta de administradora (desactivar el `admin` del seed).
+5. **Resto del panel admin:** pedidos (confirmar/anular), productos, ofertas, combos, stock, zonas/distritos (reutiliza `src/app/admin/`, `admin-ui.css` y los estilos `.input`/`.btn`).
+6. **Correo real:** conectar un `EmailSender` real (Resend u otro) cuando exista el dominio (SPF/DKIM/DMARC en Cloudflare, clave solo en variable de entorno); hoy solo `NoopEmailSender`. Con el correo real, el aviso de respuesta debería adjuntar el PDF ya respondido.
+7. **Legales y calidad:** términos y privacidad (`/terminos`, `/privacidad`, enlaces en el checkout y en el formulario), feriados en el plazo del reclamo, conservación ≥2 años; `/impeccable critique` y `audit` del catálogo, checkout y panel; probar en celular real.
+8. **Despliegue:** Angular en Vercel/Netlify, Spring Boot en Railway, Postgres gestionado, dominio en Cloudflare; resolver cómo llega `/api` al backend en producción y el CORS.
 
 ## Historial resumido
 - 2026-10-19: diseño cerrado, DDL, seeds, esqueleto del backend y módulos de inventario, delivery y pedidos; lote V4 (V4–V7: ofertas, combos, "lleva N paga M").
 - 2026-10-22: vencimiento a 20 min; refresh token descartado; V8 (DNI siempre); imágenes por URL base; V9 (`token_version`); colección Postman; entorno de la PC nueva; acuerdos por escrito en `CLAUDE.md` y `CONTEXTO-BRINDA.md`.
+- 2026-10-28: cumplimiento legal en el frontend; Libro de Reclamaciones (V10, backend, PDF con PDFBox, panel de reclamos); commits separados por tema.
