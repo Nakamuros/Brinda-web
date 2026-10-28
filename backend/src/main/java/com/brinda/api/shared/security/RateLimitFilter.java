@@ -16,11 +16,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.time.Duration;
 
-/** Protege los dos endpoints públicos delicados: pedidos anónimos y login. Límite por IP. */
+/** Protege los endpoints públicos delicados: pedidos anónimos, login y Libro de Reclamaciones. Límite por IP. */
 @Component
 @RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
 
+    private static final String COMPLAINT_COPY = "/api/v1/complaints/copy/";
     private static final Duration WINDOW = Duration.ofMinutes(1);
 
     private final SecurityProperties props;
@@ -31,7 +32,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         int limit = limitFor(request);
-        if (limit > 0 && !limiter.tryAcquire(request.getRequestURI() + "|" + ClientIp.of(request), limit, WINDOW)) {
+        if (limit > 0 && !limiter.tryAcquire(keyFor(request) + "|" + ClientIp.of(request), limit, WINDOW)) {
             response.setStatus(429);
             response.setHeader("Retry-After", String.valueOf(WINDOW.toSeconds()));
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -43,13 +44,23 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
+    /** Las copias de reclamos llevan el token en la ruta: se agrupan para que adivinar tokens también cuente. */
+    private static String keyFor(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.startsWith(COMPLAINT_COPY) ? COMPLAINT_COPY : uri;
+    }
+
     private int limitFor(HttpServletRequest request) {
+        if ("GET".equals(request.getMethod()) && request.getRequestURI().startsWith(COMPLAINT_COPY)) {
+            return props.complaintCopiesPerMinute();
+        }
         if (!"POST".equals(request.getMethod())) {
             return 0;
         }
         return switch (request.getRequestURI()) {
             case "/api/v1/orders" -> props.ordersPerMinute();
             case "/api/v1/auth/login" -> props.loginsPerMinute();
+            case "/api/v1/complaints" -> props.complaintsPerMinute();
             default -> 0;
         };
     }

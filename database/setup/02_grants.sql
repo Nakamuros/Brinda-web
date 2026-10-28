@@ -9,7 +9,7 @@
 GRANT USAGE ON SCHEMA public TO brinda_app;
 
 -- Datos editables desde el panel
-GRANT SELECT, INSERT, UPDATE ON users, categories, products, delivery_zones, districts, orders TO brinda_app;
+GRANT SELECT, INSERT, UPDATE ON users, categories, products, delivery_zones, districts, orders, complaints, complaint_counters TO brinda_app;
 
 -- Historiales inmutables: solo se agregan filas, nunca se editan ni se borran
 GRANT SELECT, INSERT ON order_items, stock_movements, audit_logs, combo_items TO brinda_app;

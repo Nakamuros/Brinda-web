@@ -10,6 +10,8 @@ public record SecurityProperties(
         int maxFailedAttempts,
         int lockMinutes,
         int ordersPerMinute,
-        int loginsPerMinute
+        int loginsPerMinute,
+        int complaintsPerMinute,
+        int complaintCopiesPerMinute
 ) {
 }

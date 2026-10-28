@@ -18,6 +18,7 @@
     <properties>
         <java.version>21</java.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <pdfbox.version>3.0.4</pdfbox.version>
     </properties>
 
     <dependencies>
@@ -70,6 +71,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Rellena y aplana la Hoja de Reclamación (AcroForm). Apache License 2.0 -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -97,6 +105,14 @@
             <resource>
                 <directory>${project.basedir}/../database/migrations</directory>
                 <targetPath>db/migration</targetPath>
+            </resource>
+            <!-- Plantilla oficial de la Hoja de Reclamación: fuente única en el frontend (se descarga desde allí) -->
+            <resource>
+                <directory>${project.basedir}/../frontend/public/legal</directory>
+                <includes>
+                    <include>hoja-reclamacion.pdf</include>
+                </includes>
+                <targetPath>legal</targetPath>
             </resource>
             <!-- Seed de desarrollo: solo se carga con el perfil local (spring.flyway.locations) -->
             <resource>
