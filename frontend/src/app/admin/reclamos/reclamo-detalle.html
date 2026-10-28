@@ -1,0 +1,124 @@
+<section class="page">
+  <a class="back" routerLink="/admin/reclamos">← Todos los reclamos</a>
+
+  @if (loading()) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button></p>
+  } @else if (c(); as c) {
+    @if (view(); as v) {
+      <header class="head">
+        <div>
+          <h1 class="page-title">{{ c.code }}</h1>
+          <p class="muted">{{ v.kind }} · {{ v.good }} · registrado el {{ v.filed }}</p>
+        </div>
+        <div class="state">
+          <span class="badge" [class.badge-done]="c.status === 'ANSWERED'">{{ v.status }}</span>
+          <span
+            class="badge"
+            [class.badge-overdue]="c.deadline.level === 'OVERDUE'"
+            [class.badge-soon]="c.deadline.level === 'SOON'"
+            [class.badge-done]="c.deadline.level === 'ANSWERED' || c.deadline.level === 'ON_TIME'"
+          >{{ v.deadline }}</span>
+        </div>
+      </header>
+
+      <div class="cols">
+        <div class="main">
+          <section class="panel" aria-labelledby="s1">
+            <h2 id="s1" class="panel-title">1. Identificación del consumidor reclamante</h2>
+            <dl class="grid">
+              <div><dt>Nombre</dt><dd>{{ c.consumerName }}</dd></div>
+              <div><dt>{{ c.documentType === 'DNI' ? 'DNI' : 'CE' }}</dt><dd>{{ c.documentNumber }}</dd></div>
+              <div><dt>Domicilio</dt><dd>{{ c.address }}</dd></div>
+              <div><dt>Teléfono</dt><dd>{{ c.phone }}</dd></div>
+              <div><dt>E-mail</dt><dd class="wrap">{{ c.email }}</dd></div>
+              @if (c.guardianName) {
+                <div><dt>Padre, madre o apoderado (menor de edad)</dt><dd>{{ c.guardianName }}</dd></div>
+              }
+            </dl>
+            <p class="hint">Esta lectura queda registrada en la auditoría (usuario, fecha y hora).</p>
+          </section>
+
+          <section class="panel" aria-labelledby="s2">
+            <h2 id="s2" class="panel-title">2. Identificación del bien contratado</h2>
+            <dl class="grid">
+              <div><dt>Tipo</dt><dd>{{ v.good }}</dd></div>
+              @if (v.amount) {
+                <div><dt>Monto reclamado</dt><dd>{{ v.amount }}</dd></div>
+              }
+              <div class="full"><dt>Descripción</dt><dd>{{ c.goodDescription }}</dd></div>
+            </dl>
+          </section>
+
+          <section class="panel" aria-labelledby="s3">
+            <h2 id="s3" class="panel-title">3. Detalle de la reclamación y pedido del consumidor</h2>
+            <dl class="grid one">
+              <div><dt>{{ v.kind }}</dt><dd class="pre">{{ c.detail }}</dd></div>
+              <div><dt>Pedido del consumidor</dt><dd class="pre">{{ c.consumerRequest }}</dd></div>
+            </dl>
+          </section>
+
+          <section class="panel" aria-labelledby="s4">
+            <h2 id="s4" class="panel-title">4. Observaciones y acciones adoptadas por el proveedor</h2>
+            @if (c.status === 'ANSWERED') {
+              <dl class="grid one">
+                <div><dt>Fecha de comunicación de la respuesta</dt><dd>{{ v.responseDate }}</dd></div>
+                <div><dt>Observaciones y acciones adoptadas</dt><dd class="pre">{{ c.responseText }}</dd></div>
+              </dl>
+              <p class="hint">La respuesta registrada no se edita: es parte del registro del reclamo.</p>
+            } @else {
+              <form class="form" (submit)="ask($event)" novalidate>
+                <div class="field">
+                  <label class="label" for="rt">Observaciones y acciones adoptadas</label>
+                  <textarea id="rt" class="input" rows="6" [attr.maxlength]="max" aria-describedby="rt-count"
+                    [attr.aria-invalid]="formError() ? 'true' : null"
+                    [value]="text()" (input)="text.set($any($event.target).value); confirming.set(false)"></textarea>
+                  <p id="rt-count" class="hint">{{ text().length }} / {{ max }}</p>
+                </div>
+                <div class="field narrow">
+                  <label class="label" for="rd">Fecha de comunicación de la respuesta</label>
+                  <input id="rd" class="input" type="date" [min]="v.minDate" [max]="today"
+                    [value]="date()" (input)="date.set($any($event.target).value); confirming.set(false)" />
+                </div>
+                @if (formError()) {
+                  <p class="error" role="alert">{{ formError() }}</p>
+                }
+                @if (confirming()) {
+                  <div class="confirm" role="alert">
+                    <p>Al registrar la respuesta, el reclamo pasa a <strong>Respondido</strong> y ya no se puede editar. ¿Continuar?</p>
+                    <div class="actions">
+                      <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="save()">
+                        {{ saving() ? 'Guardando…' : 'Sí, registrar' }}
+                      </button>
+                      <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="cancel()">Volver</button>
+                    </div>
+                  </div>
+                } @else {
+                  <button type="submit" class="btn btn-ghost">Registrar respuesta</button>
+                }
+              </form>
+            }
+          </section>
+        </div>
+
+        <aside class="side">
+          <section class="panel" aria-labelledby="sp">
+            <h2 id="sp" class="panel-title">Plazo</h2>
+            <p>{{ v.deadline }}</p>
+            <p class="hint">Vence el {{ v.due }}. 15 días hábiles de lunes a viernes; los feriados no se descuentan (por confirmar con el asesor).</p>
+          </section>
+          <section class="panel" aria-labelledby="se">
+            <h2 id="se" class="panel-title">Correos</h2>
+            <dl class="grid one">
+              <div><dt>Copia al consumidor</dt><dd>{{ v.consumerEmail }}</dd></div>
+              <div><dt>Aviso a Lucía</dt><dd>{{ v.ownerEmail }}</dd></div>
+            </dl>
+            <p class="hint">El servicio de correo aún no está conectado: quedan pendientes.</p>
+          </section>
+          <a class="btn btn-ghost" [href]="v.pdf" download>Descargar hoja en PDF</a>
+        </aside>
+      </div>
+    }
+  }
+</section>

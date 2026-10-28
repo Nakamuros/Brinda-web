@@ -1,0 +1,103 @@
+<section class="page">
+  <div class="top">
+    <h1 class="page-title">Reclamos</h1>
+    <p class="muted">Libro de Reclamaciones virtual</p>
+  </div>
+
+  <div class="counts" role="group" aria-label="Resumen de plazos">
+    <button type="button" class="count" [attr.aria-pressed]="status() === 'RECEIVED' && !deadline()" (click)="togglePending()">
+      <span class="num">{{ counts()?.pending ?? '–' }}</span>
+      <span class="what">Sin responder</span>
+    </button>
+    <button type="button" class="count soon" [attr.aria-pressed]="deadline() === 'SOON'" (click)="toggleDeadline('SOON')">
+      <span class="num">{{ counts()?.dueSoon ?? '–' }}</span>
+      <span class="what">Por vencer</span>
+    </button>
+    <button type="button" class="count late" [attr.aria-pressed]="deadline() === 'OVERDUE'" (click)="toggleDeadline('OVERDUE')">
+      <span class="num">{{ counts()?.overdue ?? '–' }}</span>
+      <span class="what">Vencidos</span>
+    </button>
+  </div>
+
+  <form class="filters" role="search" (submit)="$event.preventDefault()">
+    <div class="field grow">
+      <label class="label" for="q">Buscar</label>
+      <input id="q" class="input" type="search" placeholder="Código o nombre" autocomplete="off"
+        [value]="q()" (input)="search($any($event.target).value)" />
+    </div>
+    <div class="field">
+      <label class="label" for="st">Estado</label>
+      <select id="st" class="input" [value]="status()" (change)="setStatus($any($event.target).value)">
+        <option value="">Todos</option>
+        <option value="RECEIVED">Sin responder</option>
+        <option value="ANSWERED">Respondidos</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label" for="ty">Tipo</label>
+      <select id="ty" class="input" [value]="type()" (change)="setType($any($event.target).value)">
+        <option value="">Todos</option>
+        <option value="CLAIM">Reclamos</option>
+        <option value="COMPLAINT">Quejas</option>
+      </select>
+    </div>
+    @if (filtered()) {
+      <button type="button" class="btn btn-ghost clear" (click)="clear()">Limpiar</button>
+    }
+  </form>
+
+  @if (error()) {
+    <p class="error" role="alert">
+      {{ error() }} <button type="button" class="link" (click)="retry()">Reintentar</button>
+    </p>
+  } @else if (loading() && !result()) {
+    <p class="muted" role="status">Cargando reclamos…</p>
+  } @else if (rows().length === 0) {
+    <div class="panel empty" role="status">
+      <p class="panel-title">{{ filtered() ? 'Sin resultados' : 'Aún no hay reclamos' }}</p>
+      <p class="muted">
+        {{ filtered() ? 'Prueba con otros filtros.' : 'Cuando un cliente registre uno, aparecerá aquí.' }}
+      </p>
+    </div>
+  } @else {
+    <p class="sr-only" role="status">{{ result()?.totalElements }} reclamos</p>
+    <ul class="rows" [class.busy]="loading()" aria-label="Reclamos">
+      @for (r of rows(); track r.c.id) {
+        <li>
+          <a class="row" [routerLink]="['/admin/reclamos', r.c.id]">
+            <span class="code">{{ r.c.code }}</span>
+            <span class="who">{{ r.c.consumerName }}</span>
+            <span class="meta">{{ r.date }} · {{ r.kind }}</span>
+            <span class="state">
+              <span class="badge" [class.badge-done]="r.c.status === 'ANSWERED'">{{ r.status }}</span>
+              <span
+                class="badge"
+                [class.badge-overdue]="r.c.deadline.level === 'OVERDUE'"
+                [class.badge-soon]="r.c.deadline.level === 'SOON'"
+                [class.badge-done]="r.c.deadline.level === 'ANSWERED' || r.c.deadline.level === 'ON_TIME'"
+              >
+                @if (r.c.deadline.level === 'OVERDUE' || r.c.deadline.level === 'SOON') {
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4 2.5 20h19L12 4Z" /><path d="M12 10v4.5M12 17.5v.01" /></svg>
+                }
+                {{ r.deadline }}
+              </span>
+            </span>
+            <span class="mail">Correo al cliente: {{ r.consumerEmail }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    @if ((result()?.totalPages ?? 0) > 1) {
+      <nav class="pager" aria-label="Paginación">
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() === 0" (click)="go(-1)">Anterior</button>
+        <span class="muted">Página {{ pageIndex() + 1 }} de {{ result()?.totalPages }}</span>
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() + 1 >= (result()?.totalPages ?? 1)" (click)="go(1)">Siguiente</button>
+      </nav>
+    }
+  }
+
+  <p class="foot muted">
+    El plazo es de 15 días hábiles, de lunes a viernes. Los feriados no se descuentan todavía (por confirmar con el asesor).
+  </p>
+</section>
