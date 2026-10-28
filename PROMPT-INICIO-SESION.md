@@ -1,6 +1,21 @@
 # Prompt de inicio de sesión (Claude Code)
 
-Pega el bloque de abajo al abrir una sesión nueva en la raíz del repo. Actualízalo cuando cambie el estado (sobre todo "DÓNDE QUEDAMOS
+Pega el bloque de abajo al abrir una sesión nueva en la raíz del repo. Actualízalo cuando cambie el estado (sobre todo "DÓNDE QUEDAMOS" y "QUÉ SIGUE").
+
+---
+
+```text
+LEE, en este orden (no recorras el código ni leas archivos que no se piden):
+1. CLAUDE.md (reglas del proyecto).
+2. avances.md: la sección "Resumen" y "Libro de Reclamaciones funcional" son lo más reciente; "Qué sigue" dice por dónde seguir.
+3. PRODUCT.md y DESIGN.md (producto y sistema visual "El Salón a Media Luz", con las piezas del catálogo, el checkout, los avisos legales y el panel).
+4. graphify-out/GRAPH_REPORT.md (comunidades y nodos principales). No leas graph.json completo. Para dudas puntuales usa `graphify query "ComplaintService"`, `graphify path "ComplaintController" "DniCipher"` o `graphify explain "AdminAuth"`; el grafo ya incluye el Libro de Reclamaciones, el panel /admin y los avisos legales. Compara `git rev-parse --short HEAD` con "Built from commit" del informe: si hubo cambios de código después, corre `graphify update .` (sin costo de LLM).
+5. CONTEXTO-BRINDA.md: solo las secciones 18 y 19 (decisiones, incluidas las del frontend, y pendientes antes de producción).
+6. FRONTEND-BRIEF-BRINDA.md solo si vas a tocar el diseño: secciones 6 (identidad), 9 (responsive), 10 (animaciones) y 11 (landing).
+7. frontend/src/app/core/config.ts: aquí vive lo editable (video del hero, posters, WhatsApp, zonas, horario, avisos legales, API_URL, bandera del catálogo de ejemplo).
+Solo si hace falta: backend/ENDPOINTS.md (contrato de la API; no inventes rutas ni campos) y readme.md (cómo levantar el entorno).
+
+DÓNDE QUEDAMOS
 - Backend (Spring Boot 3.4.5 / Java 21, PostgreSQL 16, V1–V10): Hito 1 cerrado + Libro de Reclamaciones (registro público, PDF oficial rellenado con PDFBox, correo de desarrollo, panel de respuesta). 80 tests.
 - Frontend (Angular 21, standalone, signals, zoneless, GSAP+Lenis): landing, catálogo conectado a la API real (proxy /api → localhost:8080), carrito local, checkout /pedido solo formulario ("Finalizar compra" NO hace nada todavía, decisión del usuario), cumplimiento legal (control de edad, advertencia de alcohol, aviso de menores, logo del Libro) y panel /admin SOLO con Reclamos (login, cambio de clave, lista y detalle con respuesta). El resto del panel (pedidos, productos, ofertas, combos, stock, zonas) NO existe. 49 tests y build en verde.
 - Libro de Reclamaciones: Etapas A y B hechas; falta la Etapa C (formulario público en /libro-de-reclamaciones). Esa ruta NO puede salir a producción sin el formulario funcional y la confirmación del asesor (correo, conservación, firma, validez de la copia digital).
