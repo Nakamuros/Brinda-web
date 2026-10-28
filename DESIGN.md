@@ -241,6 +241,15 @@ Un círculo de 44px con filete de latón y "+18" en Libre Baskerville, junto a "
 ### Pie
 Fondo marrón profundo con filete de latón arriba, marca centrada con su lema en cursiva, sello +18 y enlaces legales en mayúsculas pequeñas, hoy inertes y rotulados como pendientes.
 
+### Control de edad (+18)
+Modal centrado sobre un velo marrón casi opaco: sello +18, pregunta en Libre Baskerville y dos botones de contorno ("Sí, soy mayor de 18" y "No"; el burdeos queda para pedir). Entra con un fundido y un leve ascenso (alternativa estática con `prefers-reduced-motion`). Sin cierre con Esc ni clic fuera; foco atrapado y fondo inerte.
+
+### Avisos legales
+La advertencia de alcohol va en mayúsculas espaciadas, crema sobre fondo oscuro (contraste mayor a 13:1), siempre en el pie. El aviso de menores y DNI físico es un recuadro de filete fino dentro del resumen del carrito y del checkout. El logo del Libro de Reclamaciones va sobre una pastilla marfil de 12px de radio (el PNG oficial sin tocar colores ni proporciones), de al menos 120px de ancho en celular y con objetivo táctil de 44px.
+
+### Panel de administración
+Sobrio y operativo (el panel prioriza rapidez y claridad sobre expresividad): marco propio sin barra de anuncio ni carrito, tarjetas de 12px con filete de latón al 28%, contadores que filtran (el elegido se rellena de crema) y etiquetas de plazo: vencido o por vencer en terracota tenue con borde terracota, ícono y texto crema (nunca solo color), respondido en latón apagado. Reutiliza `.input` y `.btn-ghost`; las acciones del panel no usan burdeos.
+
 ## Do's and Don'ts
 
 ### Do:
