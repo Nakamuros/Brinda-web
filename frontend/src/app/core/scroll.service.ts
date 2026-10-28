@@ -10,6 +10,7 @@ export class ScrollService {
   private readonly prefs = inject(MediaPrefs);
   private lenis: Lenis | null = null;
   private started = false;
+  private readonly locks = new Set<string>();
 
   /** true cuando la página bajó lo suficiente para que la navegación pase a fondo sólido. */
   readonly scrolled = signal(false);
@@ -42,12 +43,19 @@ export class ScrollService {
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
   }
 
-  lock(locked: boolean): void {
+  /** Bloquea el fondo mientras haya algún motivo activo (menú, control de edad…). */
+  lock(locked: boolean, key = 'menu'): void {
     if (locked) {
+      this.locks.add(key);
+    } else {
+      this.locks.delete(key);
+    }
+    const any = this.locks.size > 0;
+    if (any) {
       this.lenis?.stop();
     } else {
       this.lenis?.start();
     }
-    document.documentElement.classList.toggle('menu-open', locked);
+    document.documentElement.classList.toggle('menu-open', any);
   }
 }

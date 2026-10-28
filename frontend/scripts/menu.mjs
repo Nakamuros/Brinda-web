@@ -1,10 +1,12 @@
 // Verifica el menú móvil (apertura, foco, Escape) y el scroll con movimiento normal. Solo desarrollo.
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
 const browser = await chromium.launch();
 
 const ctx = await browser.newContext({ viewport: { width: 360, height: 780 } });
+await passAgeGate(ctx);
 const page = await ctx.newPage();
 const errors = [];
 page.on('pageerror', (e) => errors.push(String(e)));

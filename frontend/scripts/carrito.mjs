@@ -1,6 +1,7 @@
 // Verificación del carrito (solo desarrollo). Uso: node scripts/carrito.mjs
 // Flujo completo a 360/768/1440 con contexto limpio; capturas en frontend/capturas/.
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -23,6 +24,7 @@ const money = (t) => Math.round(parseFloat(t.replace(/[^\d.]/g, '')) * 100);
 
 for (const { name, width, height } of sizes) {
   const ctx = await newCtx({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await passAgeGate(ctx);
   const page = await ctx.newPage();
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -173,6 +175,7 @@ for (const { name, width, height } of sizes) {
 // Movimiento reducido: sin animación, contenido visible
 {
   const ctx = await newCtx({ viewport: { width: 360, height: 780 }, reducedMotion: 'reduce' });
+  await passAgeGate(ctx);
   const page = await ctx.newPage();
   await page.goto(`${base}/catalogo`, { waitUntil: 'networkidle' });
   await page.waitForSelector('app-product-card');

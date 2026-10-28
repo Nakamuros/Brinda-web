@@ -1,9 +1,11 @@
 // Comprueba la build de producción servida en BASE_URL: marcadores internos, objetivos táctiles y barra fija.
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 
 const base = process.env.BASE_URL ?? 'http://127.0.0.1:4300';
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 360, height: 780 }, reducedMotion: 'reduce' });
+await passAgeGate(page);
 await page.goto(base + '/', { waitUntil: 'networkidle' });
 await page.waitForSelector('app-hero h1', { timeout: 10000 });
 await page.waitForTimeout(500);

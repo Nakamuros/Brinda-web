@@ -1,6 +1,7 @@
 // Capturas de verificación (solo desarrollo). Uso: node scripts/capture.mjs [ruta] [prefijo]
 // Salida en frontend/capturas/ (ignorada por git).
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -20,6 +21,7 @@ for (const { name, width, height } of sizes) {
     reducedMotion: 'reduce',
     deviceScaleFactor: 1,
   });
+  await passAgeGate(context);
   const page = await context.newPage();
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));

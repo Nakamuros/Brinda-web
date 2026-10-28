@@ -1,6 +1,7 @@
 // Verifica el catálogo contra la API REAL (backend en :8080 vía proxy). Solo lectura.
 // Uso: node scripts/catalogo-api.mjs   (con el backend y `ng serve` encendidos)
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -20,6 +21,7 @@ for (const { name, width, height } of [
   { name: '1440', width: 1440, height: 900 },
 ]) {
   const ctx = await browser.newContext({ viewport: { width, height } });
+  await passAgeGate(ctx);
   const page = await ctx.newPage();
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));

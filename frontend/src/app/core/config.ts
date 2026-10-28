@@ -92,8 +92,48 @@ export const CONTACT = {
   hours: '',
 } as const;
 
-/** Espacio reservado para los avisos legales de licor y tabaco (texto del asesor de Lucía). */
+/**
+ * Datos legales. Proveedor y notas literales de la Hoja de Reclamación (public/legal/hoja-reclamacion.pdf).
+ * La redacción final la confirma el asesor de Lucía: no inventar ni parafrasear textos legales.
+ */
 export const LEGAL = {
+  /** Espacio reservado para los avisos legales de licor y tabaco (texto del asesor de Lucía). */
   noticesText: '',
   showPlaceholder: true,
+  /** Datos del proveedor tal como figuran en la hoja. El domicilio NO es zona de reparto ni punto de venta. */
+  provider: {
+    name: 'BRINDA PERU SAC',
+    ruc: '20616579607',
+    address: 'Av. Alfredo Benavides 707, 1403, Miraflores',
+  },
+  alcoholWarning: 'TOMAR BEBIDAS ALCOHÓLICAS EN EXCESO ES DAÑINO',
+  minorsNotice:
+    'No se entregan productos a menores de 18 años. El repartidor pedirá tu DNI físico al momento de la entrega.',
+  complaints: {
+    path: '/libro-de-reclamaciones',
+    logo: 'legal/logo-libro-reclamaciones.png',
+    sheetPdf: 'legal/hoja-reclamacion.pdf',
+    responseDays: 15,
+    definitions: [
+      { term: 'Reclamo', text: 'Disconformidad relacionada a los productos o servicios.' },
+      {
+        term: 'Queja',
+        text: 'Disconformidad no relacionada a los productos o servicios; o, malestar o descontento respecto a la atención al público.',
+      },
+    ],
+    notes: [
+      'La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.',
+      'El proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince (15) días hábiles, el cual es improrrogable.',
+    ],
+  },
+} as const;
+
+/**
+ * Control de edad (+18) a la entrada. Solo un filtro: la validación real es `adultConfirmed` del checkout.
+ * Rutas exentas: nunca se bloquea el Libro de Reclamaciones ni las páginas legales.
+ * Decisión pendiente del asesor: confirmar que esta excepción es suficiente.
+ */
+export const AGE_GATE = {
+  storageKey: 'brinda.age18.v1',
+  exemptPaths: ['/libro-de-reclamaciones', '/terminos', '/privacidad'],
 } as const;

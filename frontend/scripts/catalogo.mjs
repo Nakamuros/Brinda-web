@@ -1,6 +1,7 @@
 // Verificación del catálogo (solo desarrollo). Uso: node scripts/catalogo.mjs
 // Capturas a 360/768/1440 en frontend/capturas/ (ignorada por git) y comprobación de interacciones.
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -23,6 +24,7 @@ const check = (label, ok, extra = '') => checks.push(`${ok ? 'OK ' : 'FALLA'} ${
 
 for (const { name, width, height } of sizes) {
   const context = await newCtx({ viewport: { width, height }, deviceScaleFactor: 1 });
+  await passAgeGate(context);
   const page = await context.newPage();
   const errors = [];
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -107,6 +109,7 @@ for (const { name, width, height } of sizes) {
 // Movimiento reducido: el contenido es visible sin animar.
 {
   const context = await newCtx({ viewport: { width: 360, height: 780 }, reducedMotion: 'reduce' });
+  await passAgeGate(context);
   const page = await context.newPage();
   await page.goto(`${base}/catalogo`, { waitUntil: 'networkidle' });
   await page.waitForSelector('app-product-card');

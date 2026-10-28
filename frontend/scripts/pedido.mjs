@@ -1,6 +1,7 @@
 // Verifica /pedido contra la API REAL (backend :8080 vía proxy). Solo lectura: el botón no crea pedidos.
 // Uso: node scripts/pedido.mjs   (con backend y `ng serve` encendidos)
 import { chromium } from 'playwright';
+import { passAgeGate } from './age.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -22,6 +23,7 @@ for (const { name, width, height } of [
   { name: '1440', width: 1440, height: 900 },
 ]) {
   const ctx = await browser.newContext({ viewport: { width, height } });
+  await passAgeGate(ctx);
   const page = await ctx.newPage();
   const errors = [];
   const posts = [];
@@ -140,6 +142,7 @@ for (const { name, width, height } of [
 // Carrito vacío: no hay formulario
 {
   const ctx = await browser.newContext({ viewport: { width: 360, height: 780 } });
+  await passAgeGate(ctx);
   const page = await ctx.newPage();
   await page.goto(`${base}/pedido`, { waitUntil: 'networkidle' });
   await page.waitForSelector('app-state-panel');
