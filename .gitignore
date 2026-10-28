@@ -18,3 +18,5 @@ backups/
 graphify-out/cache/
 graphify-out/.graphify_*
 graphify-out/graph.html
+# Copias fechadas que graphify deja al reconstruir (duplican graph.json; no aportan contexto)
+graphify-out/20*/
