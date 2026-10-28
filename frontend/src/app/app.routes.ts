@@ -26,6 +26,13 @@ export const routes: Routes = [
         title: 'Carrito · BRINDA',
         loadComponent: () => import('./pages/public/carrito/carrito').then((m) => m.Carrito),
       },
+      {
+        // No puede salir a producción sin el formulario funcional (ver avances.md).
+        path: 'libro-de-reclamaciones',
+        title: 'Libro de Reclamaciones · BRINDA',
+        loadComponent: () =>
+          import('./pages/public/libro-reclamaciones/libro-reclamaciones').then((m) => m.LibroReclamaciones),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

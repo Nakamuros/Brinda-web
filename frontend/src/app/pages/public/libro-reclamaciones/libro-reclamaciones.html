@@ -1,0 +1,42 @@
+<section class="head candle-edge" aria-labelledby="claims-title">
+  <div class="container">
+    <h1 id="claims-title" class="title">Libro de <span class="accent">Reclamaciones</span></h1>
+    <p class="lead">Hoja de Reclamación virtual</p>
+  </div>
+</section>
+
+<div class="container body">
+  <dl class="provider" aria-label="Datos del proveedor">
+    <div>
+      <dt>Proveedor</dt>
+      <dd>{{ provider.name }}</dd>
+    </div>
+    <div>
+      <dt>RUC</dt>
+      <dd>{{ provider.ruc }}</dd>
+    </div>
+    <div>
+      <dt>Domicilio</dt>
+      <dd>{{ provider.address }}</dd>
+    </div>
+  </dl>
+
+  @if (showPending) {
+    <p class="dev" role="note">Formulario pendiente de implementar. Esta ruta no puede salir a producción sin él.</p>
+  }
+
+  <dl class="defs">
+    @for (d of claims.definitions; track d.term; let i = $index) {
+      <div>
+        <dt>{{ d.term }}<sup>{{ i + 1 }}</sup></dt>
+        <dd>{{ d.text }}</dd>
+      </div>
+    }
+  </dl>
+
+  <ul class="notes">
+    @for (n of claims.notes; track n) {
+      <li>{{ n }}</li>
+    }
+  </ul>
+</div>
