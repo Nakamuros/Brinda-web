@@ -4827,553 +4827,6 @@
       ]
     },
     {
-      "name": "12 · Sesión: cierre, token invalidado y acceso sin cookie",
-      "item": [
-        {
-          "name": "12.1 Login para probar el cierre de sesión",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
-                  "s('retry429', '');",
-                  "const j = pm.response.json();",
-                  "pm.test('200', () => pm.response.to.have.status(200));",
-                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT1', m ? m[1] : '');"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "login"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "12.2 Logout",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('204 y cookie borrada', () => { pm.response.to.have.status(204); pm.expect(pm.response.headers.get('Set-Cookie')).to.match(/Max-Age=0/i); });"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "logout"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.3 El token anterior ya no sirve (token_version) → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "brinda_token={{tokenT1}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
-              ]
-            },
-            "description": "Reenvía a mano el token emitido antes del logout: el servidor lo rechaza aunque no haya vencido."
-          }
-        },
-        {
-          "name": "12.4 Admin sin cookie → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/products",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "products"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.5 Admin sin cookie (POST) → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "products",
-                "visibility"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"ids\": [\n    \"{{snackId}}\"\n  ],\n  \"available\": false\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "12.6 Pedidos admin sin cookie → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/orders",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "orders"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.7 Token basura → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401, nunca 500', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "brinda_token=basura.basura.basura"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/orders",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "admin",
-                "orders"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.8 /auth/me sin cookie → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.9 El catálogo público sigue abierto",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('200', () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/catalog/categories",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "catalog",
-                "categories"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.10 Login (sesión T2)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
-                  "s('retry429', '');",
-                  "pm.test('200', () => pm.response.to.have.status(200));",
-                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT2', m ? m[1] : '');"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "login"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "12.11 Cambiar la clave (temporal)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('200', () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/change-password",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "change-password"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminPassword}}-tmp\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "12.12 T2 (anterior al cambio de clave) → 401",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('401: cambiar la clave invalida las sesiones previas', () => pm.response.to.have.status(401));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Cookie",
-                "value": "brinda_token={{tokenT2}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.13 La sesión nueva (cookie del cambio) sigue válida",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('200', () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "me"
-              ]
-            }
-          }
-        },
-        {
-          "name": "12.14 Restaurar la clave",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const g = k => pm.collectionVariables.get(k);",
-                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "pm.test('200', () => pm.response.to.have.status(200));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/auth/change-password",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "change-password"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}-tmp\",\n  \"newPassword\": \"{{adminPassword}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "12b · Libro de Reclamaciones (público)",
       "item": [
         {
@@ -5709,6 +5162,1295 @@
                 "v1",
                 "complaints"
               ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11b · Panel: Libro de Reclamaciones (admin)",
+      "item": [
+        {
+          "name": "11b.1 Lista (buscar por código): sin datos personales",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('limaToday', new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 con el reclamo de la corrida', () => { pm.response.to.have.status(200); pm.expect(j.content.length).to.eql(1); pm.expect(j.content[0].code).to.eql(g('complaintCode')); });",
+                  "const t = JSON.stringify(j);",
+                  "pm.test('La lista NO trae DNI, teléfono, correo ni dirección', () => { ['12345678', '987654321', 'ana.prueba@example.com', 'Larco', 'documentNumber', 'phone', 'address'].forEach(x => pm.expect(t).to.not.include(x)); });",
+                  "pm.test('Trae plazo y estado de los correos', () => { const r = j.content[0]; pm.expect(r.deadline.level).to.be.oneOf(['ON_TIME', 'SOON', 'OVERDUE']); pm.expect(r.consumerEmail.status).to.eql('PENDING'); });",
+                  "s('adminComplaintId', j.content[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?q={{complaintCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{complaintCode}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.2 Filtros por estado y tipo (pendientes del más antiguo al más nuevo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('Solo RECEIVED y CLAIM, orden ascendente', () => { pm.response.to.have.status(200); pm.expect(j.content.length).to.be.at.least(1); j.content.forEach(r => { pm.expect(r.status).to.eql('RECEIVED'); pm.expect(r.complaintType).to.eql('CLAIM'); }); const d = j.content.map(r => r.filedAt); pm.expect(d).to.eql([...d].sort()); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?status=RECEIVED&type=CLAIM&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "RECEIVED"
+                },
+                {
+                  "key": "type",
+                  "value": "CLAIM"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.3 Filtro de plazo inválido → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?deadline=NOPE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "deadline",
+                  "value": "NOPE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.4 Filtro de plazo ON_TIME no se admite → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?deadline=ON_TIME",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "deadline",
+                  "value": "ON_TIME"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.5 Filtro de plazo OVERDUE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todos vencidos (puede estar vacío)', () => { pm.response.to.have.status(200); j.content.forEach(r => pm.expect(r.deadline.level).to.eql('OVERDUE')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?deadline=OVERDUE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "deadline",
+                  "value": "OVERDUE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.6 Contadores del panel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('pending ≥ 1; por vencer y vencidos numéricos', () => { pm.response.to.have.status(200); pm.expect(j.pending).to.be.at.least(1); pm.expect(j.dueSoon).to.be.a('number'); pm.expect(j.overdue).to.be.a('number'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/counts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "counts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.7 Detalle: documento descifrado y plazo de 15 días hábiles (lun-vie)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 con el DNI descifrado', () => { pm.response.to.have.status(200); pm.expect(j.documentType).to.eql('DNI'); pm.expect(j.documentNumber).to.eql('12345678'); pm.expect(j.email).to.eql('ana.prueba@example.com'); });",
+                  "pm.test('El vencimiento cae en día hábil y es posterior a la fecha de registro', () => { const day = new Date(j.deadline.dueOn + 'T12:00:00Z').getUTCDay(); pm.expect(day).to.be.within(1, 5); pm.expect(j.deadline.dueOn > j.filedAt.slice(0, 10)).to.eql(true); pm.expect(j.deadline.businessDaysLeft).to.be.a('number'); });",
+                  "pm.test('Correos pendientes, sin intentos (NoopEmailSender)', () => { pm.expect(j.consumerEmail.status).to.eql('PENDING'); pm.expect(j.consumerEmail.attempts).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.8 Reclamo inexistente → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.9 Responder con texto vacío → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400 en responseText', () => { pm.response.to.have.status(400); pm.expect(Object.keys(pm.response.json().fields || {})).to.include('responseText'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/respond",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "respond"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"\",\n  \"responseDate\": \"2026-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11b.10 Responder con fecha futura → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/respond",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "respond"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"Respuesta de prueba\",\n  \"responseDate\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11b.11 Responder con fecha anterior al reclamo → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/respond",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "respond"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"Respuesta de prueba\",\n  \"responseDate\": \"2000-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11b.12 Responder (hoy, hora de Lima) → ANSWERED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200, ANSWERED, con texto y fecha', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('ANSWERED'); pm.expect(j.responseText).to.eql('Se repone el producto y se piden disculpas.'); pm.expect(j.responseDate).to.eql(g('limaToday')); pm.expect(j.respondedAt).to.be.a('string'); pm.expect(j.deadline.level).to.eql('ANSWERED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/respond",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "respond"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"Se repone el producto y se piden disculpas.\",\n  \"responseDate\": \"{{limaToday}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11b.13 Un reclamo respondido no se vuelve a responder → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/respond",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "respond"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"responseText\": \"Otra respuesta\",\n  \"responseDate\": \"{{limaToday}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "11b.14 Lista: el respondido sale ANSWERED",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('ANSWERED con plazo ANSWERED', () => { pm.expect(j.content[0].status).to.eql('ANSWERED'); pm.expect(j.content[0].deadline.level).to.eql('ANSWERED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints?q={{complaintCode}}&status=ANSWERED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{complaintCode}}"
+                },
+                {
+                  "key": "status",
+                  "value": "ANSWERED"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.15 PDF del panel con la sección 4",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200 PDF adjunto con el código, sin caché', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'); pm.expect(pm.response.headers.get('Content-Disposition')).to.include(g('complaintCode')); pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); pm.expect(pm.response.stream.slice(0, 4).toString()).to.eql('%PDF'); pm.expect(pm.response.stream.length).to.be.above(1000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}",
+                "pdf"
+              ]
+            }
+          }
+        },
+        {
+          "name": "11b.16 No se pueden borrar reclamos (DELETE) → 405",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('405', () => pm.response.to.have.status(405));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints/{{adminComplaintId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints",
+                "{{adminComplaintId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 · Sesión: cierre, token invalidado y acceso sin cookie",
+      "item": [
+        {
+          "name": "12.1 Login para probar el cierre de sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT1', m ? m[1] : '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.2 Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('204 y cookie borrada', () => { pm.response.to.have.status(204); pm.expect(pm.response.headers.get('Set-Cookie')).to.match(/Max-Age=0/i); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.3 El token anterior ya no sirve (token_version) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token={{tokenT1}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Reenvía a mano el token emitido antes del logout: el servidor lo rechaza aunque no haya vencido."
+          }
+        },
+        {
+          "name": "12.3b El token anterior ya no sirve en los reclamos del panel (token_version) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token={{tokenT1}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.4 Admin sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.5 Admin sin cookie (POST) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "visibility"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    \"{{snackId}}\"\n  ],\n  \"available\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.6 Pedidos admin sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.6b Reclamos del panel sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "complaints"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.7 Token basura → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401, nunca 500', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token=basura.basura.basura"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.8 /auth/me sin cookie → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.9 El catálogo público sigue abierto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/catalog/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "catalog",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.10 Login (sesión T2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "pm.test('200', () => pm.response.to.have.status(200));",
+                  "const m = (pm.response.headers.get('Set-Cookie') || '').match(/brinda_token=([^;]+)/); s('tokenT2', m ? m[1] : '');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUser}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.11 Cambiar la clave (temporal)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{adminPassword}}-tmp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12.12 T2 (anterior al cambio de clave) → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('401: cambiar la clave invalida las sesiones previas', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "brinda_token={{tokenT2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.13 La sesión nueva (cookie del cambio) sigue válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12.14 Restaurar la clave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}-tmp\",\n  \"newPassword\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         }

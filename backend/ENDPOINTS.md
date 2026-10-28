@@ -48,6 +48,8 @@ Cuerpo (todo obligatorio salvo `guardianName`, `claimedAmount` y `website`):
 - **Correlativo** único por año (tabla `complaint_counters`, atómico) y año de Lima. El DNI/CE se guarda cifrado (AES-GCM, igual que en los pedidos) y nunca se devuelve ni se registra en logs.
 - **Token de copia:** 32 bytes aleatorios (base64url). Solo se entrega en esta respuesta; la BD guarda su SHA-256. Con él, `GET /api/v1/complaints/copy/{token}` devuelve `application/pdf` (`Content-Disposition: attachment`, `Cache-Control: no-store`): la hoja oficial rellenada con los 23 campos AcroForm y aplanada. Si el reclamo ya fue respondido, la sección 4 sale rellena. No existe listado ni consulta por número.
 - **Correo:** el reclamo se guarda SIEMPRE primero; el envío va aparte (copia al consumidor con el PDF adjunto y aviso a la dueña con `COMPLAINTS_OWNER_EMAIL`, sin datos personales). Cada correo tiene estado `PENDING/SENT/FAILED`, intentos y último intento; un job (cada 5 min) reintenta con espera creciente hasta `brinda.complaints.max-email-attempts` (5). **Hoy solo está `NoopEmailSender`** (`shared/mail`): no envía nada, registra solo el id del reclamo y deja `PENDING` sin contar intentos; el job no corre mientras no haya un envío real. Conectar Resend u otro servicio = un bean `EmailSender` nuevo (guía en el Javadoc de `EmailSender`); la clave solo como variable de entorno y el dominio con SPF/DKIM/DMARC.
+- **Plazo (panel):** `deadline = { dueOn, businessDaysLeft, level, answeredLate }`. `dueOn` = fecha de registro (hora de Lima) + 15 días hábiles de lunes a viernes; `businessDaysLeft` es negativo si venció; `level`: `ON_TIME`, `SOON` (≤ 3 días hábiles o vence hoy), `OVERDUE` o `ANSWERED`. **Por confirmar con el asesor:** los feriados no se descuentan.
+- **Sin borrado:** no existe ningún DELETE sobre reclamos (la API devuelve 405 y `brinda_app` no tiene el privilegio).
 - **Conservación:** nada se borra (`brinda_app` sin `DELETE`); plazo mínimo de dos años, por confirmar con el asesor.
 
 ### Imágenes (`imageUrl`)
@@ -88,6 +90,11 @@ Cuerpo (todo obligatorio salvo `guardianName`, `claimedAmount` y `website`):
 | POST | `/api/v1/admin/orders/{id}/confirm` ("Finalizada": descuenta stock) |
 | POST | `/api/v1/admin/orders/{id}/cancel` `{reason}` (si estaba confirmada, devuelve el stock) |
 | GET | `/api/v1/admin/orders/{id}/copy/delivery` · `/copy/receipt` |
+| GET | `/api/v1/admin/complaints?status=RECEIVED\|ANSWERED&type=CLAIM\|COMPLAINT&q=&deadline=SOON\|OVERDUE&page=&size=` | Lista de reclamos **sin DNI/CE, teléfono, correo ni dirección**. Pendientes del más antiguo al más nuevo; el resto, del más nuevo. `deadline` solo admite SOON u OVERDUE (otro valor: 400/422) y trae solo pendientes |
+| GET | `/api/v1/admin/complaints/counts` | `{pending, dueSoon, overdue}` para el aviso del panel |
+| GET | `/api/v1/admin/complaints/{id}` | Detalle con el documento descifrado, plazo y estado de los dos correos. **Cada lectura queda auditada** (`COMPLAINT_VIEW`: usuario, hora e IP; sin el documento) |
+| POST | `/api/v1/admin/complaints/{id}/respond` `{responseText ≤1000, responseDate}` | Sección 4 de la hoja. Pasa a `ANSWERED` (auditado `COMPLAINT_RESPOND`, `status RECEIVED -> ANSWERED`). 422 si la fecha es futura o anterior al reclamo, o si ya fue respondido (no se edita) |
+| GET | `/api/v1/admin/complaints/{id}/pdf` | La hoja oficial rellenada (con la sección 4 si ya se respondió); auditada (`COMPLAINT_PDF`) |
 
 ## Reglas a recordar
 - "Lleva N, paga M": grupos = floor(q/N), gratis = grupos x (N-M). El stock baja por todas las unidades entregadas; el subtotal y el total usan lo ya descontado. Línea del pedido: `promoDiscount`, `promoType=BUY_X_PAY_Y`. Público: `promoBuy/promoPay/promoLabel/promoEndsAt` (solo si está activa; cuenta como `onOffer`).
