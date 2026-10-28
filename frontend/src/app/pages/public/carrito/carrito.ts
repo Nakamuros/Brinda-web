@@ -4,6 +4,7 @@ import { CartService, lineTotals } from '../../../services/cart.service';
 import { CatalogService } from '../../../services/catalog.service';
 import { BottlePlaceholder } from '../../../shared/bottle-placeholder';
 import { formatPrice } from '../../../shared/format';
+import { LegalNotice } from '../../../shared/legal-notice';
 import { QtyStepper } from '../../../shared/qty-stepper';
 import { RevealDirective } from '../../../shared/reveal.directive';
 import { RiseDirective } from '../../../shared/rise.directive';
@@ -11,7 +12,7 @@ import { StatePanel } from '../../../shared/state-panel';
 
 @Component({
   selector: 'app-carrito',
-  imports: [RouterLink, BottlePlaceholder, QtyStepper, RevealDirective, RiseDirective, StatePanel],
+  imports: [LegalNotice, RouterLink, BottlePlaceholder, QtyStepper, RevealDirective, RiseDirective, StatePanel],
   templateUrl: './carrito.html',
   styleUrl: './carrito.css',
 })

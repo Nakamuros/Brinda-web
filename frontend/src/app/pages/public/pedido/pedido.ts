@@ -7,6 +7,7 @@ import { CartService, lineTotals } from '../../../services/cart.service';
 import { DeliveryService } from '../../../services/delivery.service';
 import { FormField } from '../../../shared/form-field';
 import { formatPrice } from '../../../shared/format';
+import { LegalNotice } from '../../../shared/legal-notice';
 import { RevealDirective } from '../../../shared/reveal.directive';
 import { StatePanel } from '../../../shared/state-panel';
 
@@ -37,7 +38,7 @@ type FieldName = keyof typeof MESSAGES;
 
 @Component({
   selector: 'app-pedido',
-  imports: [ReactiveFormsModule, RouterLink, FormField, RevealDirective, StatePanel],
+  imports: [LegalNotice, ReactiveFormsModule, RouterLink, FormField, RevealDirective, StatePanel],
   templateUrl: './pedido.html',
   styleUrl: './pedido.css',
 })

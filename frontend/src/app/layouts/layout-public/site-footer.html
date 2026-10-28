@@ -5,6 +5,8 @@
       <p class="tagline">{{ tagline }}</p>
     </div>
 
+    <app-legal-notice kind="alcohol" />
+
     <p class="age"><span class="badge" aria-hidden="true">+18</span> Venta solo para mayores de 18 años.</p>
 
     <nav class="legal-links" aria-label="Información legal">
@@ -16,6 +18,10 @@
         }
       </ul>
     </nav>
+
+    <a class="claims" [routerLink]="complaints.path">
+      <img [src]="complaints.logo" alt="Libro de Reclamaciones" width="168" height="134" loading="lazy" decoding="async" />
+    </a>
 
     @if (showNotice) {
       <div class="notices" role="note">
@@ -30,6 +36,7 @@
       </div>
     }
 
+    <p class="copy">{{ provider.name }} · RUC {{ provider.ruc }}</p>
     <p class="copy">© {{ year }} {{ brand }}. Todos los derechos reservados.</p>
   </div>
 </footer>

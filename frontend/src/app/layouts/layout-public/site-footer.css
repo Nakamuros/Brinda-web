@@ -61,6 +61,33 @@
   align-items: center;
   min-height: 2.75rem;
 }
+.claims {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: var(--space-2);
+  background: var(--ivory);
+  border-radius: var(--radius-lg);
+  transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+.claims img {
+  display: block;
+  width: clamp(7.5rem, 30vw, 10.5rem);
+  height: auto;
+}
+.claims:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+.claims:active {
+  transform: translateY(1px);
+}
+.claims:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
 .notices {
   width: 100%;
   max-width: 44rem;
