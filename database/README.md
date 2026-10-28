@@ -12,6 +12,7 @@
 | 4c | `migrations/V5__offers_end_date.sql` | `brinda_owner` | `offer_ends_at`, `promo_type` |
 | 4d | `migrations/V6__combos.sql` | `brinda_owner` | combos, `combo_items`, movimientos de armado |
 | 4e | `migrations/V7__buy_x_pay_y.sql` | `brinda_owner` | promoción lleva N paga M |
+| 4f | `migrations/V10__complaints.sql` | `brinda_owner` | Libro de Reclamaciones: `complaints` y `complaint_counters` (V8 y V9: DNI siempre y `token_version`) |
 
 En DBeaver: conecta a la BD `brinda`, abre cada archivo y ejecútalo como script (Alt+X). Los `V*` están listos para Flyway (`db/migration`).
 
