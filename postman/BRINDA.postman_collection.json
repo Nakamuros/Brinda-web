@@ -21,7 +21,7 @@
         "type": "text/javascript",
         "exec": [
           "// Respeta el rate limit del servidor: espera si ya se enviaron demasiados POST de login/pedido en el último minuto.",
-          "const LIM = { '/api/v1/orders': 4, '/api/v1/auth/login': 8 };",
+          "const LIM = { '/api/v1/orders': 4, '/api/v1/auth/login': 8, '/api/v1/complaints': 2 };",
           "const p = pm.request.url.getPath();",
           "if (pm.request.method === 'POST' && LIM[p]) {",
           "  const key = '_hits' + p; const now = Date.now();",
@@ -5368,6 +5368,347 @@
                   "language": "json"
                 }
               }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12b · Libro de Reclamaciones (público)",
+      "item": [
+        {
+          "name": "12b.1 Sin privacidad ni correo → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con errores en privacyAccepted y email', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include.members(['privacyAccepted', 'email']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consumerName\": \"Ana Núñez Pérez\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123, Miraflores\",\n  \"phone\": \"987654321\",\n  \"goodType\": \"PRODUCT\",\n  \"claimedAmount\": 45.5,\n  \"goodDescription\": \"Whisky Reserva 750 ml\",\n  \"complaintType\": \"CLAIM\",\n  \"detail\": \"La botella llegó abierta.\",\n  \"consumerRequest\": \"Quiero el cambio del producto.\",\n  \"privacyAccepted\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12b.2 DNI de 7 dígitos → 400 en documentNumber",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('documentNumber'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consumerName\": \"Ana Núñez Pérez\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"1234567\",\n  \"address\": \"Av. Larco 123, Miraflores\",\n  \"phone\": \"987654321\",\n  \"email\": \"ana.prueba@example.com\",\n  \"goodType\": \"PRODUCT\",\n  \"claimedAmount\": 45.5,\n  \"goodDescription\": \"Whisky Reserva 750 ml\",\n  \"complaintType\": \"CLAIM\",\n  \"detail\": \"La botella llegó abierta.\",\n  \"consumerRequest\": \"Quiero el cambio del producto.\",\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12b.3 Honeypot lleno → finge éxito sin guardar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('201 con código de relleno y sin token', () => { pm.response.to.have.status(201); pm.expect(j.code).to.eql('LR-0000-000000'); pm.expect(j.copyToken).to.eql(''); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consumerName\": \"Ana Núñez Pérez\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123, Miraflores\",\n  \"phone\": \"987654321\",\n  \"email\": \"ana.prueba@example.com\",\n  \"goodType\": \"PRODUCT\",\n  \"claimedAmount\": 45.5,\n  \"goodDescription\": \"Whisky Reserva 750 ml\",\n  \"complaintType\": \"CLAIM\",\n  \"detail\": \"La botella llegó abierta.\",\n  \"consumerRequest\": \"Quiero el cambio del producto.\",\n  \"privacyAccepted\": true,\n  \"website\": \"http://spam.example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12b.4 Reclamo válido (DNI, producto) → 201 con código y token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('201 con código LR-AAAA-NNNNNN', () => { pm.response.to.have.status(201); pm.expect(j.code).to.match(/^LR-\\d{4}-\\d{6}$/); });",
+                  "pm.test('Token aleatorio de ≥43 caracteres y ruta de copia', () => { pm.expect(j.copyToken.length).to.be.at.least(43); pm.expect(j.copyPath).to.eql('/api/v1/complaints/copy/' + j.copyToken); });",
+                  "pm.test('La respuesta no devuelve el DNI ni el correo', () => { const t = JSON.stringify(j); pm.expect(t).to.not.include('12345678'); pm.expect(t).to.not.include('example.com'); });",
+                  "s('complaintCode', j.code); s('complaintNumber', String(j.number)); s('complaintToken', j.copyToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consumerName\": \"Ana Núñez Pérez\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123, Miraflores\",\n  \"phone\": \"987654321\",\n  \"email\": \"ana.prueba@example.com\",\n  \"goodType\": \"PRODUCT\",\n  \"claimedAmount\": 45.5,\n  \"goodDescription\": \"Whisky Reserva 750 ml\",\n  \"complaintType\": \"CLAIM\",\n  \"detail\": \"La botella llegó abierta.\",\n  \"consumerRequest\": \"Quiero el cambio del producto.\",\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12b.5 Queja de servicio, CE y menor con apoderado → 201 y correlativo siguiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('201 y correlativo = anterior + 1 (mismo año)', () => { pm.response.to.have.status(201); pm.expect(j.number).to.eql(Number(g('complaintNumber')) + 1); });",
+                  "s('complaintToken2', j.copyToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consumerName\": \"Luis Pérez\",\n  \"documentType\": \"CE\",\n  \"documentNumber\": \"a12345678\",\n  \"address\": \"Av. Larco 123, Miraflores\",\n  \"phone\": \"987654321\",\n  \"email\": \"ana.prueba@example.com\",\n  \"goodType\": \"SERVICE\",\n  \"goodDescription\": \"Whisky Reserva 750 ml\",\n  \"complaintType\": \"COMPLAINT\",\n  \"detail\": \"Mala atención del repartidor.\",\n  \"consumerRequest\": \"Una disculpa.\",\n  \"privacyAccepted\": true,\n  \"guardianName\": \"Rosa Pérez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "12b.6 Descargar la copia con su token → PDF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 application/pdf adjunto con el código', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'); pm.expect(pm.response.headers.get('Content-Disposition')).to.include(pm.collectionVariables.get('complaintCode')); });",
+                  "pm.test('Es un PDF de más de 1 KB, sin caché', () => { pm.expect(pm.response.stream.length).to.be.above(1000); pm.expect(pm.response.stream.slice(0, 4).toString()).to.eql('%PDF'); pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints/copy/{{complaintToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints",
+                "copy",
+                "{{complaintToken}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12b.7 Token ajeno o inventado → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints/copy/token-inventado-que-no-existe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints",
+                "copy",
+                "token-inventado-que-no-existe"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12b.8 No hay listado público de reclamos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Sin sesión no se puede listar (401/403/405)', () => pm.expect([401, 403, 405]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/complaints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "complaints"
+              ]
             }
           }
         }
