@@ -27,6 +27,28 @@ Con Docker: `docker exec -i brinda-db psql -U postgres -v owner_password='...' -
 
 Rotar una clave existente: `ALTER ROLE brinda_app PASSWORD '<nueva>';` y actualizar `backend/.env`.
 
+## Producción en Render (Postgres administrado)
+Scripts de `database/setup/`. Ninguno lleva claves: se piden de forma oculta o se pasan como variables de psql. Orden:
+
+| # | Script | Quién lo corre | Para qué |
+|---|---|---|---|
+| 1 | `run-render-roles.ps1` | tú, en tu terminal (PowerShell, con Docker Desktop abierto) | Pide la URL externa del administrador y las dos claves nuevas, ejecuta `01b_render_roles.sql` y luego `verify_render_roles.sql`. Muestra solo nombres de roles y booleanos. |
+| 1b | `01b_render_roles.sql` | lo usa el anterior | Crea `brinda_owner` y `brinda_app` en una transacción, sobre una base que ya existe y con un usuario sin superusuario pero con `CREATEROLE`. No usa `ALTER DATABASE … OWNER` (exige `CREATEDB`): da `CREATE` en la base y la propiedad del esquema `public` a `brinda_owner`. Falla si los roles ya existen. |
+| 1c | `verify_render_roles.sql` | lo usa el anterior | Comprueba que `brinda_owner` crea en `public`, que `brinda_app` no tiene `DELETE` ni `CREATE`, y que `pg_trgm` es "trusted" (V1 la crea). La prueba usa una tabla temporal dentro de una transacción que se revierte. |
+| 2 | primer arranque de la API | la app | Flyway aplica V1–V10 (sin baseline) y el callback `afterMigrate` aplica `02_grants.sql`. Revisar en `flyway_schema_history` que V1 figure como `SQL`, no `BASELINE`. |
+| 3 | `deactivate_provisional_zones.sql` | `brinda_owner`, **antes de abrir al público** | Desactiva las 3 zonas provisionales de V4 (los distritos no se tocan). Idempotente; el control final `distritos_entregables` debe dar 0. Se revierte con `is_active = TRUE` o cargando los datos reales de Lucía. |
+| 4 | `new-admin-hash.ps1` y `create_admin.sql` | tú | Crea el administrador real (ver abajo). |
+
+Las claves nuevas de los roles van como `DB_OWNER_PASSWORD` y `DB_APP_PASSWORD` en las variables de entorno de Render; guárdalas también en tu gestor de claves.
+
+### Alta del administrador real
+1. `$hash = .\database\setup\new-admin-hash.ps1`: pide la clave dos veces, oculta (mín. 12 caracteres), y devuelve solo el hash BCrypt de costo 12 (el mismo encoder que la API). Requiere JDK 21 y haber compilado el backend una vez (usa los jar de `~/.m2`).
+2. Con `brinda_owner`, tras el primer arranque:
+   ```
+   psql "$OWNER_URL" -v ON_ERROR_STOP=1 -v admin_user=<usuario> -v admin_email=<correo> -v admin_hash="$hash" -f database/setup/create_admin.sql
+   ```
+   `create_admin.sql` rechaza un hash que no sea BCrypt de costo 12 y deja `must_change_password = TRUE`: el primer ingreso exige cambiar la clave. Al final muestra los usuarios y `seed_admin_presente`, que debe ser 0 (con perfil `prod`, si existe `admin@brinda.local` la app no arranca).
+
 ## Privilegios y builds de release
 - `setup/02_grants.sql` es la **fuente única** de privilegios de `brinda_app`. El `pom.xml` lo copia como `db/migration/afterMigrate.sql` y Flyway lo ejecuta con `brinda_owner` tras cada migración (arranque de la app). Idempotente.
 - **Los builds de release usan siempre `mvn clean package`.** Un `target/` viejo puede arrastrar el seed (`V3`) a `db/migration`. Defensas: el test `MigrationsSeedGuardTest` rompe el build si lo encuentra, y con perfil `prod` la app no arranca si existe el usuario `admin@brinda.local`.
