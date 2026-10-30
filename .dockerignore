@@ -1,0 +1,16 @@
+# El contexto de build es la raíz del repo (ver backend/Dockerfile): fuera secretos y ruido.
+**/.env
+**/.env.*
+!**/.env.example
+.git
+**/target
+**/node_modules
+**/dist
+**/.angular
+frontend/capturas
+graphify-out
+backups
+postman
+brinda-db
+*.md
+!frontend/public/**
