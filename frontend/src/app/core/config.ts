@@ -1,4 +1,5 @@
 import { isDevMode } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 /**
  * Configuración editable de la landing.
@@ -12,8 +13,8 @@ export const PENDING = 'Por confirmar';
  */
 export const SHOW_PENDING = isDevMode();
 
-/** Base de la API. Relativa: en desarrollo la atiende el proxy de `proxy.conf.json` (→ localhost:8080). */
-export const API_URL = '/api/v1';
+/** Base de la API por entorno (src/environments): relativa en desarrollo, subdominio propio en producción. */
+export const API_URL = environment.apiUrl;
 
 /**
  * Catálogo de ejemplo (`core/catalog.mock.ts`), solo para trabajar el diseño sin backend:
