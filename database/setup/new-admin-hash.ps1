@@ -20,7 +20,7 @@ if ($p1 -ne $p2) { throw 'Las claves no coinciden.' }
 
 $java = if ($env:JAVA_HOME) { Join-Path $env:JAVA_HOME 'bin\java.exe' } else { 'java' }
 $src = Join-Path $PSScriptRoot 'tools\BcryptHash.java'
-[Console]::OutputEncoding = $OutputEncoding = New-Object System.Text.UTF8Encoding $false   # claves con tildes/ñ llegan intactas
+[Console]::OutputEncoding = $global:OutputEncoding = New-Object System.Text.UTF8Encoding $false   # claves con tildes/ñ llegan intactas
 $hash = $p1 | & $java -cp "$($crypto.FullName);$($jcl.FullName)" $src
 $p1 = $null; $p2 = $null
 if ($LASTEXITCODE -ne 0 -or -not $hash) { throw 'No se pudo generar el hash.' }
