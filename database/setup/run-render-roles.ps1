@@ -1,4 +1,4 @@
-# Crea brinda_owner y brinda_app en el Postgres de Render y verifica el resultado.
+﻿# Crea brinda_owner y brinda_app en el Postgres de Render y verifica el resultado.
 # Uso (desde la raíz del repo):  .\database\setup\run-render-roles.ps1
 # Pide de forma oculta: URL externa del administrador, clave nueva de brinda_owner y clave nueva de brinda_app.
 # Nada se escribe en archivos ni se imprime: viajan al contenedor por variables de entorno del proceso

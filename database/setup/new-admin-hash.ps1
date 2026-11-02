@@ -1,4 +1,4 @@
-# Genera el hash BCrypt (costo 12) de la clave del admin SIN mostrarla ni dejarla en el historial.
+﻿# Genera el hash BCrypt (costo 12) de la clave del admin SIN mostrarla ni dejarla en el historial.
 # Uso:  $hash = .\database\setup\new-admin-hash.ps1      (la clave se pide dos veces, oculta)
 # Requiere JDK 21 en PATH/JAVA_HOME y haber compilado el backend alguna vez (usa los jar de ~/.m2).
 $ErrorActionPreference = 'Stop'
