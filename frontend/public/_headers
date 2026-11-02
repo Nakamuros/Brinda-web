@@ -1,0 +1,15 @@
+# Cloudflare Pages: cabeceras de seguridad de la web (la API ya envía las suyas).
+# PENDIENTE: cuando exista el dominio de la API, reemplazar BRINDA_API_ORIGIN en connect-src (hoy: Render).
+# El hash cubre el onload="this.media='all'" que Angular inyecta para cargar las fuentes sin bloquear; si cambia el build, recalcular.
+# PENDIENTE: img-src/media-src incluyen https: porque IMAGES_BASE_URL (R2) aún no está definido; acotar al dominio real.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-hashes' 'sha256-MhtPZXr7+LpJUY5qtMutB+qWfQtMaPccfe7QXtCcEYc='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https://brinda-api.onrender.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Cross-Origin-Opener-Policy: same-origin
+
+/legal/*
+  Cache-Control: public, max-age=3600
