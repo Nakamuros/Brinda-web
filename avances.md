@@ -155,3 +155,21 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 - 2026-10-19: diseño cerrado, DDL, seeds, esqueleto del backend y módulos de inventario, delivery y pedidos; lote V4 (V4–V7: ofertas, combos, "lleva N paga M").
 - 2026-10-22: vencimiento a 20 min; refresh token descartado; V8 (DNI siempre); imágenes por URL base; V9 (`token_version`); colección Postman; entorno de la PC nueva; acuerdos por escrito en `CLAUDE.md` y `CONTEXTO-BRINDA.md`.
 - 2026-10-28: cumplimiento legal en el frontend; Libro de Reclamaciones (V10, backend, PDF con PDFBox, panel de reclamos); commits separados por tema.
+
+## Auditoría de seguridad (2026-11-02) — hecha
+- Auditoría, correcciones y pruebas en localhost completadas; detalle en `SECURITY-REPORT.md`. Backend 92 tests, frontend 52, build ok. Spring Boot queda en 3.5.16 (sin soporte OSS desde 2026-06-30; migración a 4.x es tarea aparte).
+- `TRUSTED_PROXY_HOPS` (default 1, mínimo 1; la app no arranca si es inválido): proxies propios delante de la API, contados desde la derecha de `X-Forwarded-For` para el límite por IP. Sin cabecera o con menos entradas se usa la IP del par TCP. Verificar el valor real con `LOGGING_LEVEL_COM_BRINDA_API_SHARED_UTIL_CLIENTIP=DEBUG` (solo cuenta entradas, no IPs). Con Cloudflare delante probablemente 2: revisar, nunca subir sin verificar.
+
+### Acciones manuales pendientes en Render / Cloudflare
+- Render: definir `TRUSTED_PROXY_HOPS=1` y verificarlo con el log DEBUG (quitarlo después).
+- Render: `DB_URL` con `sslmode=require`; confirmar `COOKIE_SECURE` sin definir o `true` y `CORS_ALLOWED_ORIGINS` con el origen exacto.
+- Rotación de claves: confirmar que las claves de los roles `brinda_owner`/`brinda_app` y del admin no son las de desarrollo del historial de Git; si hay duda, rotar y actualizar las variables en Render.
+- Cloudflare Pages: al tener dominio de la API, ajustar `connect-src`, `img-src` y `media-src` en `frontend/public/_headers`.
+- Tras redeploy: repetir los GET inofensivos de comprobación.
+
+### Tareas futuras
+- Migrar a Spring Boot 4.x.
+- Separar las migraciones Flyway (rol dueño) del arranque de la app (S-12).
+- Decidir qué hacer con `.claude/skills/` versionado en el repo (S-15).
+- Procedimiento ARCO (Ley 29733) y política de retención: lo define la asesora legal.
+- Escaneo de CVE de Maven (dependency-check): pedir autorización antes de añadirlo.
