@@ -22,6 +22,8 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
+import java.time.OffsetDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -96,6 +98,22 @@ class ComplaintServiceTest {
         verify(repository, org.mockito.Mockito.times(2)).save(cap.capture());
         assertFalse(cap.getAllValues().get(0).getCopyTokenHash().contains(ta));
         assertEquals(64, cap.getAllValues().get(0).getCopyTokenHash().length());
+    }
+
+    @Test
+    void laCopiaVencidaALos30DiasDaElMismoNotFoundQueUnTokenInexistente() {
+        Complaint c = new Complaint();
+        c.setFiledAt(OffsetDateTime.now(clock).minusDays(30).minusSeconds(1));
+        when(repository.findByCopyTokenHash(anyString())).thenReturn(Optional.of(c));
+        assertThrows(ResourceNotFoundException.class, () -> service.findByCopyToken("token-vencido"));
+    }
+
+    @Test
+    void laCopiaSigueVigenteEnElDia30() {
+        Complaint c = new Complaint();
+        c.setFiledAt(OffsetDateTime.now(clock).minusDays(30));
+        when(repository.findByCopyTokenHash(anyString())).thenReturn(Optional.of(c));
+        assertEquals(c, service.findByCopyToken("token-vigente"));
     }
 
     @Test

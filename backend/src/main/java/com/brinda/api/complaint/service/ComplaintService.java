@@ -29,6 +29,8 @@ public class ComplaintService {
 
     public static final String COPY_PATH = "/api/v1/complaints/copy/";
     private static final int TOKEN_BYTES = 32;
+    /** Vigencia del enlace público de descarga de la copia. El reclamo sigue accesible en el panel. */
+    static final int COPY_LINK_DAYS = 30;
 
     private final ComplaintRepository repository;
     private final ComplaintNumberGenerator numbers;
@@ -77,7 +79,10 @@ public class ComplaintService {
     /** La copia solo se entrega con el token aleatorio de ese reclamo; no hay forma de listar ni adivinar otros. */
     @Transactional(readOnly = true)
     public Complaint findByCopyToken(String token) {
+        OffsetDateTime now = OffsetDateTime.now(clock);
+        // Vencido = mismo 404 que un token inexistente: no se distingue "existió" de "nunca existió".
         return repository.findByCopyTokenHash(hash(token))
+                .filter(c -> !c.getFiledAt().plusDays(COPY_LINK_DAYS).isBefore(now))
                 .orElseThrow(() -> new ResourceNotFoundException("Copia no encontrada"));
     }
 
