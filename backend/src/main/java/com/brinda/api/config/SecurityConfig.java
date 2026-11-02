@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.annotation.PostConstruct;
+import com.brinda.api.shared.util.ClientIp;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +46,11 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final RateLimitFilter rateLimitFilter;
     private final SecurityProperties props;
+
+    @PostConstruct
+    void configureClientIp() {
+        ClientIp.configure(props.trustedProxyHops());
+    }
 
     @Bean
     PasswordEncoder passwordEncoder() {
