@@ -33,6 +33,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         int limit = limitFor(request);
         if (limit > 0 && !limiter.tryAcquire(keyFor(request) + "|" + ClientIp.of(request), limit, WINDOW)) {
+            SecurityEventLog.rateLimited(request);
             response.setStatus(429);
             response.setHeader("Retry-After", String.valueOf(WINDOW.toSeconds()));
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);

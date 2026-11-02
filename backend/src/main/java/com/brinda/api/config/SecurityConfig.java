@@ -3,7 +3,9 @@ package com.brinda.api.config;
 import com.brinda.api.auth.security.JwtAuthenticationFilter;
 import com.brinda.api.auth.security.SecurityProperties;
 import com.brinda.api.shared.exception.ErrorResponse;
+import com.brinda.api.shared.security.BodySizeLimitFilter;
 import com.brinda.api.shared.security.RateLimitFilter;
+import com.brinda.api.shared.security.SecurityEventLog;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -38,6 +40,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final int BCRYPT_COST = 12;
+    /** Mayor cuerpo legítimo (recepción de mercadería, reclamo) ronda unos pocos KB. */
+    private static final long MAX_BODY_BYTES = 64 * 1024;
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -69,8 +73,11 @@ public class SecurityConfig {
                 .headers(h -> h
                         .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
                         .frameOptions(f -> f.deny())
+                        .permissionsPolicyHeader(pp -> pp.policy("camera=(), microphone=(), geolocation=(), payment=(), usb=()"))
                         .referrerPolicy(r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
                 .authorizeHttpRequests(a -> a
+                        // /error solo como despacho interno de errores (si no, cada 404 deja un ERROR con stack en el log)
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/login", "/api/v1/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/catalog/**", "/api/v1/delivery/**").permitAll()
@@ -80,12 +87,17 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().denyAll())
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint((req, res, ex) ->
-                                write(res, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "Autenticación requerida"))
-                        .accessDeniedHandler((req, res, ex) ->
-                                write(res, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "No tienes permiso para esta acción")))
+                        .authenticationEntryPoint((req, res, ex) -> {
+                            SecurityEventLog.unauthorized(req);
+                            write(res, HttpServletResponse.SC_UNAUTHORIZED, "UNAUTHORIZED", "Autenticación requerida");
+                        })
+                        .accessDeniedHandler((req, res, ex) -> {
+                            SecurityEventLog.forbidden(req);
+                            write(res, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "No tienes permiso para esta acción");
+                        }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter.class);
+                .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(new BodySizeLimitFilter(MAX_BODY_BYTES), RateLimitFilter.class);
         return http.build();
     }
 

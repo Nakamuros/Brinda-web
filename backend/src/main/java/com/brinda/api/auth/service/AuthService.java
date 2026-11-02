@@ -9,6 +9,7 @@ import com.brinda.api.shared.audit.AuditService;
 import com.brinda.api.shared.exception.BusinessRuleException;
 import com.brinda.api.shared.exception.InvalidCredentialsException;
 import com.brinda.api.shared.exception.ResourceNotFoundException;
+import com.brinda.api.shared.security.SecurityEventLog;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,9 +44,11 @@ public class AuthService {
         if (user == null) {
             passwordEncoder.matches(request.password(), dummyHash);
             auditService.record(null, "LOGIN_FAIL", "users", null, ip);
+            SecurityEventLog.loginFailed(ip);
             throw new InvalidCredentialsException();
         }
         if (!user.isActive() || user.isLocked()) {
+            passwordEncoder.matches(request.password(), dummyHash); // mismo tiempo que un intento normal: no delata cuentas bloqueadas
             auditService.record(user.getId(), "LOGIN_BLOCKED", "users", user.getId().toString(), ip);
             throw new InvalidCredentialsException();
         }
@@ -97,7 +100,9 @@ public class AuthService {
             user.setLockedUntil(OffsetDateTime.now().plusMinutes(securityProperties.lockMinutes()));
             user.setFailedAttempts(0);
             auditService.record(user.getId(), "ACCOUNT_LOCKED", "users", user.getId().toString(), ip);
+            SecurityEventLog.accountLocked(user.getId().toString(), ip);
         }
         auditService.record(user.getId(), "LOGIN_FAIL", "users", user.getId().toString(), ip);
+        SecurityEventLog.loginFailed(ip);
     }
 }

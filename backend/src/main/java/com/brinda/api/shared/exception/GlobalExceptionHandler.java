@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -53,15 +55,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(ErrorResponse.of(400, "VALIDATION_ERROR", "Datos inválidos", fields));
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    ResponseEntity<ErrorResponse> mediaType() {
+        return build(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "UNSUPPORTED_MEDIA_TYPE", "Tipo de contenido no soportado");
+    }
+
     @ExceptionHandler({ConstraintViolationException.class, HttpMessageNotReadableException.class,
-            MethodArgumentTypeMismatchException.class})
+            MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
     ResponseEntity<ErrorResponse> badRequest() {
         return build(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "Solicitud inválida");
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<ErrorResponse> integrity(DataIntegrityViolationException ex) {
-        log.warn("Violación de integridad: {}", ex.getMostSpecificCause().getMessage());
+        // Solo la clase: el mensaje de Postgres incluye el valor duplicado (puede ser un dato personal).
+        log.warn("Violación de integridad ({})", ex.getMostSpecificCause().getClass().getSimpleName());
         return build(HttpStatus.CONFLICT, "CONFLICT", "La operación viola una regla de datos (¿duplicado?)");
     }
 
