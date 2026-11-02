@@ -158,10 +158,10 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 
 ## Auditoría de seguridad (2026-11-02) — hecha
 - Auditoría, correcciones y pruebas en localhost completadas; detalle en `SECURITY-REPORT.md`. Backend 92 tests, frontend 52, build ok. Spring Boot queda en 3.5.16 (sin soporte OSS desde 2026-06-30; migración a 4.x es tarea aparte).
-- `TRUSTED_PROXY_HOPS` (default 1, mínimo 1; la app no arranca si es inválido): proxies propios delante de la API, contados desde la derecha de `X-Forwarded-For` para el límite por IP. Sin cabecera o con menos entradas se usa la IP del par TCP. Verificar el valor real con `LOGGING_LEVEL_COM_BRINDA_API_SHARED_UTIL_CLIENTIP=DEBUG` (solo cuenta entradas, no IPs). Con Cloudflare delante probablemente 2: revisar, nunca subir sin verificar.
+- `TRUSTED_PROXY_HOPS` (default 1, mínimo 1; la app no arranca si es inválido): proxies propios delante de la API, contados desde la derecha de `X-Forwarded-For` para el límite por IP. Sin cabecera o con menos entradas se usa la IP del par TCP. Verificar el valor real con `LOGGING_LEVEL_COM_BRINDA_API_SHARED_UTIL_CLIENTIP=DEBUG` (solo cuenta entradas, no IPs). **Valor verificado en Render: 2** (Render tiene Cloudflare delante; con 1 se veían IPs de borde de Cloudflare). Verificación: pedir `/api/v1/admin/products` (responde 401, sirve) varias veces y comprobar en los logs `SECURITY unauthorized ... ip=` que la IP sea constante y coincida con la IP pública real del cliente; si aparecen IPs de borde de Cloudflare o varían sin motivo, el valor es incorrecto. Cualquier proxy nuevo delante de la API obliga a re-verificar. Nunca subir el valor sin verificarlo.
 
 ### Acciones manuales pendientes en Render / Cloudflare
-- Render: definir `TRUSTED_PROXY_HOPS=1` y verificarlo con el log DEBUG (quitarlo después).
+- Render: `TRUSTED_PROXY_HOPS=2` (verificado). No omitir la variable: el valor por defecto del código es 1 y en Render daría IPs de Cloudflare. Re-verificar si se añade o cambia cualquier proxy.
 - Render: `DB_URL` con `sslmode=require`; confirmar `COOKIE_SECURE` sin definir o `true` y `CORS_ALLOWED_ORIGINS` con el origen exacto.
 - Rotación de claves: confirmar que las claves de los roles `brinda_owner`/`brinda_app` y del admin no son las de desarrollo del historial de Git; si hay duda, rotar y actualizar las variables en Render.
 - Cloudflare Pages: al tener dominio de la API, ajustar `connect-src`, `img-src` y `media-src` en `frontend/public/_headers`.
