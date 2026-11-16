@@ -4,6 +4,8 @@
 
 # Backend
 backend/target/
+# Fotos subidas desde el panel en desarrollo
+backend/uploads/
 *.log
 .idea/
 *.iml

@@ -42,6 +42,8 @@ public class SecurityConfig {
     private static final int BCRYPT_COST = 12;
     /** Mayor cuerpo legítimo (recepción de mercadería, reclamo) ronda unos pocos KB. */
     private static final long MAX_BODY_BYTES = 64 * 1024;
+    /** Foto de producto (3 MB) más el envoltorio multipart. */
+    private static final long MAX_UPLOAD_BYTES = com.brinda.api.shared.image.ImageStore.MAX_BYTES + 64 * 1024;
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .registerModule(new JavaTimeModule())
@@ -97,7 +99,7 @@ public class SecurityConfig {
                         }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(rateLimitFilter, JwtAuthenticationFilter.class)
-                .addFilterBefore(new BodySizeLimitFilter(MAX_BODY_BYTES), RateLimitFilter.class);
+                .addFilterBefore(new BodySizeLimitFilter(MAX_BODY_BYTES, "/api/v1/admin/images", MAX_UPLOAD_BYTES), RateLimitFilter.class);
         return http.build();
     }
 

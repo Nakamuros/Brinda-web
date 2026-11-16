@@ -66,6 +66,17 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "Solicitud inválida");
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    ResponseEntity<ErrorResponse> tooLarge() {
+        return build(HttpStatus.PAYLOAD_TOO_LARGE, "PAYLOAD_TOO_LARGE", "La imagen no puede pesar más de 3 MB");
+    }
+
+    @ExceptionHandler({org.springframework.web.multipart.MultipartException.class,
+            org.springframework.web.multipart.support.MissingServletRequestPartException.class})
+    ResponseEntity<ErrorResponse> badUpload() {
+        return build(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "Envía la imagen en el campo \"file\"");
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<ErrorResponse> integrity(DataIntegrityViolationException ex) {
         // Solo la clase: el mensaje de Postgres incluye el valor duplicado (puede ser un dato personal).

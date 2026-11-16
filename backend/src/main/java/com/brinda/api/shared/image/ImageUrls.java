@@ -14,7 +14,9 @@ public final class ImageUrls {
             return null;
         }
         String v = value.trim();
-        if (v.startsWith("http://") || v.startsWith("https://") || baseUrl == null || baseUrl.isBlank()) {
+        // Las fotos subidas desde el panel ya traen su ruta dentro de la API: no llevan la URL base.
+        if (v.startsWith("http://") || v.startsWith("https://") || v.startsWith(ImageStore.PUBLIC_PATH)
+                || baseUrl == null || baseUrl.isBlank()) {
             return v;
         }
         String base = baseUrl.trim();

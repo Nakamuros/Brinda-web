@@ -26,15 +26,21 @@ public class BodySizeLimitFilter extends OncePerRequestFilter {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final long maxBytes;
+    private final long defaultMaxBytes;
+    private final String uploadPath;
+    private final long uploadMaxBytes;
 
-    public BodySizeLimitFilter(long maxBytes) {
-        this.maxBytes = maxBytes;
+    /** uploadPath: única ruta (subida de fotos) con un tope propio, mayor que el del JSON. */
+    public BodySizeLimitFilter(long maxBytes, String uploadPath, long uploadMaxBytes) {
+        this.defaultMaxBytes = maxBytes;
+        this.uploadPath = uploadPath;
+        this.uploadMaxBytes = uploadMaxBytes;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        long maxBytes = uploadPath.equals(request.getRequestURI()) ? uploadMaxBytes : defaultMaxBytes;
         if (request.getContentLengthLong() > maxBytes) {
             response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
