@@ -36,7 +36,7 @@
           name="q"
           autocomplete="off"
           enterkeyhint="search"
-          placeholder="Busca cerveza, pisco, combos…"
+          placeholder="Busca en el catálogo"
           [value]="query()"
           (input)="onSearch($event)"
         />
@@ -127,9 +127,6 @@
           </p>
           @if (hasFilters()) {
             <button type="button" class="link" (click)="clearFilters()">Limpiar filtros</button>
-          }
-          @if (isMock) {
-            <p class="dev">Datos de ejemplo · solo en desarrollo</p>
           }
         </div>
 

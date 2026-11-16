@@ -16,20 +16,6 @@ export const SHOW_PENDING = isDevMode();
 /** Base de la API por entorno (src/environments): relativa en desarrollo, subdominio propio en producción. */
 export const API_URL = environment.apiUrl;
 
-/**
- * Catálogo de ejemplo (`core/catalog.mock.ts`), solo para trabajar el diseño sin backend:
- * en desarrollo, `localStorage.setItem('brinda.mock', '1')` y recargar. Nunca se activa en producción.
- */
-export const USE_MOCK_CATALOG = isDevMode() && readFlag('brinda.mock');
-
-function readFlag(key: string): boolean {
-  try {
-    return localStorage.getItem(key) === '1';
-  } catch {
-    return false;
-  }
-}
-
 export const SITE = {
   name: 'BRINDA',
   tagline: 'Licorería a domicilio en Lima',
@@ -53,28 +39,10 @@ export const HERO = {
 /** Imágenes configurables. Vacío o ausente = placeholder local. */
 export const IMAGES = {
   introProduct: 'media/product-placeholder.svg',
-  categories: {
-    cervezas: '',
-    vinos: '',
-    destilados: '',
-    licores: '',
-    mezcladores: '',
-    snacks: '',
-  } as Record<string, string>,
 } as const;
 
-/** Sin cigarros hasta que el asesor lo confirme. */
-export const CATEGORIES = [
-  { id: 'cervezas', name: 'Cervezas' },
-  { id: 'vinos', name: 'Vinos' },
-  { id: 'destilados', name: 'Destilados' },
-  { id: 'licores', name: 'Licores' },
-  { id: 'mezcladores', name: 'Mezcladores' },
-  { id: 'snacks', name: 'Snacks' },
-] as const;
-
 export const HOW_TO_ORDER = [
-  { title: 'Elige', text: 'Arma tu carrito con cervezas, vinos, destilados y combos.' },
+  { title: 'Elige', text: 'Arma tu carrito desde el catálogo.' },
   {
     title: 'Envía por WhatsApp',
     text: 'Tu pedido recibe un código corto y se abre el chat con el mensaje listo.',
@@ -93,14 +61,16 @@ export const CONTACT = {
   hours: '',
 } as const;
 
+/** Minutos que un pedido espera confirmación; igual que la expiración del backend (`OrderProperties`). */
+export const ORDER = { expiryMinutes: 20 } as const;
+
 /**
  * Datos legales. Proveedor y notas literales de la Hoja de Reclamación (public/legal/hoja-reclamacion.pdf).
  * La redacción final la confirma el asesor de Lucía: no inventar ni parafrasear textos legales.
  */
 export const LEGAL = {
-  /** Espacio reservado para los avisos legales de licor y tabaco (texto del asesor de Lucía). */
+  /** Avisos legales de licor y tabaco (texto del asesor de Lucía). Vacío = no se muestra. */
   noticesText: '',
-  showPlaceholder: true,
   /** Datos del proveedor tal como figuran en la hoja. El domicilio NO es zona de reparto ni punto de venta. */
   provider: {
     name: 'BRINDA PERU SAC',

@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { MOCK_CATEGORIES, mockProducts } from '../core/catalog.mock';
-import { API_URL, USE_MOCK_CATALOG } from '../core/config';
+import { API_URL } from '../core/config';
 import { Category } from '../models/category';
 import { Page } from '../models/page';
 import { Product } from '../models/product';
@@ -31,18 +30,12 @@ export class CatalogService {
     }
     this.status.set('loading');
     try {
-      if (USE_MOCK_CATALOG) {
-        await new Promise((resolve) => setTimeout(resolve, 450));
-        this.products.set(mockProducts());
-        this.categories.set(MOCK_CATEGORIES);
-      } else {
-        const [categories, products] = await Promise.all([
-          this.fetchCategories(),
-          this.fetchAllProducts(),
-        ]);
-        this.categories.set(categories);
-        this.products.set(products);
-      }
+      const [categories, products] = await Promise.all([
+        this.fetchCategories(),
+        this.fetchAllProducts(),
+      ]);
+      this.categories.set(categories);
+      this.products.set(products);
       this.status.set('ready');
     } catch {
       this.status.set('error');

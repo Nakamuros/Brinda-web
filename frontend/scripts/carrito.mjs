@@ -2,6 +2,7 @@
 // Flujo completo a 360/768/1440 con contexto limpio; capturas en frontend/capturas/.
 import { chromium } from 'playwright';
 import { passAgeGate } from './age.mjs';
+import { mockCatalog } from './fixture.mjs';
 import { mkdirSync } from 'node:fs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
@@ -12,10 +13,10 @@ const sizes = [
 ];
 mkdirSync('capturas', { recursive: true });
 const browser = await chromium.launch();
-// Estas pruebas usan el catálogo de ejemplo (bandera de desarrollo), no la base de datos.
+// Estas pruebas usan el catálogo de ejemplo (scripts/fixture.mjs intercepta la API), no la base de datos.
 const newCtx = async (opts) => {
   const c = await browser.newContext(opts);
-  await c.addInitScript(() => localStorage.setItem('brinda.mock', '1'));
+  await mockCatalog(c);
   return c;
 };
 const out = [];

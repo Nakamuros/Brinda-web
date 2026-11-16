@@ -134,7 +134,8 @@
   }
   .rail {
     grid-auto-flow: row;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, 12rem));
+    justify-content: center;
     grid-auto-columns: auto;
     overflow: visible;
     max-width: 76rem;

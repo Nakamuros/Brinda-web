@@ -2,6 +2,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { AGE_KEY, passAgeGate } from './age.mjs';
+import { mockCatalog } from './fixture.mjs';
 
 const base = process.env.BASE_URL ?? 'http://localhost:4200';
 const sizes = [
@@ -34,7 +35,9 @@ for (const { name, width, height } of sizes) {
   check(L('Tab no sale del modal'), await page.evaluate(() => !!document.activeElement?.closest('[role=dialog]')));
   await page.screenshot({ path: `capturas/legal-${name}-modal.png` });
   await page.getByRole('button', { name: 'No', exact: true }).click();
-  check(L('"No" muestra el mensaje'), await page.getByText('Lo sentimos, solo vendemos a mayores de 18 años.').isVisible());
+  const sorry = page.getByText('Lo sentimos, solo vendemos a mayores de 18 años.');
+  await sorry.waitFor({ timeout: 3000 }).catch(() => {});
+  check(L('"No" muestra el mensaje'), await sorry.isVisible());
   await page.screenshot({ path: `capturas/legal-${name}-modal-no.png` });
   await page.getByRole('button', { name: 'Volver a la pregunta' }).click();
   await page.getByRole('button', { name: 'Sí, soy mayor de 18' }).click();
@@ -78,13 +81,16 @@ for (const { name, width, height } of sizes) {
   // 4) Aviso de menores en carrito y pedido (carrito con producto de ejemplo).
   const c3 = await browser.newContext({ viewport: { width, height } });
   await passAgeGate(c3);
-  await c3.addInitScript(() => localStorage.setItem('brinda.mock', '1'));
+  await mockCatalog(c3);
   const p3 = await c3.newPage();
   await p3.goto(base + '/catalogo', { waitUntil: 'networkidle' });
   await p3.locator('app-product-card button', { hasText: /Agregar/ }).first().click();
+  // El carrito se guarda en un effect: esperar a que quede en localStorage antes de navegar.
+  await p3.waitForFunction(() => (localStorage.getItem('brinda.cart.v1') ?? '[]') !== '[]');
   for (const r of ['/carrito', '/pedido']) {
     await p3.goto(base + r, { waitUntil: 'networkidle' });
     const n = p3.locator('app-legal-notice p.minors');
+    await n.waitFor({ timeout: 3000 }).catch(() => {});
     check(L(`${r}: aviso de menores visible`), await n.isVisible() && (await n.innerText()).includes('DNI físico'));
     await p3.screenshot({ path: `capturas/legal-${name}${r.replace('/', '-')}.png` });
   }

@@ -241,25 +241,7 @@ html.menu-open {
   overflow: hidden;
 }
 
-/* Tinte de cada categoría (fichas de la landing, tarjetas y detalle del catálogo) */
-[data-cat='cervezas'] {
-  --tint: var(--brass);
-}
-[data-cat='vinos'] {
-  --tint: var(--cta);
-}
-[data-cat='destilados'] {
-  --tint: var(--promo);
-}
-[data-cat='licores'] {
-  --tint: var(--bg-alt);
-}
-[data-cat='mezcladores'] {
-  --tint: var(--teal);
-}
-[data-cat='snacks'] {
-  --tint: var(--stone);
-}
+/* Tinte por categoría (fichas de la landing, tarjetas y detalle); sin regla = latón por defecto */
 [data-cat='combos-y-promociones'] {
   --tint: var(--teal);
 }

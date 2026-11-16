@@ -2,7 +2,6 @@ import { Location } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CatalogoSoon } from './catalogo-soon';
-import { USE_MOCK_CATALOG } from '../../../core/config';
 import { Product } from '../../../models/product';
 import { CartService } from '../../../services/cart.service';
 import { CatalogService } from '../../../services/catalog.service';
@@ -39,7 +38,6 @@ export class Catalogo {
 
   protected readonly status = this.catalog.status;
   protected readonly categories = this.catalog.categories;
-  protected readonly isMock = USE_MOCK_CATALOG;
   protected readonly skeletons = Array.from({ length: 8 }, (_, i) => i);
   protected readonly page = PAGE;
 

@@ -19,7 +19,7 @@
           "src/app/pages/public/landing/sections/categories.ts"
         ],
         "createdAt": "2026-10-26T00:50:56.163Z",
-        "reason": "falso positivo: img dentro de @if con src no vacio (IMAGES.categories)"
+        "reason": "falso positivo: img dentro de @if con src no vacio (iconUrl de la categoría)"
       },
       {
         "rule": "broken-image",
@@ -38,6 +38,15 @@
         ],
         "createdAt": "2026-10-26T02:08:23.020Z",
         "reason": "falso positivo: src enlazado a IMAGES.introProduct (config.ts), no vacio"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "src/app/admin/productos/producto-form.html"
+        ],
+        "createdAt": "2026-11-15T20:03:15.716Z",
+        "reason": "falso positivo (Claude): img dentro de @if con src enlazado a p.imageUrl, nunca vacio"
       }
     ]
   }

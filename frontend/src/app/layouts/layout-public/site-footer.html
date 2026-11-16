@@ -11,9 +11,9 @@
 
     <nav class="legal-links" aria-label="Información legal">
       <ul>
-        @for (label of pendingLinks; track label) {
+        @for (l of legalLinks; track l.path) {
           <li>
-            <span class="pending" title="Disponible pronto">{{ label }}</span>
+            <a class="legal-link" [routerLink]="l.path">{{ l.label }}</a>
           </li>
         }
       </ul>
@@ -23,16 +23,9 @@
       <img [src]="complaints.logo" alt="Libro de Reclamaciones" width="168" height="134" loading="lazy" decoding="async" />
     </a>
 
-    @if (showNotice) {
+    @if (legal.noticesText) {
       <div class="notices" role="note">
-        @if (legal.noticesText) {
-          <p>{{ legal.noticesText }}</p>
-        } @else {
-          <p class="reserved">
-            Espacio reservado para los avisos legales sobre la venta de licor y tabaco. El texto lo entrega el asesor
-            legal.
-          </p>
-        }
+        <p>{{ legal.noticesText }}</p>
       </div>
     }
 

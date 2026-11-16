@@ -200,12 +200,6 @@
 .link:hover {
   color: var(--brass);
 }
-.dev {
-  margin-left: auto;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  opacity: 0.8;
-}
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

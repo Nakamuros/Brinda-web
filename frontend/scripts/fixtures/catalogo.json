@@ -1,0 +1,483 @@
+{
+ "categories": [
+  {
+   "id": 1,
+   "name": "Cervezas",
+   "slug": "cervezas",
+   "active": true,
+   "displayOrder": 1
+  },
+  {
+   "id": 2,
+   "name": "Vinos",
+   "slug": "vinos",
+   "active": true,
+   "displayOrder": 2
+  },
+  {
+   "id": 3,
+   "name": "Destilados",
+   "slug": "destilados",
+   "active": true,
+   "displayOrder": 3
+  },
+  {
+   "id": 4,
+   "name": "Licores",
+   "slug": "licores",
+   "active": true,
+   "displayOrder": 4
+  },
+  {
+   "id": 5,
+   "name": "Mezcladores",
+   "slug": "mezcladores",
+   "active": true,
+   "displayOrder": 5
+  },
+  {
+   "id": 6,
+   "name": "Snacks",
+   "slug": "snacks",
+   "active": true,
+   "displayOrder": 6
+  },
+  {
+   "id": 99,
+   "name": "Combos y promociones",
+   "slug": "combos-y-promociones",
+   "active": true,
+   "displayOrder": 99
+  }
+ ],
+ "products": [
+  {
+   "id": "mock-026",
+   "slug": "combo-pisco-sour",
+   "name": "Combo pisco sour",
+   "description": "Lo necesario para preparar el clásico en casa.",
+   "price": 74,
+   "discountPrice": 66,
+   "finalPrice": 66,
+   "onOffer": true,
+   "discountPercent": 11,
+   "offerEndsAt": "2026-11-20T18:47:54.324Z",
+   "categorySlug": "combos-y-promociones",
+   "categoryName": "Combos y promociones",
+   "featured": false,
+   "inStock": true,
+   "productType": "COMBO",
+   "items": [
+    {
+     "name": "Pisco quebranta, 700 ml",
+     "quantity": 1
+    },
+    {
+     "name": "Hielo en bolsa, 2 kg",
+     "quantity": 1
+    }
+   ]
+  },
+  {
+   "id": "mock-003",
+   "slug": "cerveza-ipa-artesanal-330-ml",
+   "name": "Cerveza IPA artesanal, 330 ml",
+   "description": "Amargor marcado y aroma cítrico. Para quienes buscan algo con carácter.",
+   "price": 11,
+   "discountPrice": 9,
+   "finalPrice": 9,
+   "onOffer": true,
+   "discountPercent": 18,
+   "offerEndsAt": "2026-11-20T18:47:54.202Z",
+   "categorySlug": "cervezas",
+   "categoryName": "Cervezas",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-011",
+   "slug": "ron-anejo-750-ml",
+   "name": "Ron añejo, 750 ml",
+   "description": "Dulzor de caña y vainilla, perfecto para un trago largo.",
+   "price": 72,
+   "finalPrice": 72,
+   "onOffer": true,
+   "promoBuy": 2,
+   "promoPay": 1,
+   "promoLabel": "Lleva 2, paga 1",
+   "promoEndsAt": "2026-11-21T18:47:54.315Z",
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-015",
+   "slug": "tequila-reposado-750-ml",
+   "name": "Tequila reposado, 750 ml",
+   "description": "Agave maduro con un paso corto por barrica.",
+   "price": 118,
+   "discountPrice": 99,
+   "finalPrice": 99,
+   "onOffer": true,
+   "discountPercent": 16,
+   "offerEndsAt": "2026-11-19T18:47:54.315Z",
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-007",
+   "slug": "vino-rosado-750-ml",
+   "name": "Vino rosado, 750 ml",
+   "description": "Ligero, frutal y muy fácil de beber. Servir muy frío.",
+   "price": 42,
+   "discountPrice": 35,
+   "finalPrice": 35,
+   "onOffer": true,
+   "discountPercent": 17,
+   "offerEndsAt": "2026-11-18T18:47:54.314Z",
+   "categorySlug": "vinos",
+   "categoryName": "Vinos",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-025",
+   "slug": "combo-cervecero",
+   "name": "Combo cervecero",
+   "description": "Todo para la previa: cervezas y algo para picar.",
+   "price": 79,
+   "finalPrice": 79,
+   "onOffer": false,
+   "categorySlug": "combos-y-promociones",
+   "categoryName": "Combos y promociones",
+   "featured": true,
+   "inStock": true,
+   "productType": "COMBO",
+   "items": [
+    {
+     "name": "Cerveza rubia lager, six pack 330 ml",
+     "quantity": 2
+    },
+    {
+     "name": "Papas fritas artesanales, 150 g",
+     "quantity": 1
+    }
+   ]
+  },
+  {
+   "id": "mock-027",
+   "slug": "combo-gin-tonic",
+   "name": "Combo gin tonic",
+   "description": "Gin, tónica y hielo para armar la noche.",
+   "price": 105,
+   "finalPrice": 105,
+   "onOffer": false,
+   "categorySlug": "combos-y-promociones",
+   "categoryName": "Combos y promociones",
+   "featured": false,
+   "inStock": true,
+   "productType": "COMBO",
+   "items": [
+    {
+     "name": "Gin seco, 700 ml",
+     "quantity": 1
+    },
+    {
+     "name": "Agua tónica, pack x6",
+     "quantity": 1
+    },
+    {
+     "name": "Hielo en bolsa, 2 kg",
+     "quantity": 1
+    }
+   ]
+  },
+  {
+   "id": "mock-001",
+   "slug": "cerveza-rubia-lager-six-pack-330-ml",
+   "name": "Cerveza rubia lager, six pack 330 ml",
+   "description": "Lager ligera y fresca, pensada para compartir. Sírvela bien fría.",
+   "price": 28,
+   "finalPrice": 28,
+   "onOffer": false,
+   "categorySlug": "cervezas",
+   "categoryName": "Cervezas",
+   "featured": true,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-008",
+   "slug": "espumante-brut-750-ml",
+   "name": "Espumante brut, 750 ml",
+   "description": "Burbuja fina y fresca para el brindis de la noche.",
+   "price": 68,
+   "finalPrice": 68,
+   "onOffer": false,
+   "categorySlug": "vinos",
+   "categoryName": "Vinos",
+   "featured": true,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-013",
+   "slug": "pisco-quebranta-700-ml",
+   "name": "Pisco quebranta, 700 ml",
+   "description": "Pisco puro, de aroma intenso. Para el clásico de la casa.",
+   "price": 54,
+   "finalPrice": 54,
+   "onOffer": false,
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": true,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-005",
+   "slug": "vino-tinto-reserva-750-ml",
+   "name": "Vino tinto reserva, 750 ml",
+   "description": "Tinto de cuerpo medio, taninos redondos y final largo. Acompaña carnes y pastas.",
+   "price": 59,
+   "finalPrice": 59,
+   "onOffer": false,
+   "categorySlug": "vinos",
+   "categoryName": "Vinos",
+   "featured": true,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-010",
+   "slug": "whisky-12-anos-750-ml",
+   "name": "Whisky 12 años, 750 ml",
+   "description": "Suave, con notas de miel y madera. Para tomar solo o con hielo.",
+   "price": 169,
+   "finalPrice": 169,
+   "onOffer": false,
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": true,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-019",
+   "slug": "agua-tonica-pack-x6",
+   "name": "Agua tónica, pack x6",
+   "description": "Burbuja viva y amargor justo para tus tragos.",
+   "price": 21,
+   "finalPrice": 21,
+   "onOffer": false,
+   "categorySlug": "mezcladores",
+   "categoryName": "Mezcladores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-018",
+   "slug": "amaro-de-hierbas-700-ml",
+   "name": "Amaro de hierbas, 700 ml",
+   "description": "Agridulce y herbal, para la sobremesa.",
+   "price": 61,
+   "finalPrice": 61,
+   "onOffer": false,
+   "categorySlug": "licores",
+   "categoryName": "Licores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-002",
+   "slug": "cerveza-negra-artesanal-500-ml",
+   "name": "Cerveza negra artesanal, 500 ml",
+   "description": "Notas de café y cacao, cuerpo medio y final seco.",
+   "price": 14.5,
+   "finalPrice": 14.5,
+   "onOffer": false,
+   "categorySlug": "cervezas",
+   "categoryName": "Cervezas",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-014",
+   "slug": "gin-seco-700-ml",
+   "name": "Gin seco, 700 ml",
+   "description": "Enebro y cítricos, listo para un buen gin tonic.",
+   "price": 89,
+   "finalPrice": 89,
+   "onOffer": false,
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-020",
+   "slug": "ginger-ale-pack-x6",
+   "name": "Ginger ale, pack x6",
+   "description": "Jengibre picante y fresco. Para mulas y highballs.",
+   "price": 21,
+   "finalPrice": 21,
+   "onOffer": false,
+   "categorySlug": "mezcladores",
+   "categoryName": "Mezcladores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-021",
+   "slug": "hielo-en-bolsa-2-kg",
+   "name": "Hielo en bolsa, 2 kg",
+   "description": "Hielo cristalino de lenta dilución.",
+   "price": 8,
+   "finalPrice": 8,
+   "onOffer": false,
+   "categorySlug": "mezcladores",
+   "categoryName": "Mezcladores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-016",
+   "slug": "licor-de-cafe-700-ml",
+   "name": "Licor de café, 700 ml",
+   "description": "Dulce, cremoso y aromático. Va bien con hielo o con postre.",
+   "price": 52,
+   "finalPrice": 52,
+   "onOffer": false,
+   "categorySlug": "licores",
+   "categoryName": "Licores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-017",
+   "slug": "licor-de-crema-700-ml",
+   "name": "Licor de crema, 700 ml",
+   "description": "Suave y sedoso, con un final de vainilla.",
+   "price": 49,
+   "finalPrice": 49,
+   "onOffer": false,
+   "categorySlug": "licores",
+   "categoryName": "Licores",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-022",
+   "slug": "mix-de-frutos-secos-200-g",
+   "name": "Mix de frutos secos, 200 g",
+   "description": "Almendras, pecanas y pasas. Un picoteo sin culpa.",
+   "price": 15,
+   "finalPrice": 15,
+   "onOffer": false,
+   "categorySlug": "snacks",
+   "categoryName": "Snacks",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-023",
+   "slug": "papas-fritas-artesanales-150-g",
+   "name": "Papas fritas artesanales, 150 g",
+   "description": "Crocantes y con sal de mar.",
+   "price": 9,
+   "finalPrice": 9,
+   "onOffer": false,
+   "categorySlug": "snacks",
+   "categoryName": "Snacks",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-006",
+   "slug": "vino-blanco-seco-750-ml",
+   "name": "Vino blanco seco, 750 ml",
+   "description": "Fresco y floral, ideal para pescados, ceviche y quesos suaves.",
+   "price": 46,
+   "finalPrice": 46,
+   "onOffer": false,
+   "categorySlug": "vinos",
+   "categoryName": "Vinos",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-012",
+   "slug": "vodka-premium-750-ml",
+   "name": "Vodka premium, 750 ml",
+   "description": "Destilado limpio y neutro, base de todo coctel.",
+   "price": 64,
+   "finalPrice": 64,
+   "onOffer": false,
+   "categorySlug": "destilados",
+   "categoryName": "Destilados",
+   "featured": false,
+   "inStock": true,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-004",
+   "slug": "cerveza-de-trigo-330-ml",
+   "name": "Cerveza de trigo, 330 ml",
+   "description": "Suave y turbia, con un toque de naranja.",
+   "price": 10,
+   "finalPrice": 10,
+   "onOffer": false,
+   "categorySlug": "cervezas",
+   "categoryName": "Cervezas",
+   "featured": false,
+   "inStock": false,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-024",
+   "slug": "mani-salado-250-g",
+   "name": "Maní salado, 250 g",
+   "description": "Tostado y salado, el compañero de la cerveza.",
+   "price": 7,
+   "finalPrice": 7,
+   "onOffer": false,
+   "categorySlug": "snacks",
+   "categoryName": "Snacks",
+   "featured": false,
+   "inStock": false,
+   "productType": "PRODUCT"
+  },
+  {
+   "id": "mock-009",
+   "slug": "vino-tinto-gran-reserva-750-ml",
+   "name": "Vino tinto gran reserva, 750 ml",
+   "description": "Crianza larga en barrica, intenso y elegante.",
+   "price": 98,
+   "finalPrice": 98,
+   "onOffer": false,
+   "categorySlug": "vinos",
+   "categoryName": "Vinos",
+   "featured": false,
+   "inStock": false,
+   "productType": "PRODUCT"
+  }
+ ]
+}
