@@ -75,7 +75,7 @@ export class AdminPassword {
       this.error.set('');
       try {
         await this.auth.changePassword(this.current(), this.next());
-        await this.router.navigateByUrl('/admin/reclamos');
+        await this.router.navigateByUrl('/admin/pedidos');
       } catch (e) {
         this.error.set(apiError(e, 'No se pudo cambiar la contraseña.'));
       } finally {

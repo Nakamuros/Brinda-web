@@ -75,7 +75,7 @@ export class AdminLogin {
     this.error.set('');
     try {
       const user = await this.auth.login(this.username().trim(), this.password());
-      await this.router.navigateByUrl(user.mustChangePassword ? '/admin/cambiar-clave' : '/admin/reclamos');
+      await this.router.navigateByUrl(user.mustChangePassword ? '/admin/cambiar-clave' : '/admin/pedidos');
     } catch (e) {
       this.error.set(apiError(e, 'No se pudo ingresar. Inténtalo de nuevo.'));
     } finally {

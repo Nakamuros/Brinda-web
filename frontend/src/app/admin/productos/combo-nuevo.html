@@ -1,0 +1,83 @@
+<section class="page">
+  <a class="back" routerLink="/admin/productos">← Todos los productos</a>
+  <h1 class="page-title">Nuevo combo</h1>
+
+  @if (loading()) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button></p>
+  } @else {
+    <section class="panel" aria-labelledby="c-data">
+      <h2 id="c-data" class="panel-title">Datos</h2>
+      <form class="form" (submit)="save($event)" novalidate>
+        <div class="two">
+          <div class="field">
+            <label class="label" for="name">Nombre</label>
+            <input id="name" class="input" maxlength="150" autocomplete="off"
+              [value]="name()" (input)="name.set($any($event.target).value)" />
+          </div>
+          <div class="field">
+            <label class="label" for="price">Precio del combo (S/)</label>
+            <input id="price" class="input" inputmode="decimal" autocomplete="off" placeholder="0.00"
+              [value]="price()" (input)="price.set($any($event.target).value)" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="description">Descripción <span class="hint">(opcional)</span></label>
+          <textarea id="description" class="input short" rows="3" maxlength="2000"
+            [value]="description()" (input)="description.set($any($event.target).value)"></textarea>
+        </div>
+
+        <fieldset class="fs items-edit">
+          <legend class="label">Qué incluye</legend>
+          @for (l of lines(); track $index; let i = $index) {
+            <div class="item-row">
+              <div class="field">
+                <label class="label" [attr.for]="'ip' + i">Producto {{ i + 1 }}</label>
+                <select [id]="'ip' + i" class="input" (change)="setLine(i, 'productId', $any($event.target).value)">
+                  <option value="" [selected]="!l.productId" disabled>Elige un producto</option>
+                  @for (p of products(); track p.id) {
+                    <option [value]="p.id" [selected]="l.productId === p.id">{{ p.name }} (stock {{ p.stockQuantity }})</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label class="label" [attr.for]="'iq' + i">Cant.</label>
+                <input [id]="'iq' + i" class="input" inputmode="numeric" autocomplete="off"
+                  [value]="l.quantity" (input)="setLine(i, 'quantity', $any($event.target).value)" />
+              </div>
+              <button type="button" class="btn btn-ghost icon" [disabled]="lines().length === 1"
+                [attr.aria-label]="'Quitar producto ' + (i + 1)" (click)="removeLine(i)">×</button>
+            </div>
+          }
+          @if (lines().length < maxItems) {
+            <button type="button" class="link add-line" (click)="addLine()">+ Agregar otro producto</button>
+          }
+          <p class="hint">La composición no se puede cambiar después de crear el combo.</p>
+        </fieldset>
+
+        <div class="two">
+          <div class="field">
+            <label class="label" for="units">Combos a armar ahora</label>
+            <input id="units" class="input" inputmode="numeric" autocomplete="off" aria-describedby="units-hint"
+              [value]="units()" (input)="units.set($any($event.target).value)" />
+          </div>
+        </div>
+        <p id="units-hint" class="hint">Se descuentan del stock los productos necesarios. Si no alcanza, el combo no se crea.</p>
+
+        <label class="check">
+          <input type="checkbox" [checked]="available()" (change)="available.set($any($event.target).checked)" />
+          <span>Visible en la tienda</span>
+        </label>
+
+        @if (formError()) {
+          <p class="error" role="alert">{{ formError() }}</p>
+        }
+        <div class="actions">
+          <button type="submit" class="btn btn-ghost solid" [disabled]="saving()">{{ saving() ? 'Creando…' : 'Crear combo' }}</button>
+        </div>
+        <p class="hint">Después podrás ponerle foto, oferta y armar más unidades desde su ficha.</p>
+      </form>
+    </section>
+  }
+</section>

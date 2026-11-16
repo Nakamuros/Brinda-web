@@ -1,0 +1,74 @@
+/* Se suma a admin-ui.css y reclamo-detalle.css. */
+.order-code {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  user-select: all;
+}
+.lines {
+  display: grid;
+  gap: var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.lines li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.lines .hint {
+  display: block;
+}
+.num {
+  white-space: nowrap;
+}
+.totals {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line-soft);
+  font-variant-numeric: tabular-nums;
+}
+.totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.totals dt {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: inherit;
+}
+.totals dd {
+  margin: 0;
+  white-space: nowrap;
+}
+.totals .total {
+  padding-top: var(--space-2);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.totals .total dt {
+  color: var(--cream);
+}
+.copied {
+  display: grid;
+  gap: var(--space-2);
+}
+.copied .pre {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  font-size: var(--step--1);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  user-select: all;
+}
+textarea.reason {
+  min-height: 5rem;
+}
+/* Acción principal del panel: crema sólido (el burdeos es solo para pedir en la tienda). */
+.solid {
+  background: var(--cream);
+  color: var(--bg);
+}

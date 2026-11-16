@@ -71,7 +71,59 @@ export const routes: Routes = [
         path: '',
         canActivate: [adminGuard],
         children: [
-          { path: '', pathMatch: 'full', redirectTo: 'reclamos' },
+          { path: '', pathMatch: 'full', redirectTo: 'pedidos' },
+          {
+            path: 'pedidos',
+            title: 'Pedidos · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/pedidos/pedidos-lista').then((m) => m.PedidosLista),
+          },
+          {
+            path: 'pedidos/:id',
+            title: 'Pedido · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/pedidos/pedido-detalle').then((m) => m.PedidoDetalle),
+          },
+          {
+            path: 'productos',
+            title: 'Productos · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/productos/productos-lista').then((m) => m.ProductosLista),
+          },
+          {
+            path: 'productos/nuevo',
+            title: 'Nuevo producto · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/productos/producto-form').then((m) => m.ProductoForm),
+          },
+          {
+            path: 'combos/nuevo',
+            title: 'Nuevo combo · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/productos/combo-nuevo').then((m) => m.ComboNuevo),
+          },
+          {
+            path: 'categorias',
+            title: 'Categorías · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/categorias/categorias').then((m) => m.Categorias),
+          },
+          {
+            path: 'productos/:id',
+            title: 'Producto · Panel BRINDA',
+            loadComponent: () =>
+              import('./admin/productos/producto-form').then((m) => m.ProductoForm),
+          },
+          {
+            path: 'ventas',
+            title: 'Ventas · Panel BRINDA',
+            loadComponent: () => import('./admin/ventas/ventas').then((m) => m.Ventas),
+          },
+          {
+            path: 'zonas',
+            title: 'Zonas de reparto · Panel BRINDA',
+            loadComponent: () => import('./admin/zonas/zonas').then((m) => m.Zonas),
+          },
           {
             path: 'cambiar-clave',
             title: 'Cambiar contraseña · Panel BRINDA',

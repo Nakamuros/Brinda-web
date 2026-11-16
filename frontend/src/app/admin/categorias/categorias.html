@@ -1,0 +1,66 @@
+<section class="page">
+  <div class="top">
+    <h1 class="page-title">Categorías</h1>
+    <p class="muted">Ordenan el catálogo. El número de orden más bajo va primero.</p>
+  </div>
+
+  @if (loading() && !categories().length) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button></p>
+  } @else {
+    @for (c of categories(); track c.id) {
+      <section class="panel" [attr.aria-labelledby]="'c' + c.id">
+        <div class="zone-head">
+          <h2 [id]="'c' + c.id" class="panel-title">{{ c.name }}</h2>
+          <span class="badge" [class.badge-done]="!c.active">{{ c.active ? 'Activa' : 'Inactiva' }}</span>
+        </div>
+        <form class="form zone-form" (submit)="save($event, c)" novalidate>
+          <div class="field">
+            <label class="label" [attr.for]="'cn' + c.id">Nombre</label>
+            <input [id]="'cn' + c.id" class="input" name="name" maxlength="80" autocomplete="off" [value]="c.name" />
+          </div>
+          <div class="field">
+            <label class="label" [attr.for]="'co' + c.id">Orden</label>
+            <input [id]="'co' + c.id" class="input" name="order" inputmode="numeric" autocomplete="off" [value]="c.displayOrder" />
+          </div>
+          <label class="check">
+            <input type="checkbox" name="active" [checked]="c.active" />
+            <span>Activa</span>
+          </label>
+          <button type="submit" class="btn btn-ghost" [disabled]="busy()">Guardar</button>
+        </form>
+        @if (actionError(); as e) {
+          @if (e.id === c.id) {
+            <p class="error" role="alert">{{ e.text }}</p>
+          }
+        }
+      </section>
+    } @empty {
+      <div class="panel" role="status">
+        <p class="panel-title">Aún no hay categorías</p>
+        <p class="muted">Crea la primera para poder registrar productos.</p>
+      </div>
+    }
+
+    <section class="panel" aria-labelledby="c-new">
+      <h2 id="c-new" class="panel-title">Nueva categoría</h2>
+      <form class="form zone-form" (submit)="save($event, null)" novalidate>
+        <div class="field">
+          <label class="label" for="cn0">Nombre</label>
+          <input id="cn0" class="input" name="name" maxlength="80" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label class="label" for="co0">Orden</label>
+          <input id="co0" class="input" name="order" inputmode="numeric" autocomplete="off" value="0" />
+        </div>
+        <button type="submit" class="btn btn-ghost solid" [disabled]="busy()">Crear categoría</button>
+      </form>
+      @if (actionError(); as e) {
+        @if (e.id === 0) {
+          <p class="error" role="alert">{{ e.text }}</p>
+        }
+      }
+    </section>
+  }
+</section>

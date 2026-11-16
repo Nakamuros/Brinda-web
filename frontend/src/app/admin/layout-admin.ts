@@ -1,6 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, effect, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AdminAuth } from './admin-auth.service';
+import { OrdersAdmin } from './pedidos/pedidos.service';
+
+/** Cada cuánto se consulta el contador de pedidos pendientes. */
+const PENDING_POLL_MS = 15_000;
 
 /** Marco del panel (sin barra de anuncio, sin carrito ni control de edad: no es la tienda). */
 @Component({
@@ -13,6 +17,16 @@ import { AdminAuth } from './admin-auth.service';
         <a class="brand" routerLink="/admin">BRINDA <span class="tag">Panel</span></a>
         @if (auth.user(); as u) {
           <nav class="nav" aria-label="Panel">
+            <a routerLink="/admin/pedidos" routerLinkActive="on">
+              Pedidos
+              @if (orders.pending(); as n) {
+                <span class="pill" [attr.aria-label]="n + ' pendientes'">{{ n }}</span>
+              }
+            </a>
+            <a routerLink="/admin/productos" routerLinkActive="on">Productos</a>
+            <a routerLink="/admin/categorias" routerLinkActive="on">Categorías</a>
+            <a routerLink="/admin/ventas" routerLinkActive="on">Ventas</a>
+            <a routerLink="/admin/zonas" routerLinkActive="on">Zonas</a>
             <a routerLink="/admin/reclamos" routerLinkActive="on">Reclamos</a>
           </nav>
           <div class="who">
@@ -76,7 +90,8 @@ import { AdminAuth } from './admin-auth.service';
     }
     .nav {
       display: flex;
-      gap: var(--space-4);
+      flex-wrap: wrap;
+      gap: 0 var(--space-4);
       margin-right: auto;
     }
     .nav a,
@@ -94,6 +109,19 @@ import { AdminAuth } from './admin-auth.service';
     .nav a:hover,
     .nav a.on {
       border-bottom-color: var(--brass);
+    }
+    .pill {
+      display: inline-grid;
+      place-items: center;
+      min-width: 1.5rem;
+      height: 1.5rem;
+      margin-left: var(--space-2);
+      padding-inline: 0.375rem;
+      border-radius: 999px;
+      background: var(--cream);
+      color: var(--bg);
+      font-weight: 700;
+      letter-spacing: 0;
     }
     .who {
       display: flex;
@@ -124,7 +152,21 @@ import { AdminAuth } from './admin-auth.service';
 })
 export class LayoutAdmin {
   protected readonly auth = inject(AdminAuth);
+  protected readonly orders = inject(OrdersAdmin);
   private readonly router = inject(Router);
+
+  constructor() {
+    // Aviso de pedidos nuevos: solo con sesión iniciada.
+    let timer: ReturnType<typeof setInterval> | undefined;
+    effect(() => {
+      clearInterval(timer);
+      if (this.auth.user()) {
+        void this.orders.refreshPending();
+        timer = setInterval(() => void this.orders.refreshPending(), PENDING_POLL_MS);
+      }
+    });
+    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+  }
 
   protected async logout(): Promise<void> {
     await this.auth.logout();

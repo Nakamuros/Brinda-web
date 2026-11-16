@@ -1,0 +1,91 @@
+<section class="page">
+  <div class="top">
+    <h1 class="page-title">Ventas</h1>
+    <p class="muted">Solo pedidos confirmados, según el día en que se confirmaron.</p>
+  </div>
+
+  <form class="filters range" (submit)="$event.preventDefault()">
+    <div class="field">
+      <label class="label" for="from">Desde</label>
+      <input id="from" class="input" type="date" [value]="from()" [max]="to()"
+        (change)="setRange('from', $any($event.target).value)" />
+    </div>
+    <div class="field">
+      <label class="label" for="to">Hasta</label>
+      <input id="to" class="input" type="date" [value]="to()" [min]="from()"
+        (change)="setRange('to', $any($event.target).value)" />
+    </div>
+  </form>
+
+  @if (error()) {
+    <p class="error" role="alert">
+      {{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button>
+    </p>
+  } @else if (loading() && !report()) {
+    <p class="muted" role="status">Cargando ventas…</p>
+  } @else if (view(); as v) {
+    <p class="sr-only" role="status">Ventas del {{ v.range }}</p>
+    <dl class="tiles" [class.busy]="loading()">
+      @for (t of v.tiles; track t.label) {
+        <div class="tile">
+          <dt>{{ t.label }}</dt>
+          <dd>{{ t.value }}</dd>
+          @if (t.note) {
+            <p class="hint">{{ t.note }}</p>
+          }
+        </div>
+      }
+    </dl>
+
+    <div class="cols">
+      <section class="panel" aria-labelledby="v-days">
+        <h2 id="v-days" class="panel-title">Por día</h2>
+        @if (v.days.length) {
+          <table class="table">
+            <thead>
+              <tr><th scope="col">Día</th><th scope="col" class="n">Pedidos</th><th scope="col" class="n">Ventas</th></tr>
+            </thead>
+            <tbody>
+              @for (d of v.days; track d.date) {
+                <tr><td>{{ d.date }}</td><td class="n">{{ d.orders }}</td><td class="n">{{ d.revenue }}</td></tr>
+              }
+            </tbody>
+          </table>
+        } @else {
+          <p class="muted">No hay pedidos confirmados en estas fechas.</p>
+        }
+      </section>
+
+      <div class="stack">
+        <section class="panel" aria-labelledby="v-top">
+          <h2 id="v-top" class="panel-title">Lo más vendido</h2>
+          @if (v.top.length) {
+            <table class="table">
+              <thead>
+                <tr><th scope="col">Producto</th><th scope="col" class="n">Unidades</th><th scope="col" class="n">Ventas</th></tr>
+              </thead>
+              <tbody>
+                @for (p of v.top; track p.name) {
+                  <tr><td>{{ p.name }}</td><td class="n">{{ p.units }}</td><td class="n">{{ p.revenue }}</td></tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <p class="muted">Sin ventas en estas fechas.</p>
+          }
+        </section>
+
+        <section class="panel" aria-labelledby="v-stock">
+          <h2 id="v-stock" class="panel-title">Inventario hoy</h2>
+          <dl class="pair">
+            <div><dt>Unidades en stock</dt><dd>{{ v.stockUnits }}</dd></div>
+            <div><dt>Valor a precio de venta</dt><dd>{{ v.stockValue }}</dd></div>
+          </dl>
+          <p class="hint">
+            Es lo que valdría el stock vendido a precio normal. El costo del inventario y la ganancia aún no se pueden calcular: falta registrar el precio de costo de cada producto.
+          </p>
+        </section>
+      </div>
+    </div>
+  }
+</section>

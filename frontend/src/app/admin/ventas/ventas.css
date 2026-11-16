@@ -1,0 +1,108 @@
+/* Ventas del panel: se suma a admin-ui.css y reclamos-lista.css (filtros). */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  transition: opacity 0.2s ease;
+}
+.tiles.busy {
+  opacity: 0.6;
+}
+.tile {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-deep) 45%, transparent);
+}
+/* La cifra principal ocupa todo el ancho. */
+.tile:first-child {
+  grid-column: 1 / -1;
+}
+dt {
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.tile:first-child dd {
+  font-size: var(--step-2);
+}
+.cols,
+.stack {
+  display: grid;
+  gap: var(--space-5);
+  align-items: start;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.table th {
+  padding-bottom: var(--space-2);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--text-soft);
+}
+.table td {
+  padding-block: var(--space-2);
+  border-top: 1px solid var(--line-soft);
+}
+.table .n {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: var(--space-3);
+}
+.pair {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+.pair > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.pair dt {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: inherit;
+}
+
+@media (min-width: 48rem) {
+  .filters.range {
+    grid-template-columns: 12rem 12rem;
+  }
+  .tiles {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .tile:first-child {
+    grid-column: auto;
+  }
+  .tile:first-child dd {
+    font-size: var(--step-1);
+  }
+}
+@media (min-width: 64rem) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}

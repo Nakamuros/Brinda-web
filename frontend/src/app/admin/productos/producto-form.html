@@ -1,0 +1,280 @@
+<section class="page">
+  <a class="back" routerLink="/admin/productos">← Todos los productos</a>
+
+  @if (loading()) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">
+      {{ error() }}
+      @if (id) {
+        <button type="button" class="link" (click)="load()">Reintentar</button>
+      }
+    </p>
+  } @else {
+    <header class="head">
+      <div>
+        <h1 class="page-title">{{ p()?.name ?? 'Nuevo producto' }}</h1>
+        @if (p(); as p) {
+          <p class="muted">{{ p.categoryName }}{{ p.productType === 'COMBO' ? ' · Combo' : '' }}</p>
+        }
+      </div>
+      @if (p(); as p) {
+        <div class="state">
+          <span class="badge" [class.badge-overdue]="p.stockLevel === 'OUT'" [class.badge-soon]="p.stockLevel === 'LOW'">{{ view()?.stock }}</span>
+          <span class="badge" [class.badge-done]="!p.available">{{ p.available ? 'Visible' : 'Oculto' }}</span>
+        </div>
+      }
+    </header>
+
+    <div class="cols">
+      <div class="main">
+        <section class="panel" aria-labelledby="f-data">
+          <h2 id="f-data" class="panel-title">Datos</h2>
+          <form class="form" (submit)="save($event)" novalidate>
+            <div class="field">
+              <label class="label" for="name">Nombre</label>
+              <input id="name" class="input" maxlength="150" autocomplete="off"
+                [value]="d().name" (input)="set('name', $any($event.target).value)" />
+            </div>
+            <div class="two">
+              <div class="field">
+                <label class="label" for="category">Categoría</label>
+                <select id="category" class="input" [disabled]="view()?.isCombo" (change)="set('categoryId', $any($event.target).value)">
+                  <option value="" [selected]="!d().categoryId" disabled>Elige una categoría</option>
+                  @for (c of categories(); track c.id) {
+                    <option [value]="c.id" [selected]="d().categoryId === '' + c.id">{{ c.name }}{{ c.active ? '' : ' (inactiva)' }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label class="label" for="price">Precio (S/)</label>
+                <input id="price" class="input" inputmode="decimal" autocomplete="off" placeholder="0.00"
+                  [value]="d().price" (input)="set('price', $any($event.target).value)" />
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="description">Descripción <span class="hint">(opcional)</span></label>
+              <textarea id="description" class="input short" rows="3" maxlength="2000"
+                [value]="d().description" (input)="set('description', $any($event.target).value)"></textarea>
+            </div>
+            <div class="field">
+              <label class="label" for="sku">SKU <span class="hint">(opcional)</span></label>
+              <input id="sku" class="input" maxlength="50" autocomplete="off"
+                [value]="d().sku" (input)="set('sku', $any($event.target).value)" />
+            </div>
+
+            <fieldset class="photo">
+              <legend class="label">Foto <span class="hint">(opcional)</span></legend>
+              <div class="photo-box">
+                @if (photo(); as src) {
+                  <img [src]="src" alt="Foto del producto" decoding="async" />
+                } @else {
+                  <app-bottle-placeholder class="ph" />
+                }
+              </div>
+              <div class="photo-side">
+                <label class="btn btn-ghost pick" [class.busy]="uploading()">
+                  <input type="file" class="sr-only" accept="image/png,image/jpeg,image/webp"
+                    [disabled]="uploading()" (change)="upload($event)" />
+                  {{ uploading() ? 'Subiendo…' : photo() ? 'Cambiar foto' : 'Subir foto' }}
+                </label>
+                <p class="hint">PNG, JPG o WebP de hasta 3 MB, desde este equipo.</p>
+                @if (uploaded()) {
+                  <p class="ok" role="status">Foto subida. Pulsa "{{ id ? 'Guardar cambios' : 'Crear producto' }}" para dejarla en el producto.</p>
+                }
+                @if (uploadError()) {
+                  <p class="error" role="alert">{{ uploadError() }}</p>
+                }
+                <div class="field">
+                  <label class="label" for="image">O su ruta</label>
+                  <input id="image" class="input" maxlength="500" autocomplete="off" aria-describedby="image-hint"
+                    [value]="d().imageUrl" (input)="setImage($any($event.target).value)" />
+                </div>
+                <p id="image-hint" class="hint">
+                  Para las fotos guardadas en el proyecto (por ejemplo /media/productos/archivo.webp) o una dirección completa (https://…).
+                </p>
+              </div>
+            </fieldset>
+            <div class="two">
+              <div class="field">
+                <label class="label" for="min">Stock mínimo (aviso)</label>
+                <input id="min" class="input" inputmode="numeric" autocomplete="off"
+                  [value]="d().minStock" (input)="set('minStock', $any($event.target).value)" />
+              </div>
+              <div class="field">
+                <label class="label" for="max">Stock máximo</label>
+                <input id="max" class="input" inputmode="numeric" autocomplete="off"
+                  [value]="d().maxStock" (input)="set('maxStock', $any($event.target).value)" />
+              </div>
+            </div>
+            <div class="checks">
+              <label class="check">
+                <input type="checkbox" [checked]="d().available" (change)="set('available', $any($event.target).checked)" />
+                <span>Visible en la tienda</span>
+              </label>
+              <label class="check">
+                <input type="checkbox" [checked]="d().featured" (change)="set('featured', $any($event.target).checked)" />
+                <span>Destacado</span>
+              </label>
+            </div>
+            @if (formError()) {
+              <p class="error" role="alert">{{ formError() }}</p>
+            }
+            @if (saved()) {
+              <p class="ok" role="status">Cambios guardados.</p>
+            }
+            <div class="actions">
+              <button type="submit" class="btn btn-ghost solid" [disabled]="saving()">
+                {{ saving() ? 'Guardando…' : id ? 'Guardar cambios' : 'Crear producto' }}
+              </button>
+            </div>
+            @if (!id) {
+              <p class="hint">El producto se crea con stock 0. Después de crearlo podrás reponer el stock y ponerle oferta.</p>
+            }
+          </form>
+        </section>
+      </div>
+
+      @if (p(); as p) {
+        <aside class="side">
+          <section class="panel" aria-labelledby="f-stock">
+            <h2 id="f-stock" class="panel-title">Stock</h2>
+            <p class="stock-now">{{ p.stockQuantity }}</p>
+            <p class="hint">Unidades disponibles. Aviso de stock bajo en {{ p.minStock }}.</p>
+            @if (stockError()) {
+              <p class="error" role="alert">{{ stockError() }}</p>
+            }
+            @if (view()?.isCombo) {
+              @if (combo(); as c) {
+                <div class="split">
+                  <p class="label">Este combo incluye</p>
+                  <ul class="parts">
+                    @for (i of c.items; track i.productId) {
+                      <li>
+                        <span>{{ i.quantity }} × {{ i.name }}</span>
+                        <span class="hint">stock {{ i.stockQuantity }}{{ i.available ? '' : ' · oculto' }}</span>
+                      </li>
+                    }
+                  </ul>
+                  <p class="hint">Con el stock de sus productos se pueden armar {{ c.buildableNow }} más.</p>
+                </div>
+              }
+              <form class="form split" (submit)="build($event)" novalidate>
+                <div class="field">
+                  <label class="label" for="bq">Armar más (combos)</label>
+                  <input id="bq" class="input" inputmode="numeric" autocomplete="off"
+                    [value]="buildQty()" (input)="buildQty.set($any($event.target).value)" />
+                </div>
+                <div class="field">
+                  <label class="label" for="rr">Nota <span class="hint">(opcional)</span></label>
+                  <input id="rr" class="input" maxlength="255" autocomplete="off"
+                    [value]="restockReason()" (input)="restockReason.set($any($event.target).value)" />
+                </div>
+                <button type="submit" class="btn btn-ghost" [disabled]="stockBusy()">Armar</button>
+                <p class="hint">Armar descuenta del stock los productos que lo componen.</p>
+              </form>
+            } @else {
+              <form class="form split" (submit)="restock($event)" novalidate>
+                <div class="field">
+                  <label class="label" for="rq">Reponer (unidades)</label>
+                  <input id="rq" class="input" inputmode="numeric" autocomplete="off"
+                    [value]="restockQty()" (input)="restockQty.set($any($event.target).value)" />
+                </div>
+                <div class="field">
+                  <label class="label" for="rr">Nota <span class="hint">(opcional)</span></label>
+                  <input id="rr" class="input" maxlength="255" autocomplete="off"
+                    [value]="restockReason()" (input)="restockReason.set($any($event.target).value)" />
+                </div>
+                <button type="submit" class="btn btn-ghost" [disabled]="stockBusy()">Reponer</button>
+              </form>
+            }
+            <form class="form split" (submit)="adjust($event)" novalidate>
+              <div class="field">
+                <label class="label" for="aq">Ajuste (+ suma, − resta)</label>
+                <input id="aq" class="input" inputmode="text" autocomplete="off" placeholder="-2"
+                  [value]="adjustQty()" (input)="adjustQty.set($any($event.target).value)" />
+              </div>
+              <div class="field">
+                <label class="label" for="ar">Motivo</label>
+                <input id="ar" class="input" maxlength="255" autocomplete="off" placeholder="Rotura, merma, conteo…"
+                  [value]="adjustReason()" (input)="adjustReason.set($any($event.target).value)" />
+              </div>
+              <button type="submit" class="btn btn-ghost" [disabled]="stockBusy()">Ajustar</button>
+            </form>
+            @if (history().length) {
+              <div class="split">
+                <p class="label">Últimos movimientos</p>
+                <ul class="moves">
+                  @for (m of history(); track m.id) {
+                    <li>
+                      <span>{{ m.label }} <strong>{{ m.change }}</strong> → {{ m.after }}</span>
+                      <span class="hint">{{ m.date }}{{ m.reason ? ' · ' + m.reason : '' }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </section>
+
+          <section class="panel" aria-labelledby="f-offer">
+            <h2 id="f-offer" class="panel-title">Oferta</h2>
+            @if (view(); as v) {
+              @if (v.promo) {
+                <p>{{ v.promo }}</p>
+                <p class="hint">{{ p.promoActive ? 'Hasta el' : 'Venció el' }} {{ v.promoEnds }}. Mientras exista, no admite una oferta de precio.</p>
+                <button type="button" class="btn btn-ghost" [disabled]="offerBusy()" (click)="clearPromo()">Quitar promoción</button>
+              } @else if (v.offer) {
+                <p>{{ v.offer }} <span class="hint">(normal {{ v.price }})</span></p>
+                <p class="hint">{{ p.offerExpired ? 'Venció el' : 'Hasta el' }} {{ v.offerEnds }}.</p>
+                <button type="button" class="btn btn-ghost" [disabled]="offerBusy()" (click)="clearOffer()">Quitar oferta</button>
+              } @else {
+                <p class="hint">Sin oferta. Precio normal: {{ v.price }}.</p>
+              }
+              @if (offerError()) {
+                <p class="error" role="alert">{{ offerError() }}</p>
+              }
+              @if (!v.promo) {
+                <form class="form split" (submit)="setOffer($event)" novalidate>
+                  <div class="field">
+                    <label class="label" for="op">Precio de oferta (S/)</label>
+                    <input id="op" class="input" inputmode="decimal" autocomplete="off" placeholder="0.00"
+                      [value]="offerPrice()" (input)="offerPrice.set($any($event.target).value)" />
+                  </div>
+                  <div class="field">
+                    <label class="label" for="oe">Termina (hora de Lima)</label>
+                    <input id="oe" class="input" type="datetime-local"
+                      [value]="offerEnds()" (input)="offerEnds.set($any($event.target).value)" />
+                  </div>
+                  <button type="submit" class="btn btn-ghost" [disabled]="offerBusy()">{{ v.offer ? 'Cambiar oferta' : 'Poner oferta' }}</button>
+                </form>
+              }
+              @if (!v.offer) {
+                <form class="form split" (submit)="setPromo($event)" novalidate>
+                  <p class="label">Promoción "lleva y paga"</p>
+                  <div class="two-fixed">
+                    <div class="field">
+                      <label class="label" for="pb">Lleva</label>
+                      <input id="pb" class="input" inputmode="numeric" autocomplete="off" placeholder="3"
+                        [value]="promoBuy()" (input)="promoBuy.set($any($event.target).value)" />
+                    </div>
+                    <div class="field">
+                      <label class="label" for="pp">Paga</label>
+                      <input id="pp" class="input" inputmode="numeric" autocomplete="off" placeholder="2"
+                        [value]="promoPay()" (input)="promoPay.set($any($event.target).value)" />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="label" for="pe">Termina (hora de Lima)</label>
+                    <input id="pe" class="input" type="datetime-local"
+                      [value]="promoEnds()" (input)="promoEnds.set($any($event.target).value)" />
+                  </div>
+                  <button type="submit" class="btn btn-ghost" [disabled]="offerBusy()">{{ v.promo ? 'Cambiar promoción' : 'Poner promoción' }}</button>
+                </form>
+              }
+            }
+          </section>
+        </aside>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,97 @@
+<section class="page">
+  <div class="top">
+    <h1 class="page-title">Zonas de reparto</h1>
+    @if (!loading() && !error()) {
+      <p class="muted" role="status">
+        @if (deliverable(); as n) {
+          {{ n }} {{ n === 1 ? 'distrito con reparto' : 'distritos con reparto' }}
+        } @else {
+          Sin distritos con reparto: la tienda no recibe pedidos.
+        }
+      </p>
+    }
+  </div>
+
+  @if (loading() && !zones().length) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button></p>
+  } @else {
+    @for (v of view(); track v.z.id) {
+      <section class="panel" [attr.aria-labelledby]="'z' + v.z.id">
+        <div class="zone-head">
+          <h2 [id]="'z' + v.z.id" class="panel-title">{{ v.z.name }}</h2>
+          <span class="badge" [class.badge-done]="!v.z.active">{{ v.z.active ? 'Activa' : 'Inactiva' }}</span>
+        </div>
+
+        <form class="form zone-form" (submit)="saveZone($event, v.z.id)" novalidate>
+          <div class="field">
+            <label class="label" [attr.for]="'zn' + v.z.id">Nombre</label>
+            <input [id]="'zn' + v.z.id" class="input" name="name" maxlength="80" autocomplete="off" [value]="v.z.name" />
+          </div>
+          <div class="field">
+            <label class="label" [attr.for]="'zf' + v.z.id">Tarifa (S/)</label>
+            <input [id]="'zf' + v.z.id" class="input" name="fee" inputmode="decimal" autocomplete="off" [value]="v.z.fee" />
+          </div>
+          <label class="check">
+            <input type="checkbox" name="active" [checked]="v.z.active" />
+            <span>Zona activa</span>
+          </label>
+          <button type="submit" class="btn btn-ghost" [disabled]="busy()">Guardar zona</button>
+        </form>
+
+        @if (actionError(); as e) {
+          @if (e.zoneId === v.z.id) {
+            <p class="error" role="alert">{{ e.text }}</p>
+          }
+        }
+
+        <ul class="districts" [attr.aria-label]="'Distritos de ' + v.z.name">
+          @for (d of v.districts; track d.id) {
+            <li>
+              <span [class.muted]="!d.active">{{ d.name }}{{ d.active ? '' : ' (inactivo)' }}</span>
+              <button type="button" class="link" [disabled]="busy()" (click)="toggleDistrict(d)">
+                {{ d.active ? 'Desactivar' : 'Activar' }}<span class="sr-only"> {{ d.name }}</span>
+              </button>
+            </li>
+          } @empty {
+            <li class="muted">Sin distritos.</li>
+          }
+        </ul>
+
+        <form class="form add" (submit)="addDistrict($event, v.z.id)" novalidate>
+          <div class="field grow">
+            <label class="label" [attr.for]="'zd' + v.z.id">Nuevo distrito</label>
+            <input [id]="'zd' + v.z.id" class="input" name="district" maxlength="80" autocomplete="off" />
+          </div>
+          <button type="submit" class="btn btn-ghost" [disabled]="busy()">Agregar</button>
+        </form>
+      </section>
+    } @empty {
+      <div class="panel" role="status">
+        <p class="panel-title">Aún no hay zonas</p>
+        <p class="muted">Crea la primera zona con su tarifa y luego agrégale distritos.</p>
+      </div>
+    }
+
+    <section class="panel" aria-labelledby="z-new">
+      <h2 id="z-new" class="panel-title">Nueva zona</h2>
+      <form class="form zone-form" (submit)="saveZone($event, 0)" novalidate>
+        <div class="field">
+          <label class="label" for="zn0">Nombre</label>
+          <input id="zn0" class="input" name="name" maxlength="80" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label class="label" for="zf0">Tarifa (S/)</label>
+          <input id="zf0" class="input" name="fee" inputmode="decimal" autocomplete="off" placeholder="0.00" />
+        </div>
+        <button type="submit" class="btn btn-ghost solid" [disabled]="busy()">Crear zona</button>
+      </form>
+      @if (actionError(); as e) {
+        @if (e.zoneId === 0) {
+          <p class="error" role="alert">{{ e.text }}</p>
+        }
+      }
+    </section>
+  }
+</section>

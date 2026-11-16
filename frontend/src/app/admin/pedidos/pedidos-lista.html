@@ -1,0 +1,80 @@
+<section class="page">
+  <div class="top">
+    <h1 class="page-title">Pedidos</h1>
+    <p class="muted" role="status">
+      @if (pending(); as n) {
+        {{ n }} {{ n === 1 ? 'pedido pendiente' : 'pedidos pendientes' }} de confirmar
+      } @else if (pending() === 0) {
+        Sin pedidos pendientes
+      }
+    </p>
+  </div>
+
+  <form class="filters" role="search" (submit)="$event.preventDefault()">
+    <div class="field grow">
+      <label class="label" for="code">Código</label>
+      <input
+        id="code"
+        class="input"
+        type="search"
+        placeholder="Ej. EQ12"
+        autocomplete="off"
+        autocapitalize="characters"
+        maxlength="6"
+        style="text-transform: uppercase"
+        aria-describedby="code-hint"
+        [value]="code()"
+        (input)="code.set($any($event.target).value)"
+      />
+    </div>
+    <div class="field">
+      <label class="label" for="st">Estado</label>
+      <select id="st" class="input" [value]="status()" (change)="setStatus($any($event.target).value)">
+        @for (s of statuses; track s[0]) {
+          <option [value]="s[0]" [selected]="status() === s[0]">{{ s[1] }}</option>
+        }
+        <option value="" [selected]="status() === ''">Todos</option>
+      </select>
+    </div>
+  </form>
+  <p id="code-hint" class="hint">El código se busca entre los pedidos de esta página y estado.</p>
+
+  @if (error()) {
+    <p class="error" role="alert">
+      {{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button>
+    </p>
+  } @else if (loading() && !result()) {
+    <p class="muted" role="status">Cargando pedidos…</p>
+  } @else if (rows().length === 0) {
+    <div class="panel empty" role="status">
+      <p class="panel-title">{{ code() ? 'Sin resultados' : 'No hay pedidos en este estado' }}</p>
+      <p class="muted">
+        {{ code() ? 'Revisa el código o cambia el estado.' : 'Cuando entre un pedido aparecerá aquí.' }}
+      </p>
+    </div>
+  } @else {
+    <ul class="rows" [class.busy]="loading()" aria-label="Pedidos">
+      @for (r of rows(); track r.o.id) {
+        <li>
+          <a class="row" [routerLink]="['/admin/pedidos', r.o.id]">
+            <span class="code">{{ r.o.code }}</span>
+            <span class="who">{{ r.o.customerName }}</span>
+            <span class="meta">{{ r.meta }}</span>
+            <span class="state">
+              <span class="badge" [class.badge-soon]="r.o.status === 'PENDING'" [class.badge-done]="r.o.status !== 'PENDING'">{{ r.status }}</span>
+              <span class="badge">{{ r.total }}</span>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    @if ((result()?.totalPages ?? 0) > 1) {
+      <nav class="pager" aria-label="Paginación">
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() === 0" (click)="go(-1)">Anterior</button>
+        <span class="muted">Página {{ pageIndex() + 1 }} de {{ result()?.totalPages }}</span>
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() + 1 >= (result()?.totalPages ?? 1)" (click)="go(1)">Siguiente</button>
+      </nav>
+    }
+  }
+</section>

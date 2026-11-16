@@ -68,6 +68,8 @@ for (const [idx, { name, width, height }] of sizes.entries()) {
   // Login correcto.
   await page.getByLabel('Contraseña').fill(password);
   await page.getByRole('button', { name: 'Ingresar' }).click();
+  await page.waitForURL('**/admin/pedidos');
+  await page.getByRole('link', { name: 'Reclamos' }).click();
   await page.waitForURL('**/admin/reclamos');
   await page.getByRole('list', { name: 'Reclamos' }).waitFor();
   const body = await page.locator('main').innerText();

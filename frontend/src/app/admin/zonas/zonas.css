@@ -1,0 +1,44 @@
+.top {
+  display: grid;
+  gap: var(--space-1);
+}
+.zone-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.zone-form,
+.add {
+  align-items: end;
+}
+.districts {
+  display: grid;
+  gap: 0 var(--space-5);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--line-soft);
+}
+.districts li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+}
+.link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (min-width: 48rem) {
+  .zone-form {
+    grid-template-columns: 1fr 9rem auto auto;
+  }
+  .add {
+    grid-template-columns: 1fr auto;
+  }
+  .districts {
+    grid-template-columns: 1fr 1fr;
+  }
+}

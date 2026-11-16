@@ -1,0 +1,237 @@
+/* Productos del panel: se suma a admin-ui.css y a los estilos de lista o de detalle de reclamos. */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.icon {
+  min-width: 3rem;
+  padding-inline: 0;
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+.add-line {
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0;
+  font: inherit;
+  color: var(--cream);
+  text-decoration: underline;
+  text-decoration-color: var(--brass);
+  text-underline-offset: 0.3em;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+/* Acción principal del panel: crema sólido (el burdeos es solo para pedir en la tienda). */
+.solid {
+  background: var(--cream);
+  color: var(--bg);
+}
+.price {
+  font-variant-numeric: tabular-nums;
+}
+.was {
+  display: block;
+  font-family: var(--font-text);
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--text-soft);
+  text-decoration-color: var(--promo);
+}
+
+/* Formulario */
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+.two {
+  display: grid;
+  gap: var(--space-4);
+}
+.checks {
+  display: grid;
+  gap: var(--space-1);
+}
+/* Foto del producto: vista previa grande y controles al lado */
+.photo {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.photo legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+.photo-box {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 18rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+}
+.photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.photo-box .ph {
+  width: 30%;
+  opacity: 0.7;
+}
+.photo-side {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.pick {
+  justify-self: start;
+  cursor: pointer;
+}
+.pick:has(input:focus-visible) {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+.pick.busy {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+/* Fila de la lista con miniatura */
+.prow {
+  grid-template-columns: 4.5rem 1fr;
+  grid-template-areas:
+    'thumb code'
+    'thumb who'
+    'thumb meta'
+    'state state';
+  align-items: center;
+}
+.prow .mini {
+  grid-area: thumb;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+}
+.prow .mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.prow .mini .ph {
+  width: 34%;
+  opacity: 0.7;
+}
+.prow .code {
+  grid-area: code;
+}
+.prow .who {
+  grid-area: who;
+}
+.prow .meta {
+  grid-area: meta;
+}
+.prow .state {
+  grid-area: state;
+}
+.ok {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.stock-now {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.split {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line-soft);
+}
+.parts,
+.moves {
+  display: grid;
+  gap: var(--space-2);
+}
+.parts li,
+.moves li {
+  display: grid;
+  gap: 0;
+  font-variant-numeric: tabular-nums;
+}
+.two-fixed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+.fs {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.fs legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+.items-edit {
+  display: grid;
+  gap: var(--space-3);
+}
+.item-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 5rem auto;
+  gap: var(--space-2);
+  align-items: end;
+}
+textarea.short {
+  min-height: 6rem;
+}
+
+@media (min-width: 48rem) {
+  .photo {
+    grid-template-columns: 18rem minmax(0, 1fr);
+  }
+  .photo legend {
+    grid-column: 1 / -1;
+  }
+  .prow {
+    grid-template-columns: 5.5rem 9.5rem 1fr auto;
+    grid-template-areas:
+      'thumb code who state'
+      'thumb code meta state';
+  }
+  .prow .mini {
+    width: 5.5rem;
+  }
+  .filters.four {
+    grid-template-columns: 1fr 11rem 10rem 11rem;
+  }
+  .two {
+    grid-template-columns: 1fr 1fr;
+  }
+}

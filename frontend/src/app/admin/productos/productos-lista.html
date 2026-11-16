@@ -1,0 +1,106 @@
+<section class="page">
+  <div class="top bar">
+    <div>
+      <h1 class="page-title">Productos</h1>
+      <p class="muted" role="status">
+        @if (result(); as r) {
+          {{ r.totalElements }} {{ r.totalElements === 1 ? 'producto' : 'productos' }}
+        }
+      </p>
+    </div>
+    <div class="bar-actions">
+      <a class="btn btn-ghost" routerLink="/admin/combos/nuevo">Nuevo combo</a>
+      <a class="btn btn-ghost solid" routerLink="/admin/productos/nuevo">Nuevo producto</a>
+    </div>
+  </div>
+
+  <form class="filters four" role="search" (submit)="$event.preventDefault()">
+    <div class="field grow">
+      <label class="label" for="q">Buscar</label>
+      <input id="q" class="input" type="search" placeholder="Nombre o SKU" autocomplete="off"
+        [value]="q()" (input)="search($any($event.target).value)" />
+    </div>
+    <div class="field">
+      <label class="label" for="cat">Categoría</label>
+      <select id="cat" class="input" (change)="setCategory($any($event.target).value)">
+        <option value="">Todas</option>
+        @for (c of categories(); track c.id) {
+          <option [value]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label class="label" for="vis">Visibilidad</label>
+      <select id="vis" class="input" (change)="setVisibility($any($event.target).value)">
+        <option value="ALL">Todos</option>
+        <option value="VISIBLE">Visibles</option>
+        <option value="HIDDEN">Ocultos</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label" for="low">Stock</label>
+      <select id="low" class="input" (change)="setLowStock($any($event.target).value)">
+        <option value="">Todos</option>
+        <option value="1">Bajo o agotado</option>
+      </select>
+    </div>
+  </form>
+
+  @if (error()) {
+    <p class="error" role="alert">
+      {{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button>
+    </p>
+  } @else if (loading() && !result()) {
+    <p class="muted" role="status">Cargando productos…</p>
+  } @else if (rows().length === 0) {
+    <div class="panel empty" role="status">
+      <p class="panel-title">{{ filtered() ? 'Sin resultados' : 'Aún no hay productos' }}</p>
+      <p class="muted">{{ filtered() ? 'Prueba con otros filtros.' : 'Crea el primero con "Nuevo producto".' }}</p>
+    </div>
+  } @else {
+    <ul class="rows" [class.busy]="loading()" aria-label="Productos">
+      @for (r of rows(); track r.p.id) {
+        <li>
+          <a class="row prow" [routerLink]="['/admin/productos', r.p.id]">
+            <span class="mini">
+              @if (r.p.imageUrl; as src) {
+                <img [src]="src" alt="" loading="lazy" decoding="async" />
+              } @else {
+                <app-bottle-placeholder class="ph" />
+              }
+            </span>
+            <span class="code price">
+              {{ r.price }}
+              @if (r.was) {
+                <s class="was">{{ r.was }}</s>
+              }
+            </span>
+            <span class="who">{{ r.p.name }}</span>
+            <span class="meta">{{ r.meta }}</span>
+            <span class="state">
+              <span
+                class="badge"
+                [class.badge-overdue]="r.p.stockLevel === 'OUT'"
+                [class.badge-soon]="r.p.stockLevel === 'LOW'"
+              >{{ r.stock }}</span>
+              @if (r.p.offerActive || r.p.promoActive) {
+                <span class="badge">Oferta</span>
+              }
+              @if (!r.p.available) {
+                <span class="badge badge-done">Oculto</span>
+              }
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+
+    @if ((result()?.totalPages ?? 0) > 1) {
+      <nav class="pager" aria-label="Paginación">
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() === 0" (click)="go(-1)">Anterior</button>
+        <span class="muted">Página {{ pageIndex() + 1 }} de {{ result()?.totalPages }}</span>
+        <button type="button" class="btn btn-ghost" [disabled]="pageIndex() + 1 >= (result()?.totalPages ?? 1)" (click)="go(1)">Siguiente</button>
+      </nav>
+    }
+  }
+</section>

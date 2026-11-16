@@ -1,0 +1,131 @@
+<section class="page">
+  <a class="back" routerLink="/admin/pedidos">← Todos los pedidos</a>
+
+  @if (loading()) {
+    <p class="muted" role="status">Cargando…</p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }} <button type="button" class="link" (click)="load()">Reintentar</button></p>
+  } @else if (o(); as o) {
+    @if (view(); as v) {
+      <header class="head">
+        <div>
+          <h1 class="page-title order-code">{{ o.code }}</h1>
+          <p class="muted">Creado el {{ v.created }} · {{ v.payment }}</p>
+        </div>
+        <div class="state">
+          <span class="badge" [class.badge-soon]="o.status === 'PENDING'" [class.badge-done]="o.status !== 'PENDING'">{{ v.status }}</span>
+          <span class="badge">{{ money(o.total) }}</span>
+        </div>
+      </header>
+
+      <div class="cols">
+        <div class="main">
+          <section class="panel" aria-labelledby="p-items">
+            <h2 id="p-items" class="panel-title">Productos</h2>
+            <ul class="lines">
+              @for (i of o.items; track i.productId) {
+                <li>
+                  <span>
+                    {{ i.quantity }} × {{ i.name }}
+                    @if (i.promoType === 'BUY_X_PAY_Y') {
+                      <span class="hint">Promoción: −{{ money(i.promoDiscount ?? 0) }}</span>
+                    } @else if (i.promoType === 'OFFER') {
+                      <span class="hint">Oferta: {{ money(i.unitPrice) }} c/u (antes {{ money(i.listPrice) }})</span>
+                    } @else {
+                      <span class="hint">{{ money(i.unitPrice) }} c/u</span>
+                    }
+                  </span>
+                  <span class="num">{{ money(i.subtotal) }}</span>
+                </li>
+              }
+            </ul>
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd>{{ money(o.subtotal) }}</dd></div>
+              <div><dt>Delivery ({{ o.zoneName }})</dt><dd>{{ money(o.deliveryFee) }}</dd></div>
+              <div class="total"><dt>Total</dt><dd>{{ money(o.total) }}</dd></div>
+            </dl>
+          </section>
+
+          <section class="panel" aria-labelledby="p-client">
+            <h2 id="p-client" class="panel-title">Cliente y entrega</h2>
+            <dl class="grid">
+              <div><dt>Nombre</dt><dd>{{ o.firstName }} {{ o.lastName }}</dd></div>
+              <div><dt>Celular</dt><dd>{{ o.phone }}</dd></div>
+              <div><dt>DNI</dt><dd>{{ o.dni }}</dd></div>
+              <div><dt>Distrito</dt><dd>{{ o.districtName }}</dd></div>
+              <div class="full"><dt>Dirección</dt><dd>{{ o.address }}</dd></div>
+              @if (o.reference) {
+                <div class="full"><dt>Referencia</dt><dd>{{ o.reference }}</dd></div>
+              }
+            </dl>
+            <p class="hint">Esta lectura queda registrada en la auditoría (usuario, fecha y hora).</p>
+            <div class="actions">
+              <button type="button" class="btn btn-ghost" (click)="copy('delivery')">Copiar datos de entrega</button>
+              <button type="button" class="btn btn-ghost" (click)="copy('receipt')">Copiar datos de boleta</button>
+            </div>
+            @if (copied(); as c) {
+              <div class="copied" role="status">
+                <p class="hint">{{ c.label }}: {{ c.ok ? 'copiado al portapapeles.' : 'selecciona el texto y cópialo.' }}</p>
+                <pre class="pre">{{ c.text }}</pre>
+              </div>
+            }
+          </section>
+        </div>
+
+        <aside class="side">
+          <section class="panel" aria-labelledby="p-state">
+            <h2 id="p-state" class="panel-title">Estado</h2>
+            <p>{{ v.status }}</p>
+            @if (o.status === 'PENDING') {
+              <p class="hint">Vence el {{ v.expires }} si no se confirma.</p>
+            } @else if (o.status === 'EXPIRED') {
+              <p class="hint">Venció el {{ v.expires }}; aún se puede confirmar si el pago llegó tarde.</p>
+            } @else if (o.status === 'CONFIRMED') {
+              <p class="hint">Confirmado el {{ v.confirmed }}; el stock ya se descontó.</p>
+            } @else if (o.cancelReason) {
+              <p class="hint">Motivo: {{ o.cancelReason }}</p>
+            }
+
+            @if (actionError()) {
+              <p class="error" role="alert">{{ actionError() }}</p>
+            }
+
+            @if (asking() === 'confirm') {
+              <div class="confirm" role="alert">
+                <p>Al confirmar, el pedido <strong>{{ o.code }}</strong> queda finalizado y se descuenta el stock. Hazlo solo con el pago recibido.</p>
+                <div class="actions">
+                  <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="confirm()">{{ saving() ? 'Confirmando…' : 'Sí, confirmar' }}</button>
+                  <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="ask(null)">Volver</button>
+                </div>
+              </div>
+            } @else if (asking() === 'cancel') {
+              <div class="confirm">
+                <div class="field">
+                  <label class="label" for="reason">Motivo de la anulación</label>
+                  <textarea id="reason" class="input reason" rows="3" [attr.maxlength]="maxReason"
+                    [value]="reason()" (input)="reason.set($any($event.target).value)"></textarea>
+                </div>
+                @if (v.restock) {
+                  <p class="hint">El pedido ya estaba confirmado: al anularlo, el stock vuelve al inventario.</p>
+                }
+                <div class="actions">
+                  <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="cancel()">{{ saving() ? 'Anulando…' : 'Anular pedido' }}</button>
+                  <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="ask(null)">Volver</button>
+                </div>
+              </div>
+            } @else {
+              <div class="actions">
+                @if (v.canConfirm) {
+                  <button type="button" class="btn btn-ghost solid" (click)="ask('confirm')">Confirmar pago</button>
+                }
+                @if (v.canCancel) {
+                  <button type="button" class="btn btn-ghost" (click)="ask('cancel')">Anular</button>
+                }
+              </div>
+            }
+          </section>
+        </aside>
+      </div>
+    }
+  }
+</section>
