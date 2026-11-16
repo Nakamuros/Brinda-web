@@ -45,4 +45,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @EntityGraph(attributePaths = "category")
     @Query("select p from Product p where p.stockQuantity <= p.minStock order by p.stockQuantity asc, p.name asc")
     List<Product> findLowStock();
+
+    /** Inventario de hoy: (unidades, valor al precio de venta normal). Una sola fila. */
+    @Query("select coalesce(sum(p.stockQuantity), 0), coalesce(sum(p.stockQuantity * p.price), 0) from Product p")
+    List<Object[]> inventoryTotals();
 }

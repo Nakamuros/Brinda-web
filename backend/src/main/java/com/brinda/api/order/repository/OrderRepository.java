@@ -12,7 +12,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,4 +46,22 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("update Order o set o.status = :expired where o.status = :pending and o.expiresAt < :now")
     int expirePending(@Param("pending") OrderStatus pending, @Param("expired") OrderStatus expired,
                       @Param("now") OffsetDateTime now);
+
+    /** Ventas: (confirmedAt, totalAmount) de cada pedido confirmado en el rango [since, until). */
+    @Query("select o.confirmedAt, o.totalAmount from Order o "
+            + "where o.status = :status and o.confirmedAt >= :since and o.confirmedAt < :until")
+    List<Object[]> confirmedTotals(@Param("status") OrderStatus status, @Param("since") OffsetDateTime since,
+                                   @Param("until") OffsetDateTime until);
+
+    @Query("select coalesce(sum(o.deliveryFee), 0) from Order o "
+            + "where o.status = :status and o.confirmedAt >= :since and o.confirmedAt < :until")
+    BigDecimal confirmedDeliveryFees(@Param("status") OrderStatus status, @Param("since") OffsetDateTime since,
+                                     @Param("until") OffsetDateTime until);
+
+    /** Ventas: (nombre, unidades, importe) por producto, del que más vendió al que menos. */
+    @Query("select i.productName, sum(i.quantity), sum(i.subtotal) from OrderItem i "
+            + "where i.order.status = :status and i.order.confirmedAt >= :since and i.order.confirmedAt < :until "
+            + "group by i.productName order by sum(i.subtotal) desc")
+    List<Object[]> topProducts(@Param("status") OrderStatus status, @Param("since") OffsetDateTime since,
+                               @Param("until") OffsetDateTime until, Pageable pageable);
 }
