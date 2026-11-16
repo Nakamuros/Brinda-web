@@ -19,10 +19,10 @@ DÓNDE QUEDAMOS
 - Backend (Spring Boot 3.5.16 / Java 21, PostgreSQL 16, V1–V10): Hito 1 cerrado + Libro de Reclamaciones (registro público, PDF oficial, panel de respuesta) + ventas (`GET /api/v1/admin/reports/sales`) + subida de fotos (`POST /api/v1/admin/images`, archivos en `IMAGES_UPLOAD_DIR`, no en la BD). 100 tests.
 - Frontend (Angular 21, standalone, signals, zoneless, GSAP+Lenis): landing (categorías reales de la API), catálogo, carrito, **pedido real** (`/pedido` valida y crea el pedido; `/pedido/:codigo` con código, aviso de 20 min y WhatsApp; el código se recuerda 1 h 30 min en el navegador), `/terminos` y `/privacidad` ("Próximamente"), cumplimiento legal y **panel /admin completo salvo gráficas**: Pedidos, Productos (fotos, stock, ofertas, promo, combos), Categorías, Ventas, Zonas y Reclamos. 69 tests y build en verde.
 - Libro de Reclamaciones: Etapas A y B hechas; falta la Etapa C (formulario público en /libro-de-reclamaciones). Esa ruta NO puede salir a producción sin el formulario funcional y la confirmación del asesor (correo, conservación, firma, validez de la copia digital).
-- Todo commiteado, sin push (verifica con `git log -12` y `git status`). El panel solo se probó en navegador con datos simulados (`scripts/admin-*.mjs`): falta la prueba con sesión real de admin.
+- Todo commiteado, sin push (verifica con `git log -12` y `git status`). Los scripts del panel (`scripts/admin-*.mjs`) corren con datos simulados; el usuario lo probó con su sesión real el 2026-11-15 y reportó que todo funciona.
 - Los servicios locales están APAGADOS (Docker/brinda-db, backend 8080, Angular 4200). Para levantarlos sigue readme.md; no los enciendas hasta que haga falta.
 - La BD local tiene el seed de desarrollo (5 productos, 4 categorías, 20 distritos, usuario admin) más pedidos y reclamos de prueba. Usuario del panel: `admin`; su clave NO está en ningún archivo (la conoce solo el usuario; para los scripts se pasa por `$env:ADMIN_PASSWORD`).
-- PRIMER PUNTO DE ESTA SESIÓN: revisar lo que encontró el usuario al probar el panel con su sesión (subida de fotos, combos, promo, categorías, Ventas) y corregirlo.
+- PRIMER PUNTO DE ESTA SESIÓN: lo elige el usuario (ver QUÉ SIGUE).
 
 REGLAS (vigentes)
 - No hagas commit ni push sin que yo lo pida. Sin claves ni .env en los commits.
@@ -39,7 +39,7 @@ ENTORNO
 - Backend: JDK 21 (JAVA_HOME = C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot), `mvn spring-boot:run "-Dspring-boot.run.profiles=local"` en backend/. BD en Docker (contenedor brinda-db, puerto 5433, base brinda; claves solo en backend/.env y brinda-db/.env).
 
 QUÉ SIGUE (yo elijo al empezar; dame tu recomendación en 5 líneas)
-0) Corregir lo que salga de la prueba del panel con sesión real.
+0) Lo que indique el usuario al empezar.
 a) Etapa C del Libro de Reclamaciones (formulario público); al cerrarla, Newman completo y proponer (sin ejecutar) la actualización del grafo.
 b) Decidir la caducidad del enlace de copia (propuesta: 30 días desde el registro).
 c) Decisiones del usuario pendientes: dónde guardar las fotos en producción (el disco de Render se borra en cada despliegue: disco persistente o R2) y columna de costo (V11) para ver ganancia y costo del inventario en Ventas.
