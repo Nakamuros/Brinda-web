@@ -1,0 +1,116 @@
+<section class="head candle-edge" aria-labelledby="done-title">
+  <div class="container">
+    @if (order()?.code ?? savedCode(); as code) {
+      <p class="eyebrow">Pedido registrado</p>
+      <h1 id="done-title" class="title code">{{ code }}</h1>
+      <p class="lead">Este es el código de tu pedido.</p>
+    } @else {
+      <h1 id="done-title" class="title">Tu <span class="accent">pedido</span></h1>
+    }
+  </div>
+</section>
+
+<div class="container body">
+  @if (order(); as o) {
+    <div class="layout">
+      <section class="next" aria-label="Siguiente paso">
+        <p class="deadline" role="note">
+          Tu pedido se mantiene <strong>{{ minutes }} minutos</strong>: si no se confirma antes de
+          las {{ expiresAt() }}, vence.
+        </p>
+
+        @if (whatsappUrl(); as url) {
+          <a class="btn btn-cta send" [href]="url" target="_blank" rel="noopener noreferrer">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z" />
+            </svg>
+            Enviar por WhatsApp
+          </a>
+          <p class="note">
+            Se abre el chat con el mensaje de tu pedido listo. Pagas cuando lo confirmemos por
+            WhatsApp.
+          </p>
+        } @else {
+          <div class="unavailable" role="status">
+            <p class="un-title">El envío por WhatsApp aún no está disponible</p>
+            <p>
+              Tu pedido quedó registrado con el código <strong>{{ o.code }}</strong>, pero todavía
+              no hay un número de WhatsApp configurado para recibirlo. Guarda tu código.
+            </p>
+          </div>
+        }
+
+        <dl class="pay">
+          <div>
+            <dt>Pago</dt>
+            <dd>{{ method() }}</dd>
+          </div>
+          @if (o.payment.number; as number) {
+            <div>
+              <dt>{{ method() }} de BRINDA</dt>
+              <dd>{{ number }}</dd>
+            </div>
+          }
+        </dl>
+
+        <a class="back" routerLink="/catalogo">Volver al catálogo</a>
+      </section>
+
+      <aside class="summary" aria-labelledby="sum-title">
+        <h2 id="sum-title" class="sum-title">Tu compra</h2>
+        <ul class="items">
+          @for (i of o.items; track $index) {
+            <li>
+              <span class="item-name">
+                {{ i.quantity }} × {{ i.name }}
+                @if (i.promo) {
+                  <span class="promo">{{ i.promo }}</span>
+                }
+              </span>
+              <span class="item-total">{{ money(i.subtotal) }}</span>
+            </li>
+          }
+        </ul>
+        <dl class="sum">
+          <div>
+            <dt>Subtotal</dt>
+            <dd>{{ money(o.subtotal) }}</dd>
+          </div>
+          <div>
+            <dt>Delivery</dt>
+            <dd>{{ money(o.deliveryFee) }}</dd>
+          </div>
+          <div class="sum-total">
+            <dt>Total</dt>
+            <dd>{{ money(o.total) }}</dd>
+          </div>
+        </dl>
+        <app-legal-notice kind="minors" />
+      </aside>
+    </div>
+  } @else if (savedCode()) {
+    <app-state-panel
+      title="Guarda tu código"
+      text="Lo recordaremos en este navegador durante una hora y media. El detalle del pedido ya no se muestra aquí por tu privacidad."
+    >
+      <a class="btn btn-ghost" routerLink="/catalogo">Ver el catálogo</a>
+    </app-state-panel>
+  } @else {
+    <app-state-panel
+      title="No podemos mostrar este pedido"
+      text="Por tu privacidad, el detalle del pedido no se guarda en el navegador y ya no está disponible en esta pantalla."
+    >
+      <a class="btn btn-ghost" routerLink="/catalogo">Ver el catálogo</a>
+    </app-state-panel>
+  }
+</div>

@@ -17,6 +17,13 @@
     >
       <a class="btn btn-ghost" routerLink="/catalogo">Ver el catálogo</a>
     </app-state-panel>
+  } @else if (noZones()) {
+    <app-state-panel
+      title="Aún no tenemos zonas de reparto"
+      text="Por ahora no hay distritos con reparto disponibles, así que todavía no podemos recibir pedidos. Tu carrito se conserva."
+    >
+      <a class="btn btn-ghost" routerLink="/carrito">Volver al carrito</a>
+    </app-state-panel>
   } @else {
     <div class="layout">
       <form class="form" [formGroup]="form" novalidate>
@@ -195,14 +202,24 @@
           }
           <label class="check">
             <input type="checkbox" formControlName="termsAccepted" />
-            <span>Acepto los términos y condiciones.</span>
+            <span
+              >Acepto los
+              <a class="doc" routerLink="/terminos" target="_blank" rel="noopener"
+                >términos y condiciones</a
+              >.</span
+            >
           </label>
           @if (error('termsAccepted'); as e) {
             <p class="msg" role="alert">{{ e }}</p>
           }
           <label class="check">
             <input type="checkbox" formControlName="privacyAccepted" />
-            <span>Acepto la política de privacidad.</span>
+            <span
+              >Acepto la
+              <a class="doc" routerLink="/privacidad" target="_blank" rel="noopener"
+                >política de privacidad</a
+              >.</span
+            >
           </label>
           @if (error('privacyAccepted'); as e) {
             <p class="msg" role="alert">{{ e }}</p>
@@ -256,7 +273,17 @@
           La tarifa y el total finales los confirma el servidor al enviar tu pedido.
         </p>
         <app-legal-notice kind="minors" />
-        <button type="button" class="btn btn-cta finish">Finalizar compra</button>
+        @if (failure(); as f) {
+          <p class="alert" role="alert">
+            {{ f.message }}
+            @if (f.cart) {
+              <a routerLink="/carrito">Revisar carrito</a>
+            }
+          </p>
+        }
+        <button type="button" class="btn btn-cta finish" [disabled]="sending()" (click)="submit()">
+          {{ sending() ? 'Enviando tu pedido…' : 'Finalizar compra' }}
+        </button>
         <a class="back" routerLink="/carrito">Volver al carrito</a>
       </aside>
     </div>

@@ -2,6 +2,7 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService, lineTotals } from '../../../services/cart.service';
 import { CatalogService } from '../../../services/catalog.service';
+import { OrderService } from '../../../services/order.service';
 import { BottlePlaceholder } from '../../../shared/bottle-placeholder';
 import { formatPrice } from '../../../shared/format';
 import { LegalNotice } from '../../../shared/legal-notice';
@@ -19,6 +20,7 @@ import { StatePanel } from '../../../shared/state-panel';
 export class Carrito {
   protected readonly cart = inject(CartService);
   private readonly catalog = inject(CatalogService);
+  protected readonly recent = inject(OrderService).recent;
 
   protected readonly rows = computed(() =>
     this.cart.lines().map((line) => {

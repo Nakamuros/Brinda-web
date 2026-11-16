@@ -1,4 +1,5 @@
-// Verifica /pedido contra la API REAL (backend :8080 vía proxy). Solo lectura: el botón no crea pedidos.
+// Verifica el formulario de /pedido contra la API REAL (backend :8080 vía proxy). Solo lectura: no pulsa
+// "Finalizar compra" (el envío del pedido se prueba en pedido-real.mjs).
 // Uso: node scripts/pedido.mjs   (con backend y `ng serve` encendidos)
 import { chromium } from 'playwright';
 import { passAgeGate } from './age.mjs';
@@ -12,7 +13,7 @@ const pick = (name) => districts.find((d) => d.name === name);
 const near = pick('Barranco');
 const far = pick('Callao');
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ channel: process.env.PW_CHANNEL });
 const out = [];
 const check = (label, ok, extra = '') => out.push(`${ok ? 'OK ' : 'FALLA'} ${label}${extra ? ' · ' + extra : ''}`);
 const money = (t) => Math.round(parseFloat(t.replace(/ /g, ' ').replace(/[^\d.]/g, '')) * 100);
@@ -118,14 +119,6 @@ for (const { name, width, height } of [
   // DNI y datos personales no se guardan en el navegador
   const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
   check(L('DNI y celular no se guardan en el navegador'), !stored.includes('12345678') && !stored.includes('987654321'));
-
-  // "Finalizar compra": no hace nada
-  const urlBefore = page.url();
-  await page.getByRole('button', { name: 'Finalizar compra' }).click();
-  await page.waitForTimeout(900);
-  check(L('"Finalizar compra" no navega ni abre pestañas'), page.url() === urlBefore && popups === 0);
-  check(L('"Finalizar compra" no hace ninguna petición POST'), posts.length === 0, posts.join(' '));
-  check(L('sigue en el formulario'), (await page.locator('form').count()) === 1);
 
   // Tamaños táctiles (controles, etiquetas de casilla y opciones de pago) y desborde
   const small = await page.evaluate(() =>

@@ -203,3 +203,24 @@
 .sum-total dt {
   white-space: nowrap;
 }
+
+/* Código del último pedido (se recuerda 1 h 30 min) */
+.recent {
+  margin-bottom: var(--space-5);
+  text-align: center;
+  color: var(--text-soft);
+}
+.recent a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding-inline: var(--space-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--cream);
+  text-decoration-color: var(--brass);
+  text-underline-offset: 0.3em;
+}

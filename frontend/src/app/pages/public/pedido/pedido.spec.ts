@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Product } from '../../../models/product';
 import { CartService } from '../../../services/cart.service';
@@ -40,7 +40,7 @@ const DISTRICTS = [
   { id: 20, name: 'Callao', zoneName: 'Zona 3 - Lejanos', fee: 13 },
 ];
 
-async function render(withItems = true) {
+async function render(withItems = true, districts = DISTRICTS) {
   localStorage.clear();
   TestBed.configureTestingModule({
     imports: [Pedido],
@@ -53,7 +53,7 @@ async function render(withItems = true) {
   }
   const fixture = TestBed.createComponent(Pedido);
   fixture.detectChanges();
-  http.expectOne('/api/v1/delivery/districts').flush(DISTRICTS);
+  http.expectOne('/api/v1/delivery/districts').flush(districts);
   await fixture.whenStable();
   fixture.detectChanges();
   return { fixture, http, el: fixture.nativeElement as HTMLElement };
@@ -68,7 +68,55 @@ function select(el: HTMLElement, value: string) {
   s.dispatchEvent(new Event('change'));
 }
 
-describe('Pedido (checkout, solo formulario)', () => {
+function type(el: HTMLElement, id: string, value: string) {
+  const input = el.querySelector(`#${id}`) as HTMLInputElement;
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
+}
+
+function fill(el: HTMLElement) {
+  type(el, 'firstName', 'Ana María');
+  type(el, 'lastName', "Pérez O'Brien");
+  type(el, 'phone', '987654321');
+  type(el, 'dni', '12345678');
+  type(el, 'address', 'Av. Larco 123');
+  select(el, 'Barranco');
+  el.querySelectorAll<HTMLInputElement>('input[type=radio], input[type=checkbox]').forEach((i) => {
+    if (i.value !== 'PLIN') {
+      i.click();
+    }
+  });
+}
+
+const CREATED = {
+  code: 'EQ12',
+  status: 'PENDING',
+  subtotal: 96,
+  deliveryFee: 6,
+  total: 102,
+  expiresAt: '2026-11-15T20:20:00-05:00',
+  items: [{ name: 'Pisco Quebranta 500 ml', quantity: 2, unitPrice: 48, subtotal: 96 }],
+  payment: { method: 'YAPE', number: null, amount: 102 },
+  whatsappUrl: null,
+};
+
+/** Llena el formulario, pulsa "Finalizar compra" y devuelve la petición POST pendiente. */
+async function submit() {
+  const view = await render();
+  const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+  fill(view.el);
+  view.fixture.detectChanges();
+  (view.el.querySelector('.finish') as HTMLButtonElement).click();
+  const req = view.http.expectOne({ method: 'POST', url: '/api/v1/orders' });
+  const settle = async () => {
+    await new Promise((r) => setTimeout(r));
+    await view.fixture.whenStable();
+    view.fixture.detectChanges();
+  };
+  return { ...view, navigate, req, settle, cart: TestBed.inject(CartService) };
+}
+
+describe('Pedido (checkout)', () => {
   beforeEach(() => TestBed.resetTestingModule());
 
   it('sin productos muestra el carrito vacío y no el formulario', async () => {
@@ -122,11 +170,102 @@ describe('Pedido (checkout, solo formulario)', () => {
     expect(dni.getAttribute('aria-invalid')).toBe('true');
   });
 
-  it('"Finalizar compra" no hace nada: sin pedidos ni peticiones', async () => {
+  it('con el formulario incompleto no envía nada y muestra los errores', async () => {
     const { fixture, http, el } = await render();
     (el.querySelector('.finish') as HTMLButtonElement).click();
     fixture.detectChanges();
-    http.verify(); // ninguna petición pendiente (ni POST /orders)
-    expect(el.querySelector('form')).not.toBeNull();
+    http.verify(); // sin POST /orders
+    expect(el.querySelector('#dni-msg')?.textContent).toContain('Ingresa tu DNI.');
+    expect(el.textContent).toContain('Debes aceptar los términos y condiciones.');
+  });
+
+  it('envía solo productId y cantidad; al crearse vacía el carrito y va a /pedido/:codigo', async () => {
+    const { req, settle, navigate, cart } = await submit();
+    expect(req.request.body).toEqual({
+      items: [{ productId: 'p1', quantity: 2 }],
+      firstName: 'Ana María',
+      lastName: "Pérez O'Brien",
+      phone: '987654321',
+      dni: '12345678',
+      districtId: 4,
+      address: 'Av. Larco 123',
+      reference: '',
+      paymentMethod: 'YAPE',
+      adultConfirmed: true,
+      termsAccepted: true,
+      privacyAccepted: true,
+    });
+    expect(cart.itemCount()).toBe(2); // todavía no se vacía
+    req.flush(CREATED, { status: 201, statusText: 'Created' });
+    await settle();
+    expect(navigate).toHaveBeenCalledWith(['/pedido', 'EQ12']);
+    expect(cart.itemCount()).toBe(0);
+    // El DNI y los datos personales no quedan en el navegador.
+    const stored = JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage });
+    expect(stored).not.toContain('12345678');
+    expect(stored).not.toContain('987654321');
+    // Solo se recuerda el código (1 h 30 min).
+    expect(JSON.parse(localStorage.getItem('brinda.order.v1') ?? '{}').code).toBe('EQ12');
+  });
+
+  it('429: pide esperar un minuto y conserva el carrito', async () => {
+    const { req, settle, navigate, cart, el } = await submit();
+    req.flush(
+      { status: 429, code: 'TOO_MANY_REQUESTS', message: 'Demasiados intentos.' },
+      { status: 429, statusText: 'Too Many Requests' },
+    );
+    await settle();
+    expect(el.querySelector('.alert')?.textContent).toContain('Espera un minuto');
+    expect(navigate).not.toHaveBeenCalled();
+    expect(cart.itemCount()).toBe(2);
+    expect((el.querySelector('.finish') as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('stock insuficiente (422/409): muestra el mensaje del servidor y enlaza al carrito', async () => {
+    const { req, settle, cart, el } = await submit();
+    req.flush(
+      {
+        status: 422,
+        code: 'BUSINESS_RULE',
+        message: 'Sin stock suficiente o no disponible: Pisco Quebranta 500 ml',
+      },
+      { status: 422, statusText: 'Unprocessable Entity' },
+    );
+    await settle();
+    const alert = el.querySelector('.alert');
+    expect(alert?.textContent).toContain('Sin stock suficiente o no disponible: Pisco Quebranta');
+    expect(alert?.querySelector('a')?.getAttribute('href')).toBe('/carrito');
+    expect(cart.itemCount()).toBe(2);
+  });
+
+  it('400: marca el campo con el mensaje del servidor', async () => {
+    const { req, settle, cart, el } = await submit();
+    req.flush(
+      {
+        status: 400,
+        code: 'VALIDATION_ERROR',
+        message: 'Datos inválidos',
+        fields: { dni: 'El DNI debe tener 8 dígitos' },
+      },
+      { status: 400, statusText: 'Bad Request' },
+    );
+    await settle();
+    expect(el.querySelector('#dni-msg')?.textContent).toContain('El DNI debe tener 8 dígitos');
+    expect(el.querySelector('.alert')?.textContent).toContain('Revisa los datos marcados');
+    expect(cart.itemCount()).toBe(2);
+  });
+
+  it('sin distritos entregables muestra "sin zonas de reparto" y no el formulario', async () => {
+    const { el } = await render(true, []);
+    expect(el.querySelector('form')).toBeNull();
+    expect(el.querySelector('.finish')).toBeNull();
+    expect(el.textContent).toContain('Aún no tenemos zonas de reparto');
+  });
+
+  it('las casillas enlazan a /terminos y /privacidad en otra pestaña', async () => {
+    const { el } = await render();
+    const links = [...el.querySelectorAll<HTMLAnchorElement>('a.doc')];
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(['/terminos', '/privacidad']);
+    expect(links.every((a) => a.target === '_blank')).toBe(true);
   });
 });

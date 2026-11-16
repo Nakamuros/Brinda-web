@@ -23,6 +23,27 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/public/pedido/pedido').then((m) => m.Pedido),
       },
       {
+        path: 'pedido/:codigo',
+        title: 'Pedido registrado · BRINDA',
+        loadComponent: () =>
+          import('./pages/public/pedido/pedido-creado').then((m) => m.PedidoCreado),
+      },
+      {
+        // Sin texto todavía: lo entrega el asesor legal.
+        path: 'terminos',
+        title: 'Términos y condiciones · BRINDA',
+        data: { heading: 'Términos y condiciones' },
+        loadComponent: () =>
+          import('./pages/public/legal-soon/legal-soon').then((m) => m.LegalSoon),
+      },
+      {
+        path: 'privacidad',
+        title: 'Política de privacidad · BRINDA',
+        data: { heading: 'Política de privacidad' },
+        loadComponent: () =>
+          import('./pages/public/legal-soon/legal-soon').then((m) => m.LegalSoon),
+      },
+      {
         path: 'carrito',
         title: 'Carrito · BRINDA',
         loadComponent: () => import('./pages/public/carrito/carrito').then((m) => m.Carrito),

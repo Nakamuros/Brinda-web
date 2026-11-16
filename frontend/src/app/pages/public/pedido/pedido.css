@@ -133,8 +133,25 @@
   color: var(--text-soft);
 }
 .note a,
+.alert a,
+.doc,
 .back {
   color: var(--cream);
+}
+/* Enlaces dentro de un texto: el relleno vertical da un objetivo táctil de 44 px sin mover la línea */
+.note a,
+.alert a,
+.doc {
+  padding-block: 1rem;
+  text-decoration-color: var(--brass);
+  text-underline-offset: 0.3em;
+}
+.alert {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--step--1);
+  line-height: 1.5;
+  border: 1px solid var(--promo);
+  border-radius: var(--radius);
 }
 .link {
   justify-self: start;

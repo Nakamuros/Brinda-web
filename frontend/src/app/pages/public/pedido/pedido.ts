@@ -1,10 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { District } from '../../../models/district';
 import { CartService, lineTotals } from '../../../services/cart.service';
 import { DeliveryService } from '../../../services/delivery.service';
+import { OrderFailure, OrderService, orderFailure } from '../../../services/order.service';
 import { FormField } from '../../../shared/form-field';
 import { formatPrice } from '../../../shared/format';
 import { LegalNotice } from '../../../shared/legal-notice';
@@ -45,7 +46,17 @@ type FieldName = keyof typeof MESSAGES;
 export class Pedido {
   protected readonly cart = inject(CartService);
   protected readonly delivery = inject(DeliveryService);
+  private readonly orders = inject(OrderService);
+  private readonly router = inject(Router);
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly fb = inject(NonNullableFormBuilder);
+
+  protected readonly sending = signal(false);
+  protected readonly failure = signal<OrderFailure | null>(null);
+  /** La API respondió, pero no hay ningún distrito con reparto: no se puede pedir. */
+  protected readonly noZones = computed(
+    () => this.delivery.status() === 'ready' && this.delivery.districts().length === 0,
+  );
 
   // El DNI no se guarda en el navegador: el formulario vive solo en memoria.
   protected readonly form = this.fb.group({
@@ -118,11 +129,70 @@ export class Pedido {
     }
     const messages: Record<string, string> = MESSAGES[name];
     const key = Object.keys(control.errors)[0];
+    if (key === 'server') {
+      return control.errors['server'];
+    }
     return messages[key] ?? messages['required'] ?? 'Revisa este campo.';
   }
 
   protected invalid(name: FieldName): boolean {
     return this.error(name) !== '';
+  }
+
+  /** Valida, crea el pedido en el servidor y solo entonces vacía el carrito. */
+  protected async submit(): Promise<void> {
+    if (this.sending()) {
+      return;
+    }
+    this.failure.set(null);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      this.focusFirstInvalid();
+      return;
+    }
+    const value = this.form.getRawValue();
+    const items = this.cart
+      .lines()
+      .filter((l) => l.available)
+      .map((l) => ({ productId: l.productId, quantity: l.quantity }));
+    if (!items.length || value.districtId === null || value.paymentMethod === null) {
+      return;
+    }
+    this.sending.set(true);
+    try {
+      const order = await this.orders.create({
+        ...value,
+        districtId: value.districtId,
+        paymentMethod: value.paymentMethod,
+        items,
+      });
+      await this.router.navigate(['/pedido', order.code]);
+      this.cart.clear();
+    } catch (error) {
+      const failure = orderFailure(error);
+      const controls: Record<string, { setErrors(e: object): void; markAsTouched(): void }> =
+        this.form.controls;
+      const other: string[] = [];
+      for (const [field, message] of Object.entries(failure.fields)) {
+        const control = controls[field];
+        if (control) {
+          control.setErrors({ server: message });
+          control.markAsTouched();
+        } else {
+          other.push(message);
+        }
+      }
+      this.failure.set({ ...failure, message: [failure.message, ...other].join(' ') });
+      this.focusFirstInvalid();
+    } finally {
+      this.sending.set(false);
+    }
+  }
+
+  private focusFirstInvalid(): void {
+    this.host.nativeElement
+      .querySelector<HTMLElement>('input.ng-invalid, select.ng-invalid')
+      ?.focus();
   }
 
   /** Solo dígitos y largo máximo, para celular y DNI. */

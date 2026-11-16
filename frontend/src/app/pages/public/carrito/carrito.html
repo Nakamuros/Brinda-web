@@ -9,6 +9,12 @@
 </section>
 
 <div class="container body">
+  @if (recent(); as r) {
+    <p class="recent">
+      Tu último pedido:
+      <a [routerLink]="['/pedido', r.code]">{{ r.code }}</a>
+    </p>
+  }
   @if (cart.lines().length === 0) {
     <app-state-panel
       title="Tu carrito está vacío"
