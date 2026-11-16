@@ -56,7 +56,7 @@ Mismo Wi‑Fi que la PC. Averigua la IP con `ipconfig` (IPv4) y abre `http://<es
 ## Pruebas
 ```powershell
 cd frontend
-npx ng test --no-watch     # 49 tests (Vitest), no necesita servidores
+npx ng test --no-watch     # 66 tests (Vitest), no necesita servidores (si se cae por memoria, apaga antes ng serve)
 npx ng build               # build de producción (debe salir sin avisos)
 
 cd ../backend
@@ -65,10 +65,13 @@ mvn test                   # 80 tests unitarios (con JAVA_HOME en JDK 21)
 Verificaciones en navegador (Playwright, en `frontend/`, con los servidores arriba; guardan capturas en `frontend/capturas/`, ignorada por git):
 ```powershell
 node scripts/catalogo-api.mjs   # catálogo contra la API real (necesita backend)
-node scripts/pedido.mjs         # checkout contra la API real (necesita backend)
-node scripts/catalogo.mjs       # catálogo con datos de ejemplo (solo ng serve)
-node scripts/carrito.mjs        # carrito con datos de ejemplo (solo ng serve)
+node scripts/pedido.mjs         # formulario del checkout contra la API real (necesita backend; no crea pedidos)
+node scripts/pedido-real.mjs    # pedido real: crea 3 pedidos de prueba y agota el límite de 5/min (espera 1 min para repetir)
+node scripts/catalogo.mjs       # catálogo con el fixture de ejemplo (scripts/fixtures/catalogo.json; solo ng serve)
+node scripts/carrito.mjs        # carrito con el fixture de ejemplo (solo ng serve)
 node scripts/legal.mjs          # control de edad, pie legal y /libro-de-reclamaciones (solo ng serve)
+node scripts/admin-productos.mjs # panel de productos, fotos, combos, categorías y zonas (simulado sin clave; con $env:ADMIN_PASSWORD, solo lectura real)
+node scripts/admin-pedidos.mjs  # panel de pedidos (API real con $env:ADMIN_PASSWORD; sin clave corre en modo simulado)
 node scripts/admin.mjs          # panel de reclamos contra la API real (backend + ng serve; lee la clave de backend/.env)
 ```
 Sin navegador de Playwright descargado, usa el Chrome instalado: `$env:PW_CHANNEL='chrome'; node scripts/legal.mjs`.
@@ -83,8 +86,8 @@ Variable opcional del backend: `COMPLAINTS_OWNER_EMAIL` (aviso a la dueña por c
 | Síntoma | Causa y solución |
 |---|---|
 | El catálogo dice "No pudimos cargar el catálogo" | El backend o la base están apagados. Levanta primero la base y luego el backend. |
-| El catálogo muestra 27 productos que no son de la base | Quedó activa la bandera de ejemplo. En la consola del navegador: `localStorage.removeItem('brinda.mock')` y recarga. |
-| El carrito dice "Ya no está disponible" en productos viejos | Eran de la base de ejemplo; usa "Quitar" o "Vaciar carrito". |
+| El carrito dice "Ya no está disponible" en productos viejos | Ya no existen o no tienen stock en la base; usa "Quitar" o "Vaciar carrito". |
+| "Finalizar compra" dice "demasiados intentos" | Límite de 5 pedidos por minuto por IP (lo agota `pedido-real.mjs`). Espera un minuto. |
 | `docker` no conecta | Docker Desktop no está abierto del todo. |
 | El panel dice "El servidor no responde" o "No se pudo ingresar" | El backend (8080) está apagado: `ng serve` solo no basta. Levanta la base y luego el backend. |
 | El puerto 5433 está ocupado | Hay otro Postgres. El contenedor viejo `intellimarket-postgres-1` (apagado) usa el mismo puerto: no lo inicies. |

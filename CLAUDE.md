@@ -58,7 +58,7 @@
 - No hagas commit ni push sin que el usuario lo pida.
 - No ejecutes nada destructivo sobre la BD sin confirmación.
 - No toques .claude/ ni las skills sin avisar.
-- No inventes productos, precios, promociones, horarios, distritos, números de WhatsApp/Yape/Plin ni textos legales: esperan datos de Lucía y del asesor. Los datos de ejemplo (`core/catalog.mock.ts`) solo existen como herramienta de diseño, con la bandera `brinda.mock` en desarrollo, y nunca en producción.
+- No inventes productos, precios, promociones, horarios, distritos, números de WhatsApp/Yape/Plin ni textos legales: esperan datos de Lucía y del asesor. La app ya no trae datos de ejemplo; los únicos que quedan son el fixture de las pruebas de navegador (`frontend/scripts/fixtures/catalogo.json`), que nunca entra al código de la app.
 - No toques la paleta, las tipografías ni el botón fantasma del hero (fijados por el brief). El burdeos es solo para botones de pedir.
 - No instales dependencias nuevas sin consultar. No mates procesos por nombre (`taskkill /IM node.exe`): detén solo el proceso por su puerto.
 - Verifica toda pantalla a 360, 768 y 1440 px y corre `npx ng test --no-watch` y `npx ng build` antes de dar algo por terminado.

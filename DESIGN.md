@@ -266,7 +266,7 @@ Sobrio y operativo (el panel prioriza rapidez y claridad sobre expresividad): ma
 - **Don't** usar gris piedra como texto, ni terracota con texto crema pequeño (3.76:1).
 - **Don't** poner gradientes en el texto, ni sombras duras de desplazamiento fijo, ni halos sin desplazamiento como profundidad.
 - **Don't** repetir el mismo ícono de botella como identidad de cada categoría una vez haya fotos reales; hasta entonces, sin recortes propios por categoría.
-- **Don't** inventar productos, precios, horarios, distritos ni promociones de ejemplo; los marcadores internos ("Por confirmar") y el catálogo de ejemplo solo existen en desarrollo.
+- **Don't** inventar productos, precios, horarios, distritos ni promociones de ejemplo; los marcadores internos ("Por confirmar") solo existen en desarrollo y la app no trae catálogo de ejemplo.
 - **Don't** mostrar cigarros hasta que el asesor lo confirme, ni redactar avisos legales por cuenta propia.
 - **Don't** añadir sobretítulos encima de los titulares, ni numerar secciones que no sean una secuencia real (solo "Cómo pedir").
 - **Don't** convertir el sistema en una tienda de ofertas: nada de rojo y amarillo promocional ni cuenta regresiva.

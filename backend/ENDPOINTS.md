@@ -10,6 +10,7 @@ Errores: `{ status, code, message, fields?, timestamp }`.
 | GET | `/api/v1/catalog/products?category=&q=&featured=&onOffer=&page=&size=` | `size` máx. 50; `inStock` sin cantidades. Oculta `is_available=false`. Orden: con stock, en oferta, destacados, nombre |
 | GET | `/api/v1/catalog/products/{slug}` | 404 si el producto está oculto |
 | GET | `/api/v1/delivery/districts` | Distritos con reparto y tarifa estimada |
+| GET | `/api/v1/catalog/images/{nombre}` | Foto subida desde el panel (caché de un año). 404 si no existe o el nombre no es `<uuid>.png\|jpg\|webp` |
 | POST | `/api/v1/orders` | Límite 5/min por IP. Devuelve código, total, pago y `whatsappUrl` |
 | POST | `/api/v1/complaints` | Libro de Reclamaciones. Límite 3/min por IP. Ver sección más abajo |
 | GET | `/api/v1/complaints/copy/{token}` | Copia en PDF de la hoja (aplanada), solo con el token de ese reclamo. Límite 20/min por IP. 404 si no existe |
@@ -90,6 +91,8 @@ Cuerpo (todo obligatorio salvo `guardianName`, `claimedAmount` y `website`):
 | POST | `/api/v1/admin/orders/{id}/confirm` ("Finalizada": descuenta stock) |
 | POST | `/api/v1/admin/orders/{id}/cancel` `{reason}` (si estaba confirmada, devuelve el stock) |
 | GET | `/api/v1/admin/orders/{id}/copy/delivery` · `/copy/receipt` |
+| POST | `/api/v1/admin/images` (multipart, campo `file`) | Sube una foto de producto: PNG, JPG o WebP (se comprueba por los bytes del archivo, no por el nombre), máx. 3 MB. `201 {key, url}`: `key` es lo que se guarda en `imageUrl` del producto. 422 si no es una imagen permitida, 413 si pesa más. Auditado (`IMAGE_UPLOAD`). Los archivos van a `IMAGES_UPLOAD_DIR` (por defecto `./uploads`), nunca a la BD |
+| GET | `/api/v1/admin/reports/sales?from=AAAA-MM-DD&to=AAAA-MM-DD` | Ventas: solo pedidos `CONFIRMED`, por fecha de confirmación en hora de Lima. Rango inclusivo, máx. 366 días (422 si es mayor o está invertido); sin fechas, últimos 30 días. Devuelve `{from, to, orders, revenue, productsRevenue, deliveryRevenue, averageTicket, days[{date, orders, revenue}], topProducts[≤10 {name, units, revenue}], inventory{units, valueAtSalePrice}}`. Sin datos personales. No hay costo ni ganancia (la base no guarda precio de costo) |
 | GET | `/api/v1/admin/complaints?status=RECEIVED\|ANSWERED&type=CLAIM\|COMPLAINT&q=&deadline=SOON\|OVERDUE&page=&size=` | Lista de reclamos **sin DNI/CE, teléfono, correo ni dirección**. Pendientes del más antiguo al más nuevo; el resto, del más nuevo. `deadline` solo admite SOON u OVERDUE (otro valor: 400/422) y trae solo pendientes |
 | GET | `/api/v1/admin/complaints/counts` | `{pending, dueSoon, overdue}` para el aviso del panel |
 | GET | `/api/v1/admin/complaints/{id}` | Detalle con el documento descifrado, plazo y estado de los dos correos. **Cada lectura queda auditada** (`COMPLAINT_VIEW`: usuario, hora e IP; sin el documento) |
