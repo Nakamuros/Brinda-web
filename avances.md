@@ -3,7 +3,16 @@
 > Registro de estado. Se actualiza al terminar cada tarea. Decisiones: `CONTEXTO-BRINDA.md` (secciones 18 y 19).
 > Para retomar: arranque local en `readme.md` y prompt de inicio en `PROMPT-INICIO-SESION.md`.
 
-## Resumen (2026-11-15)
+## Resumen (2026-11-22)
+- **Libro de Reclamaciones, Etapa C hecha:** formulario público en `/libro-de-reclamaciones` (secciones 1–3 de la hoja, guarda y descarga la copia en PDF). **Sigue sin poder salir a producción** hasta que la asesora confirme correo, conservación ≥2 años, firma, validez de la copia digital y feriados.
+- **Landing:** "Cómo pedir" pasa a 4 pasos (el envío por WhatsApp es un paso propio).
+- **`/pedido/:codigo`:** bloque "Falta un paso: envía tu pedido por WhatsApp" arriba de todo, botón verde de WhatsApp (única excepción al burdeos) y el enlace se recupera tras recargar.
+- **Backend:** el mensaje de WhatsApp ahora es corto y sin datos personales (código, total y pago). Nada más cambió.
+- **Verificación:** backend 114 tests, frontend 83 (por tandas: la corrida completa se cae por memoria del equipo), build sin avisos, Playwright a 360/768/1440 (`reclamos-publico.mjs`, `pedido-creado.mjs`). Newman: solo carpetas públicas (la clave del admin no está disponible). Detalle en "Libro, Cómo pedir y paso de WhatsApp (2026-11-22)".
+- **Git (2026-11-22):** commits por tema con push a `origin/main`: C `8bf5945`, A `290fcc9`, B `8f39c86`, más documentación y grafo.
+- **Siguiente:** la clave del admin para correr Newman completo, la confirmación de la asesora (Libro) y los datos reales de Lucía (WhatsApp, Yape/Plin, distritos y tarifas). Ver "Qué sigue".
+
+## Resumen anterior (2026-11-15)
 - **Tienda:** pedido real hecho (`/pedido` crea el pedido, `/pedido/:codigo` con código, aviso de 20 min y WhatsApp; el código se recuerda 1 h 30 min en el navegador), datos de ejemplo fuera de la app, landing con las categorías reales, `/terminos` y `/privacidad` como "Próximamente".
 - **Panel `/admin`:** Pedidos, Productos (fotos subidas desde el equipo, stock, ofertas, promo "lleva N paga M", combos), Categorías, Ventas, Zonas y Reclamos. Faltan solo las gráficas (pospuestas) y costo/ganancia (falta la columna de costo).
 - **Backend:** nuevos `GET /api/v1/admin/reports/sales` y `POST /api/v1/admin/images` + `GET /api/v1/catalog/images/{nombre}` (sin dependencias nuevas ni migraciones).
@@ -106,6 +115,40 @@
   - Plan del formulario funcional (V10, endpoint, PDF, correo, panel): ver la respuesta de la sesión; depende de lo que confirme el asesor o INDECOPI.
 - Pendiente: probar en celular real por red local, `DESIGN.md` y contrato de dirección (`/impeccable document`), crítica/auditoría (`critique`, `audit`), pulido de movimiento, assets reales de Lucía.
 
+## Libro, Cómo pedir y paso de WhatsApp (2026-11-22)
+Orden C → A → B, aprobado por el usuario tras una fase de solo lectura. Commits: C `8bf5945`, A `290fcc9`, B `8f39c86` (push a `origin/main` el 2026-11-22).
+
+### C · Formulario público del Libro de Reclamaciones
+- `pages/public/libro-reclamaciones/complaint-form.{ts,html,css,spec.ts}` + `services/complaint.service.ts`. La página muestra el proveedor (literal del PDF), el tipo de hoja, el formulario y las notas literales.
+- Secciones, campos y orden de la hoja: 1 (nombre, DNI/CE, domicilio, teléfono, e-mail, "Si es menor de edad" → nombre del padre, madre o apoderado obligatorio), 2 (producto/servicio, monto reclamado opcional, descripción), 3 (reclamo/queja con sus definiciones, detalle, pedido). Sin firma (constante `LEGAL.complaints.signature` = "Por confirmar", solo en desarrollo) ni número de pedido.
+- Mismas validaciones y límites que `CreateComplaintRequest`/`ValidDocument` (DNI 8 dígitos, CE 8–12 alfanuméricos, nombre con letras, teléfono 6–20, e-mail ≤120, textos ≤500/2000/1000 con contador). Errores al tocar el campo; los 400 del servidor se marcan por campo; 429 y red con mensaje propio y sin perder lo escrito.
+- Honeypot `website` fuera de pantalla, `aria-hidden`, `tabindex="-1"` y `autocomplete="off"`. Si el servidor responde con `LR-0000-000000` o token vacío, se muestra "No pudimos registrar tu reclamo, inténtalo de nuevo o escríbenos." (nunca "registrado").
+- Éxito: N°, fecha, "Descargar mi copia en PDF" (`${API_URL}/complaints/copy/<token>`, vale 30 días), foco en el título y formulario vaciado. Aviso de correo (NoopEmailSender) solo en desarrollo. Nada se guarda en el navegador.
+- Privacidad: casilla con enlace a `/privacidad` en pestaña nueva (el formulario se conserva).
+- **Decisión:** `LEGAL.provider.address` ahora es el literal del PDF (`AV ALFREDO BENAVIDES 707. 1403, MIRAFLORES`). El pie no muestra el domicilio.
+- **Datos de prueba en la BD local:** las corridas de `reclamos-publico.mjs` crearon los reclamos `LR-2026-000007` a `000012` (nombre "Prueba Playwright"). No se pueden borrar desde la app (`brinda_app` sin DELETE).
+
+### A · "Cómo pedir" (landing)
+- `core/config.ts` (`HOW_TO_ORDER`): Elige / Deja tus datos / Envíalo por WhatsApp ("Sin ese mensaje, tu pedido no avanza.") / Paga con Yape o Plin (misma redacción del aviso de 20 min de `/pedido`, con `ORDER.expiryMinutes`; sin prometer reserva de stock). `ORDER` se movió antes de `HOW_TO_ORDER`.
+- `how-to-order.css`: 1 columna, 2×2 desde 48rem y 4 en fila desde 64rem. Test nuevo `how-to-order.spec.ts`.
+
+### B · `/pedido/:codigo`
+- Bloque "Falta un paso / Envía tu pedido por WhatsApp" con el código, el botón y "No cierres esta página hasta enviarlo", primero en la pantalla y visible sin scroll a 360 px (cabecera compactada). Debajo, el aviso de 20 min, el pago y el resumen.
+- Tokens nuevos en `styles/tokens.css`: `--whatsapp` (#25d366), `--on-whatsapp` (= `--bg`, contraste 7.61:1 medido) y `--whatsapp-hover`. Documentado en `DESIGN.md` como única excepción a "burdeos = pedir". Ícono SVG inline. Animación de entrada y un halo de dos pulsos, solo `transform`/`opacity`, desactivados con `prefers-reduced-motion`.
+- **Recarga (B4):** `WhatsAppMessageBuilder` arma un mensaje corto (`*Pedido BRINDA <código>*`, `Total: S/ …`, `Pago: Yape|Plin`), sin productos ni datos personales; ya no usa `OrderComboContents`. `OrderService` guarda el enlace junto al código (`brinda.order.v1`, 1 h 30 min) y la pantalla lo recupera al recargar. Test nuevo `WhatsAppMessageBuilderTest` (3), `ENDPOINTS.md` y la aserción 07.1 de Postman actualizados. El panel sigue mostrando el detalle completo (no se tocó).
+
+### Verificación
+- Backend `mvn test`: 114 tests, 0 fallos. Frontend: 83 tests en 15 archivos, en verde **por tandas** (`--include` por carpeta): la corrida completa de `ng test` se cayó por falta de memoria del equipo (workers de Vitest sin heap con Docker y backend arriba). Build de producción sin avisos.
+- Playwright: `scripts/reclamos-publico.mjs` (360/768/1440 contra la API real: DNI, CE, menor con apoderado, errores, honeypot y 429 simulados, privacidad en pestaña nueva, descarga del PDF, foco, 44 px, sin scroll horizontal, consola limpia): todo OK. `scripts/pedido-creado.mjs` (Cómo pedir y `/pedido/:codigo`, POST simulado: visible sin scroll, contraste 7.61, recarga, reduced-motion): 61/61 OK.
+- Newman: **sin la clave del admin** solo corrieron las carpetas públicas. `01` + `12b`: 18 peticiones, 23 aserciones, 0 fallos (12b creó 2 reclamos de prueba más). La `06` sola falla en 10 aserciones porque depende de los ids que prepara la `02` (que necesita admin); no es una regresión. Las `00`, `02`–`05`, `07`–`11b`, `12` y `13` (y la 07.1 del mensaje corto) quedan pendientes. La `13` ya es la última de la colección.
+- `readme.md`: ruta real de las migraciones (`database/migrations/`) y los dos scripts nuevos.
+- Grafo (`graphify-out/`): AST de todo el código fusionado sobre el grafo existente (conserva los nodos semánticos de los documentos de corridas anteriores): 2223 nodos (antes 2164), 6074 aristas, 111 comunidades, sin aristas colgantes. Los `.md` y plantillas `.html` nuevos o cambiados **no** tienen extracción semántica (no hay caché; haría falta una corrida con subagentes). Los 17 `.sql` no aportan nodos (falta `tree_sitter_sql`).
+
+### Queda
+- La clave de admin para Postman no está en `backend/.env` (no existe `POSTMAN_ADMIN_NEW_PASSWORD`) ni en el entorno: falta la corrida completa de Newman (incluida la 07.1 del mensaje corto).
+- La ruta de `JAVA_HOME` de `readme.md` (`jdk-21.0.12.101`) no existe en esta PC (es `jdk-21.0.10.7-hotspot`).
+- Asesora: firma, correo, conservación, validez de la copia digital, feriados; textos de `/privacidad`.
+
 ## Limpieza y pedido real (2026-11-15)
 - **Limpieza (confirmada por el usuario; la BD local no se tocó):**
   - `core/catalog.mock.ts`, `USE_MOCK_CATALOG` y la bandera `brinda.mock` eliminados de la app. Los 27 productos de ejemplo viven solo como fixture de pruebas (`scripts/fixtures/catalogo.json` + `scripts/fixture.mjs`, que intercepta `/catalog/*` en Playwright); los usan `catalogo.mjs`, `carrito.mjs` y un bloque de `legal.mjs`.
@@ -194,8 +237,8 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 
 ## Qué sigue
 0. ~~Borrar los datos hardcodeados~~ hecho el 2026-11-15 (frontend; la BD local no se tocó).
-1. **Etapa C del Libro de Reclamaciones:** formulario público en `/libro-de-reclamaciones` que reproduce la hoja (secciones, campos, orden y textos literales; sin campo de firma: el mecanismo lo define el asesor, constante "por confirmar" visible solo en desarrollo; DNI de 8 dígitos o CE de 8 a 12 alfanuméricos; sin exigir pedido). Al enviar: N° del reclamo, botón de descarga de la copia en PDF y aviso del correo (solo en desarrollo). Casilla de privacidad hacia `/privacidad`. Mantener el aviso "no puede salir a producción". Al cerrar la C: **correr la colección Postman completa** (clave de `backend/.env`, variable `POSTMAN_ADMIN_NEW_PASSWORD`, sin imprimirla) y **proponer** (sin ejecutar) la actualización del grafo.
-2. **Decidir la caducidad del enlace de copia:** propuesta 30 días desde el registro (sin migración: `filed_at + 30 días`; 404/410 después; ~10 líneas, 2 tests y un caso de Postman). Pendiente del OK del usuario; depende del asesor.
+1. ~~Etapa C del Libro de Reclamaciones~~ hecha el 2026-11-22 (ver su sección). Falta la corrida completa de Postman con la clave del admin y la confirmación de la asesora.
+2. ~~Caducidad del enlace de copia~~ hecha (30 días, commit 5f90a9d); confirmar el plazo con la asesora.
 3. ~~Pedido real (checkout)~~ hecho el 2026-11-15. Antes decía: al pulsar "Finalizar compra": validar, `POST /api/v1/orders`, manejar `429`, vaciar el carrito, pantalla `/pedido/:codigo` con aviso de 20 min y "Enviar por WhatsApp".
 4. **Categorías y datos reales de Lucía:** las fichas de la landing (cervezas, vinos…) no coinciden con las de la BD; además productos con fotos, WhatsApp/Yape/Plin, horario, distritos y tarifas reales, video del hero y su cuenta de administradora (desactivar el `admin` del seed).
 5. **Resto del panel admin:** pedidos (confirmar/anular), productos, ofertas, combos, stock, zonas/distritos (reutiliza `src/app/admin/`, `admin-ui.css` y los estilos `.input`/`.btn`).

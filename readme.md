@@ -2,7 +2,7 @@
 
 Licorería con delivery en Lima. Catálogo público, carrito local y pedido que se cierra por WhatsApp con pago Yape/Plin. Libro de Reclamaciones virtual y panel de administración para la dueña (por ahora solo la sección de reclamos; el resto está pendiente).
 
-- **Backend:** Spring Boot 3.4.5 / Java 21 (`backend/`), PostgreSQL 16 en Docker (`brinda-db/`), migraciones en `backend/src/main/resources/db/migration`.
+- **Backend:** Spring Boot 3.4.5 / Java 21 (`backend/`), PostgreSQL 16 en Docker (`brinda-db/`), migraciones en `database/migrations/` (V1–V10; el seed de desarrollo en `database/seed-dev/`), que el build copia al classpath.
 - **Frontend:** Angular 21 (`frontend/`): landing, catálogo, carrito, checkout (formulario), avisos legales y panel `/admin` (solo reclamos).
 - **Estado y decisiones:** `avances.md`, `CONTEXTO-BRINDA.md` (secciones 18 y 19), `PRODUCT.md`, `DESIGN.md`.
 - **Retomar con Claude Code:** pegar el prompt de `PROMPT-INICIO-SESION.md`.
@@ -67,6 +67,8 @@ Verificaciones en navegador (Playwright, en `frontend/`, con los servidores arri
 node scripts/catalogo-api.mjs   # catálogo contra la API real (necesita backend)
 node scripts/pedido.mjs         # formulario del checkout contra la API real (necesita backend; no crea pedidos)
 node scripts/pedido-real.mjs    # pedido real: crea 3 pedidos de prueba y agota el límite de 5/min (espera 1 min para repetir)
+node scripts/pedido-creado.mjs  # "Cómo pedir" de la landing y /pedido/:codigo (paso de WhatsApp, contraste, recarga, reduced-motion); simula el POST, no crea pedidos
+node scripts/reclamos-publico.mjs # formulario del Libro de Reclamaciones: CREA 3 reclamos reales y descarga sus PDF (límite 3/min: espera 1 min para repetir)
 node scripts/catalogo.mjs       # catálogo con el fixture de ejemplo (scripts/fixtures/catalogo.json; solo ng serve)
 node scripts/carrito.mjs        # carrito con el fixture de ejemplo (solo ng serve)
 node scripts/legal.mjs          # control de edad, pie legal y /libro-de-reclamaciones (solo ng serve)

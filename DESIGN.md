@@ -11,6 +11,7 @@ colors:
   terracotta-promo: "#ca5a4e"
   petrol-teal: "#00585e"
   stone: "#7d7267"
+  whatsapp-green: "#25d366"
 typography:
   display:
     fontFamily: "'Libre Baskerville', Baskerville, Georgia, serif"
@@ -138,6 +139,8 @@ Derivados con `color-mix` desde esos tokens, sin hex nuevos: el fondo más oscur
 
 **The One Action Color Rule.** El burdeos es la acción y nada más. Ninguna otra superficie ni etiqueta lo usa.
 
+**Única excepción: el verde de WhatsApp.** El botón "Enviar por WhatsApp" de `/pedido/:codigo` usa `--whatsapp` (#25d366) con texto `--on-whatsapp` (= `--bg`, 7.6:1; el blanco daría 2:1 y no se usa). Es el único lugar con ese verde (botón, borde y sobretítulo del bloque "Falta un paso"); en el resto de la tienda pedir sigue siendo burdeos.
+
 **The Tokens Only Rule.** Ningún hex suelto fuera de `tokens.css`; todo lo demás sale de las variables o de `color-mix` sobre ellas.
 
 ## Typography
@@ -196,6 +199,7 @@ Refinados y contenidos: el contorno fino es la regla, el relleno sólido es la e
 - **Shape:** esquinas de 6px, altura mínima de 48px, mayúsculas de 13px con tracking 0.2em en Jost 500.
 - **Ghost (principal del hero y de las franjas):** transparente con contorno de crema de 1px. Al pasar el ratón se rellena de crema con texto marrón y sube 2px; al pulsar baja 1px. Es el botón fijado por el brief para el hero.
 - **CTA (acción real):** fondo burdeos, texto crema, filete de latón de 1px. Al pasar el ratón el burdeos se aclara hacia crema (88/12) y sube 2px.
+- **WhatsApp (solo `/pedido/:codigo`):** fondo `--whatsapp`, texto `--on-whatsapp`, tracking 0.1em para caber en una línea a 360px; hover hacia crema (`--whatsapp-hover`, 82/18) y sube 2px. Ícono de globo de chat inline (trazo 1.6). Al entrar, un halo de 2px crece y se apaga dos veces (solo `transform`/`opacity`); sin animación con `prefers-reduced-motion`.
 - **Foco:** contorno de crema de 2px con separación de 3px, siempre visible con teclado.
 - **Deshabilitado:** opacidad 0.55, sin eventos.
 
@@ -246,6 +250,15 @@ Modal centrado sobre un velo marrón casi opaco: sello +18, pregunta en Libre Ba
 
 ### Avisos legales
 La advertencia de alcohol va en mayúsculas espaciadas, crema sobre fondo oscuro (contraste mayor a 13:1), siempre en el pie. El aviso de menores y DNI físico es un recuadro de filete fino dentro del resumen del carrito y del checkout. El logo del Libro de Reclamaciones va sobre una pastilla marfil de 12px de radio (el PNG oficial sin tocar colores ni proporciones), de al menos 120px de ancho en celular y con objetivo táctil de 44px.
+
+### Paso pendiente (/pedido/:codigo)
+Lo primero de la pantalla, visible sin scroll a 360px: tarjeta de 12px con borde verde de WhatsApp sobre marrón profundo, sobretítulo "Falta un paso" en verde (excepción pedida al sobretítulo), titular "Envía tu pedido por WhatsApp" en Libre Baskerville, el código, el botón verde y la nota "No cierres esta página hasta enviarlo". Debajo, el aviso de los 20 minutos y el resto. La cabecera se compacta (código a `--step-3`). Tras recargar, el mismo bloque reaparece con el enlace recordado (sin datos personales).
+
+### Cómo pedir
+Cuatro pasos numerados: una columna en celular, 2×2 desde 48rem y una fila de cuatro desde 64rem (máx. 72rem), cada uno con filete de latón arriba.
+
+### Hoja de Reclamación
+Formulario en `/libro-de-reclamaciones` con las tres secciones de la hoja oficial como `fieldset` (leyenda en Libre Baskerville con filete), reutilizando campos, opciones y casillas del checkout. Las opciones (DNI/CE, producto/servicio, reclamo/queja) son pastillas que se rellenan de crema. El envío es un botón fantasma (no es una acción de pedir). La confirmación es una tarjeta de 12px con filete de latón: N°, fecha y "Descargar mi copia en PDF" (fantasma).
 
 ### Panel de administración
 Sobrio y operativo (el panel prioriza rapidez y claridad sobre expresividad): marco propio sin barra de anuncio ni carrito, tarjetas de 12px con filete de latón al 28%, contadores que filtran (el elegido se rellena de crema) y etiquetas de plazo: vencido o por vencer en terracota tenue con borde terracota, ícono y texto crema (nunca solo color), respondido en latón apagado. Reutiliza `.input` y `.btn-ghost`; las acciones del panel no usan burdeos.
