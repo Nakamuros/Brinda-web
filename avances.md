@@ -9,7 +9,7 @@
 - **`/pedido/:codigo`:** bloque "Falta un paso: envía tu pedido por WhatsApp" arriba de todo, botón verde de WhatsApp (única excepción al burdeos) y el enlace se recupera tras recargar.
 - **Backend:** el mensaje de WhatsApp ahora es corto y sin datos personales (código, total y pago). Nada más cambió.
 - **Verificación:** backend 114 tests, frontend 83 (por tandas: la corrida completa se cae por memoria del equipo), build sin avisos, Playwright a 360/768/1440 (`reclamos-publico.mjs`, `pedido-creado.mjs`). Newman: solo carpetas públicas (la clave del admin no está disponible). Detalle en "Libro, Cómo pedir y paso de WhatsApp (2026-11-22)".
-- **Git (2026-11-22):** commits por tema con push a `origin/main`: C `8bf5945`, A `290fcc9`, B `8f39c86`, más documentación y grafo.
+- **Git (2026-11-22):** commits por tema con push a `origin/main`: C `8bf5945`, A `290fcc9`, B `8f39c86`, más documentación (`daba59d`) y grafo (`bd18df8`, `d7567f5`).
 - **Siguiente:** la clave del admin para correr Newman completo, la confirmación de la asesora (Libro) y los datos reales de Lucía (WhatsApp, Yape/Plin, distritos y tarifas). Ver "Qué sigue".
 
 ## Resumen anterior (2026-11-15)
@@ -142,7 +142,12 @@ Orden C → A → B, aprobado por el usuario tras una fase de solo lectura. Comm
 - Playwright: `scripts/reclamos-publico.mjs` (360/768/1440 contra la API real: DNI, CE, menor con apoderado, errores, honeypot y 429 simulados, privacidad en pestaña nueva, descarga del PDF, foco, 44 px, sin scroll horizontal, consola limpia): todo OK. `scripts/pedido-creado.mjs` (Cómo pedir y `/pedido/:codigo`, POST simulado: visible sin scroll, contraste 7.61, recarga, reduced-motion): 61/61 OK.
 - Newman: **sin la clave del admin** solo corrieron las carpetas públicas. `01` + `12b`: 18 peticiones, 23 aserciones, 0 fallos (12b creó 2 reclamos de prueba más). La `06` sola falla en 10 aserciones porque depende de los ids que prepara la `02` (que necesita admin); no es una regresión. Las `00`, `02`–`05`, `07`–`11b`, `12` y `13` (y la 07.1 del mensaje corto) quedan pendientes. La `13` ya es la última de la colección.
 - `readme.md`: ruta real de las migraciones (`database/migrations/`) y los dos scripts nuevos.
-- Grafo (`graphify-out/`): AST de todo el código fusionado sobre el grafo existente (conserva los nodos semánticos de los documentos de corridas anteriores): 2223 nodos (antes 2164), 6074 aristas, 111 comunidades, sin aristas colgantes. Los `.md` y plantillas `.html` nuevos o cambiados **no** tienen extracción semántica (no hay caché; haría falta una corrida con subagentes). Los 17 `.sql` no aportan nodos (falta `tree_sitter_sql`).
+- Grafo (`graphify-out/`), dos pasos el 2026-11-22:
+  1. `bd18df8`: AST de todo el código fusionado sobre el grafo existente (2223 nodos, antes 2164).
+  2. `d7567f5`: extracción semántica de los 38 documentos (`.md` del proyecto y plantillas `.html`), los 38 leídos completos, ~385k tokens. Reemplazó la extracción vieja de esos mismos archivos (85 nodos fuera, 214 dentro; hubo que forzar el guard de graphify con OK del usuario).
+  - **Estado actual:** 2352 nodos, ~6276 aristas, 109 comunidades, 9 hiperaristas, sin aristas colgantes (4 self-loops heredados). Caché semántica local en `graphify-out/cache/` (ignorada por git): el próximo `--update` solo reprocesa lo que cambie.
+  - Revisado: ningún nodo viene de `backend/.env` ni de `brinda-db/.env`, ni contiene claves. Solo aparecen los nombres de rol de la BD (`DB_APP_USER`, `DB_OWNER_USER`), que ya están en `database/README.md` y otros documentos versionados.
+  - Límites: los 17 `.sql` no aportan nodos (falta `tree_sitter_sql`, no instalado); `tokens.css` lo omite graphify por nombre "sensible"; los nodos de código citados en los documentos (p. ej. `WhatsAppMessageBuilder`) quedan como nodos del documento, al lado de los del código, no fusionados.
 
 ### Queda
 - La clave de admin para Postman no está en `backend/.env` (no existe `POSTMAN_ADMIN_NEW_PASSWORD`) ni en el entorno: falta la corrida completa de Newman (incluida la 07.1 del mensaje corto).
