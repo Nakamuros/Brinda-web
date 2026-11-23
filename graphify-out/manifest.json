@@ -1045,99 +1045,99 @@
   },
   "CLAUDE.md": {
     "mtime": 1794787648.056859,
-    "seen": 1794787724.144899,
+    "seen": 1795409434.7335064,
     "ast_hash": "b0b68297e2844d47ddea6b82d992834c",
-    "semantic_hash": ""
+    "semantic_hash": "b0b68297e2844d47ddea6b82d992834c"
   },
   "CONTEXTO-BRINDA.md": {
     "mtime": 1794787648.0711403,
-    "seen": 1794787724.1449022,
+    "seen": 1795409434.733509,
     "ast_hash": "b9e9050a74f0a1a982c8196529834ee6",
-    "semantic_hash": ""
+    "semantic_hash": "b9e9050a74f0a1a982c8196529834ee6"
   },
   "FRONTEND-BRIEF-BRINDA.md": {
     "mtime": 1792975027.6639714,
-    "seen": 1793651809.5734408,
+    "seen": 1795409434.7335124,
     "ast_hash": "3e74a605ab0970c6a782cd1063bf007f",
-    "semantic_hash": ""
+    "semantic_hash": "3e74a605ab0970c6a782cd1063bf007f"
   },
   "PRODUCT.md": {
     "mtime": 1792974684.921171,
-    "seen": 1793651809.573442,
+    "seen": 1795409434.7335143,
     "ast_hash": "d7b36fbeed840b4416f16419ea3ca2c4",
-    "semantic_hash": ""
+    "semantic_hash": "d7b36fbeed840b4416f16419ea3ca2c4"
   },
   "PROMPT-CLI-V4.md": {
     "mtime": 1792439461.684384,
-    "seen": 1793651809.5734437,
+    "seen": 1795409434.7335157,
     "ast_hash": "f50848209d7c7cae7d6d857d94ee4e8c",
-    "semantic_hash": ""
+    "semantic_hash": "f50848209d7c7cae7d6d857d94ee4e8c"
   },
   "avances.md": {
-    "mtime": 1794787648.0721495,
-    "seen": 1794787724.145631,
-    "ast_hash": "950a726b80fc49782c4dfdaa70ed5ab0",
-    "semantic_hash": ""
+    "mtime": 1795408765.4098735,
+    "seen": 1795409434.7335207,
+    "ast_hash": "b4e34815c2ab149122cd6959daa77c31",
+    "semantic_hash": "b4e34815c2ab149122cd6959daa77c31"
   },
   "backend/ENDPOINTS.md": {
-    "mtime": 1794787328.3040326,
-    "seen": 1794787724.1456335,
-    "ast_hash": "2fbee74afc26e0def2891ea1ff32dad0",
-    "semantic_hash": ""
+    "mtime": 1795406945.121666,
+    "seen": 1795409434.7335222,
+    "ast_hash": "1cd96e200cc579694828a0785a7a2148",
+    "semantic_hash": "1cd96e200cc579694828a0785a7a2148"
   },
   "database/README.md": {
     "mtime": 1793576139.424737,
-    "seen": 1793651809.5734513,
+    "seen": 1795409434.7335236,
     "ast_hash": "72372217660193c1ed1bbc8e954e505c",
-    "semantic_hash": ""
+    "semantic_hash": "72372217660193c1ed1bbc8e954e505c"
   },
   "frontend/README.md": {
     "mtime": 1792975349.0851178,
-    "seen": 1793651809.5734575,
+    "seen": 1795409434.733531,
     "ast_hash": "53e719fc7f67be6e16027dbb90edaa15",
-    "semantic_hash": ""
+    "semantic_hash": "53e719fc7f67be6e16027dbb90edaa15"
   },
   "frontend/src/app/layouts/layout-public/site-footer.html": {
     "mtime": 1794769216.9962244,
-    "seen": 1794787724.146908,
+    "seen": 1795409434.7335494,
     "ast_hash": "6b903fd30f71df0355fb91aff1f55569",
-    "semantic_hash": ""
+    "semantic_hash": "6b903fd30f71df0355fb91aff1f55569"
   },
   "frontend/src/app/layouts/layout-public/site-nav.html": {
     "mtime": 1793041259.8413196,
-    "seen": 1793651809.573464,
+    "seen": 1795409434.733551,
     "ast_hash": "43a6df23f20500348c10b54d98393aef",
-    "semantic_hash": ""
+    "semantic_hash": "43a6df23f20500348c10b54d98393aef"
   },
   "frontend/src/app/pages/public/landing/sections/hero-video.html": {
     "mtime": 1792975662.7754934,
-    "seen": 1793651809.5734684,
+    "seen": 1795409434.733556,
     "ast_hash": "f9f084f1908efabc12097d138450da74",
-    "semantic_hash": ""
+    "semantic_hash": "f9f084f1908efabc12097d138450da74"
   },
   "frontend/src/app/pages/public/landing/sections/hero.html": {
     "mtime": 1792980448.2870781,
-    "seen": 1793651809.5734699,
+    "seen": 1795409434.7335575,
     "ast_hash": "3f68e467ef64ab92b4195b71c8faf977",
-    "semantic_hash": ""
+    "semantic_hash": "3f68e467ef64ab92b4195b71c8faf977"
   },
   "frontend/src/index.html": {
     "mtime": 1792975559.9440403,
-    "seen": 1793651809.573475,
+    "seen": 1795409434.7335658,
     "ast_hash": "721ee40eaac699f75ed6186573e1d6e6",
-    "semantic_hash": ""
+    "semantic_hash": "721ee40eaac699f75ed6186573e1d6e6"
   },
   "postman/README.md": {
     "mtime": 1793576139.4934258,
-    "seen": 1793651809.5734763,
+    "seen": 1795409434.7335675,
     "ast_hash": "be60edadb3b56a0fea3aca9acb87e82e",
-    "semantic_hash": ""
+    "semantic_hash": "be60edadb3b56a0fea3aca9acb87e82e"
   },
   "readme.md": {
-    "mtime": 1794787328.3040326,
-    "seen": 1794787724.1479661,
-    "ast_hash": "7faf3a67041c401390cf66e16665e006",
-    "semantic_hash": ""
+    "mtime": 1795407544.5983663,
+    "seen": 1795409434.733569,
+    "ast_hash": "e30e0c99191e010330bda18609d886ec",
+    "semantic_hash": "e30e0c99191e010330bda18609d886ec"
   },
   "frontend/scripts/prod-check.mjs": {
     "mtime": 1793576139.4347715,
@@ -1171,21 +1171,21 @@
   },
   "frontend/.impeccable/critique/2026-10-26T01-33-07Z__src-app-pages-public-landing-landing-ts.md": {
     "mtime": 1792978387.1731038,
-    "seen": 1793651809.5734527,
+    "seen": 1795409434.7335255,
     "ast_hash": "fad3a43bcf32ffeacaf072cb7edba9cf",
-    "semantic_hash": ""
+    "semantic_hash": "fad3a43bcf32ffeacaf072cb7edba9cf"
   },
   "frontend/.impeccable/critique/2026-10-26T01-47-10Z__src-app-pages-public-landing-landing-ts.md": {
     "mtime": 1792979230.6457956,
-    "seen": 1793651809.5734544,
+    "seen": 1795409434.7335277,
     "ast_hash": "8acabd0c525b75eddbffdc77dbed644d",
-    "semantic_hash": ""
+    "semantic_hash": "8acabd0c525b75eddbffdc77dbed644d"
   },
   "frontend/.impeccable/critique/2026-10-26T01-59-53Z__src-app-pages-public-landing-landing-ts.md": {
     "mtime": 1792979993.207189,
-    "seen": 1793651809.5734558,
+    "seen": 1795409434.733529,
     "ast_hash": "c4e6b5f21a0cf08fc469d3e9083a5fe2",
-    "semantic_hash": ""
+    "semantic_hash": "c4e6b5f21a0cf08fc469d3e9083a5fe2"
   },
   ".impeccable/design.json": {
     "mtime": 1792981230.447547,
@@ -1362,34 +1362,34 @@
     "semantic_hash": "3ba37c0f7405faf13fc9b7702299add6"
   },
   "DESIGN.md": {
-    "mtime": 1794787664.3684464,
-    "seen": 1794787724.1449044,
-    "ast_hash": "09f434379e35bcabcc7a4c1ff51ae977",
-    "semantic_hash": ""
+    "mtime": 1795407568.4292815,
+    "seen": 1795409434.733511,
+    "ast_hash": "d0e0ca2ca25a8d941f4649a4419a2386",
+    "semantic_hash": "d0e0ca2ca25a8d941f4649a4419a2386"
   },
   "PROMPT-INICIO-SESION.md": {
-    "mtime": 1794787648.056859,
-    "seen": 1794787724.1454647,
-    "ast_hash": "2ec5310fd52a4afe1ac3a4ec82799878",
-    "semantic_hash": ""
+    "mtime": 1794787915.424559,
+    "seen": 1795409434.7335174,
+    "ast_hash": "3db2773de15593a2b36b6f8bb57bc403",
+    "semantic_hash": "3db2773de15593a2b36b6f8bb57bc403"
   },
   "frontend/src/app/pages/public/carrito/carrito.html": {
     "mtime": 1794771555.775457,
-    "seen": 1794787724.1470847,
+    "seen": 1795409434.7335527,
     "ast_hash": "7cc899268ad8f5a629991f2ee6b3fd34",
-    "semantic_hash": ""
+    "semantic_hash": "7cc899268ad8f5a629991f2ee6b3fd34"
   },
   "frontend/src/app/pages/public/catalogo/catalogo.html": {
     "mtime": 1794769217.0149038,
-    "seen": 1794787724.1470876,
+    "seen": 1795409434.7335541,
     "ast_hash": "61ea465b3e6055bf6eda1507bbe6ba1a",
-    "semantic_hash": ""
+    "semantic_hash": "61ea465b3e6055bf6eda1507bbe6ba1a"
   },
   "frontend/src/app/pages/public/pedido/pedido.html": {
     "mtime": 1794769217.0427809,
-    "seen": 1794787724.1476283,
+    "seen": 1795409434.733564,
     "ast_hash": "91a23ac928de9206fae888ba04f35e7e",
-    "semantic_hash": ""
+    "semantic_hash": "91a23ac928de9206fae888ba04f35e7e"
   },
   "backend/src/main/java/com/brinda/api/complaint/controller/ComplaintAdminController.java": {
     "mtime": 1793576139.3873532,
@@ -1753,21 +1753,21 @@
   },
   "frontend/src/app/admin/reclamos/reclamo-detalle.html": {
     "mtime": 1793576139.4500475,
-    "seen": 1793651809.5734587,
+    "seen": 1795409434.7335424,
     "ast_hash": "ed2010c06c97f3fbe145efd383ef1860",
-    "semantic_hash": ""
+    "semantic_hash": "ed2010c06c97f3fbe145efd383ef1860"
   },
   "frontend/src/app/admin/reclamos/reclamos-lista.html": {
     "mtime": 1793576139.4500475,
-    "seen": 1793651809.5734603,
+    "seen": 1795409434.733544,
     "ast_hash": "77948f63c58287cc9e5156d0b332840b",
-    "semantic_hash": ""
+    "semantic_hash": "77948f63c58287cc9e5156d0b332840b"
   },
   "frontend/src/app/pages/public/libro-reclamaciones/libro-reclamaciones.html": {
-    "mtime": 1793576139.4656928,
-    "seen": 1793651809.5734715,
-    "ast_hash": "c459752c064fe49470d58c4547995d18",
-    "semantic_hash": ""
+    "mtime": 1795406662.6720855,
+    "seen": 1795409434.7335608,
+    "ast_hash": "5c06a4454f38834b2dd49f623b0bba5b",
+    "semantic_hash": "5c06a4454f38834b2dd49f623b0bba5b"
   },
   "backend/src/main/java/com/brinda/api/shared/security/BodySizeLimitFilter.java": {
     "mtime": 1794786857.6572561,
@@ -1855,9 +1855,9 @@
   },
   "SECURITY-REPORT.md": {
     "mtime": 1793651608.337008,
-    "seen": 1793651809.5734468,
+    "seen": 1795409434.7335193,
     "ast_hash": "7447885786ff6f5608bb34a08a682164",
-    "semantic_hash": ""
+    "semantic_hash": "7447885786ff6f5608bb34a08a682164"
   },
   "backend/src/main/java/com/brinda/api/order/controller/SalesReportController.java": {
     "mtime": 1794773458.9106598,
@@ -2041,57 +2041,57 @@
   },
   "frontend/src/app/admin/categorias/categorias.html": {
     "mtime": 1794787061.4999137,
-    "seen": 1794787724.1465006,
+    "seen": 1795409434.7335324,
     "ast_hash": "d27492d22e39903c8919a1d4d3cccc0c",
-    "semantic_hash": ""
+    "semantic_hash": "d27492d22e39903c8919a1d4d3cccc0c"
   },
   "frontend/src/app/admin/pedidos/pedido-detalle.html": {
     "mtime": 1794771904.3384466,
-    "seen": 1794787724.146503,
+    "seen": 1795409434.7335339,
     "ast_hash": "6f705408cdf25dff711a18484f83a1bc",
-    "semantic_hash": ""
+    "semantic_hash": "6f705408cdf25dff711a18484f83a1bc"
   },
   "frontend/src/app/admin/pedidos/pedidos-lista.html": {
     "mtime": 1794771904.3384466,
-    "seen": 1794787724.1465304,
+    "seen": 1795409434.7335358,
     "ast_hash": "83943b9a628c83aaad18f6c70bf11b49",
-    "semantic_hash": ""
+    "semantic_hash": "83943b9a628c83aaad18f6c70bf11b49"
   },
   "frontend/src/app/admin/productos/combo-nuevo.html": {
     "mtime": 1794787202.929653,
-    "seen": 1794787724.146532,
+    "seen": 1795409434.7335372,
     "ast_hash": "02f3178e9c97dc4bb3b7a295d1626840",
-    "semantic_hash": ""
+    "semantic_hash": "02f3178e9c97dc4bb3b7a295d1626840"
   },
   "frontend/src/app/admin/productos/producto-form.html": {
     "mtime": 1794787000.201818,
-    "seen": 1794787724.1465342,
+    "seen": 1795409434.733539,
     "ast_hash": "2ddbdc91e58f8fdfdef455df1efcdbdd",
-    "semantic_hash": ""
+    "semantic_hash": "2ddbdc91e58f8fdfdef455df1efcdbdd"
   },
   "frontend/src/app/admin/productos/productos-lista.html": {
     "mtime": 1794787062.5280867,
-    "seen": 1794787724.1465356,
+    "seen": 1795409434.7335408,
     "ast_hash": "ee1b54a7f7e6561e2bff4754f0cc0e6e",
-    "semantic_hash": ""
+    "semantic_hash": "ee1b54a7f7e6561e2bff4754f0cc0e6e"
   },
   "frontend/src/app/admin/ventas/ventas.html": {
     "mtime": 1794773545.7466512,
-    "seen": 1794787724.1469038,
+    "seen": 1795409434.7335458,
     "ast_hash": "2a1832abffb84df433fd64fc686c4250",
-    "semantic_hash": ""
+    "semantic_hash": "2a1832abffb84df433fd64fc686c4250"
   },
   "frontend/src/app/admin/zonas/zonas.html": {
     "mtime": 1794773042.4792876,
-    "seen": 1794787724.146906,
+    "seen": 1795409434.7335474,
     "ast_hash": "13f995fa18b542079b880afaac6b7701",
-    "semantic_hash": ""
+    "semantic_hash": "13f995fa18b542079b880afaac6b7701"
   },
   "frontend/src/app/pages/public/pedido/pedido-creado.html": {
-    "mtime": 1794786921.0607078,
-    "seen": 1794787724.1476257,
-    "ast_hash": "bc4f79c61cbc0c6e65423d0b66e8ae99",
-    "semantic_hash": ""
+    "mtime": 1795407040.9492612,
+    "seen": 1795409434.7335625,
+    "ast_hash": "bce1c195a3396fa2f71e4da58238db85",
+    "semantic_hash": "bce1c195a3396fa2f71e4da58238db85"
   },
   "backend/src/test/java/com/brinda/api/order/service/WhatsAppMessageBuilderTest.java": {
     "mtime": 1795406924.1795812,
@@ -2158,5 +2158,11 @@
     "seen": 1795408755.6457705,
     "ast_hash": "97d5bff93e5aa1816bd8daeba7d79add",
     "semantic_hash": "97d5bff93e5aa1816bd8daeba7d79add"
+  },
+  "frontend/src/app/pages/public/libro-reclamaciones/complaint-form.html": {
+    "mtime": 1795407568.4266622,
+    "seen": 1795409434.7335594,
+    "ast_hash": "0a23bb7fc548cf26322a6bb775249387",
+    "semantic_hash": "0a23bb7fc548cf26322a6bb775249387"
   }
 }
