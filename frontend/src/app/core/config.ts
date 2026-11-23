@@ -75,7 +75,8 @@ export const LEGAL = {
   provider: {
     name: 'BRINDA PERU SAC',
     ruc: '20616579607',
-    address: 'Av. Alfredo Benavides 707, 1403, Miraflores',
+    /** Literal de la hoja oficial (txtDomicilio). */
+    address: 'AV ALFREDO BENAVIDES 707. 1403, MIRAFLORES',
   },
   alcoholWarning: 'TOMAR BEBIDAS ALCOHÓLICAS EN EXCESO ES DAÑINO',
   minorsNotice:
@@ -85,6 +86,15 @@ export const LEGAL = {
     logo: 'legal/logo-libro-reclamaciones.png',
     sheetPdf: 'legal/hoja-reclamacion.pdf',
     responseDays: 15,
+    /** Tipo de hoja tal como figura en la plantilla (txtTipoHoja). */
+    sheetType: 'HOJA DE RECLAMACIÓN VIRTUAL',
+    /** Días que vale el enlace de la copia; igual que `ComplaintService` del backend. */
+    copyDays: 30,
+    /** Firma del consumidor: el mecanismo lo define la asesora. Solo se muestra en desarrollo. */
+    signature: PENDING,
+    /** Lo que la asesora debe confirmar antes de publicar la ruta (aviso solo en desarrollo). */
+    beforeProduction:
+      'Esta ruta no puede salir a producción hasta que la asesora confirme: correo, conservación de al menos 2 años, firma, validez de la copia digital y feriados en el plazo.',
     definitions: [
       { term: 'Reclamo', text: 'Disconformidad relacionada a los productos o servicios.' },
       {

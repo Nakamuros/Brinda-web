@@ -19,20 +19,17 @@
       <dt>Domicilio</dt>
       <dd>{{ provider.address }}</dd>
     </div>
+    <div>
+      <dt>Tipo de hoja</dt>
+      <dd>{{ claims.sheetType }}</dd>
+    </div>
   </dl>
 
   @if (showPending) {
-    <p class="dev" role="note">Formulario pendiente de implementar. Esta ruta no puede salir a producción sin él.</p>
+    <p class="dev" role="note">{{ claims.beforeProduction }}</p>
   }
 
-  <dl class="defs">
-    @for (d of claims.definitions; track d.term; let i = $index) {
-      <div>
-        <dt>{{ d.term }}<sup>{{ i + 1 }}</sup></dt>
-        <dd>{{ d.text }}</dd>
-      </div>
-    }
-  </dl>
+  <app-complaint-form />
 
   <ul class="notes">
     @for (n of claims.notes; track n) {

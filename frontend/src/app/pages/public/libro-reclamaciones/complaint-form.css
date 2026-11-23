@@ -1,0 +1,163 @@
+/* Base de formulario compartida con el checkout (pedido.css); aquí solo lo propio de la hoja. */
+:host {
+  display: block;
+}
+.form {
+  gap: var(--space-7);
+}
+.sub {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.label {
+  padding: 0;
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.id-doc {
+  display: grid;
+  gap: var(--space-5);
+}
+.choice sup {
+  margin-left: 0.15em;
+  font-size: 0.7em;
+  color: var(--brass);
+}
+.choice:has(input:checked) sup {
+  color: inherit;
+}
+.defs {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.defs strong {
+  font-weight: 500;
+  color: var(--cream);
+}
+textarea.input {
+  min-height: 0;
+  resize: vertical;
+  line-height: 1.5;
+}
+.money {
+  position: relative;
+  display: block;
+}
+.money .input {
+  padding-left: 2.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.prefix {
+  position: absolute;
+  top: 50%;
+  left: var(--space-4);
+  translate: 0 -50%;
+  color: var(--brass);
+  pointer-events: none;
+}
+/* Honeypot: fuera de la pantalla, no con display:none (algunos bots lo detectan). */
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.send {
+  justify-self: stretch;
+  min-height: 3.25rem;
+}
+.dev {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--step--1);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--text-soft);
+}
+
+/* Confirmación */
+.done {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-5);
+  background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  animation: rise 0.5s var(--ease-out) both;
+}
+.done-title {
+  font-size: var(--step-2);
+  font-weight: 400;
+  line-height: 1.2;
+}
+.done-title:focus {
+  outline: none;
+}
+.done-title:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+}
+.done-data {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-7);
+  margin: 0;
+}
+.done-data dt {
+  font-size: var(--step--1);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+.done-data dd {
+  margin: var(--space-1) 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.code {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.download {
+  justify-self: start;
+  gap: var(--space-3);
+  min-height: 3rem;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .done {
+    animation: none;
+  }
+}
+@media (min-width: 48rem) {
+  .id-doc {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    align-items: start;
+  }
+  .send {
+    justify-self: start;
+    min-width: 18rem;
+  }
+  .done {
+    padding: var(--space-7);
+  }
+}

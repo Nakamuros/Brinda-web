@@ -1,0 +1,315 @@
+@if (created(); as c) {
+  <section class="done" aria-labelledby="claim-done-title">
+    <h2 id="claim-done-title" class="done-title" tabindex="-1">Tu reclamo quedó registrado</h2>
+    <dl class="done-data">
+      <div>
+        <dt>N°</dt>
+        <dd class="code">{{ c.code }}</dd>
+      </div>
+      <div>
+        <dt>Fecha</dt>
+        <dd>{{ c.date }}</dd>
+      </div>
+    </dl>
+    <a class="btn btn-ghost download" [href]="c.copyUrl" download>
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14" />
+      </svg>
+      Descargar mi copia en PDF
+    </a>
+    <p class="note">
+      Guarda tu copia ahora: este enlace solo se muestra una vez y vence en
+      {{ sheet.copyDays }} días.
+    </p>
+    @if (showPending) {
+      <p class="dev" role="note">
+        Desarrollo: el correo con la copia aún no se envía (NoopEmailSender); queda pendiente en
+        el panel.
+      </p>
+    }
+  </section>
+} @else {
+  <form class="form" [formGroup]="form" novalidate (ngSubmit)="submit()">
+    <fieldset class="group">
+      <legend class="legend">1. Identificación del consumidor reclamante</legend>
+      <div class="stack">
+        <app-field label="Nombre" controlId="consumerName" [error]="error('consumerName')">
+          <input
+            id="consumerName"
+            class="input"
+            formControlName="consumerName"
+            autocomplete="name"
+            [maxlength]="limits.consumerName"
+            [attr.aria-invalid]="invalid('consumerName')"
+            [attr.aria-describedby]="invalid('consumerName') ? 'consumerName-msg' : null"
+          />
+        </app-field>
+
+        <div class="id-doc">
+          <fieldset class="sub">
+            <legend class="label">DNI / CE</legend>
+            <div class="choices">
+              <label class="choice">
+                <input type="radio" formControlName="documentType" value="DNI" />
+                <span>DNI</span>
+              </label>
+              <label class="choice">
+                <input type="radio" formControlName="documentType" value="CE" />
+                <span>CE</span>
+              </label>
+            </div>
+            @if (error('documentType'); as e) {
+              <p id="documentType-msg" class="msg" role="alert">{{ e }}</p>
+            }
+          </fieldset>
+          <app-field
+            label="Número de documento"
+            controlId="documentNumber"
+            [error]="error('documentNumber')"
+            [hint]="
+              form.controls.documentType.value === 'CE'
+                ? 'De 8 a 12 letras o números.'
+                : '8 dígitos.'
+            "
+          >
+            <input
+              id="documentNumber"
+              class="input"
+              formControlName="documentNumber"
+              autocomplete="off"
+              [attr.inputmode]="form.controls.documentType.value === 'CE' ? null : 'numeric'"
+              [maxlength]="form.controls.documentType.value === 'CE' ? 12 : 8"
+              [attr.aria-invalid]="invalid('documentNumber')"
+              aria-describedby="documentNumber-msg"
+              (input)="cleanDocument($event)"
+            />
+          </app-field>
+        </div>
+
+        <app-field label="Domicilio" controlId="address" [error]="error('address')">
+          <input
+            id="address"
+            class="input"
+            formControlName="address"
+            autocomplete="street-address"
+            [maxlength]="limits.address"
+            [attr.aria-invalid]="invalid('address')"
+            [attr.aria-describedby]="invalid('address') ? 'address-msg' : null"
+          />
+        </app-field>
+
+        <div class="grid2">
+          <app-field label="Teléfono" controlId="phone" [error]="error('phone')">
+            <input
+              id="phone"
+              class="input"
+              formControlName="phone"
+              type="tel"
+              autocomplete="tel"
+              maxlength="20"
+              [attr.aria-invalid]="invalid('phone')"
+              [attr.aria-describedby]="invalid('phone') ? 'phone-msg' : null"
+            />
+          </app-field>
+          <app-field label="E-mail" controlId="email" [error]="error('email')">
+            <input
+              id="email"
+              class="input"
+              formControlName="email"
+              type="email"
+              autocomplete="email"
+              [maxlength]="limits.email"
+              [attr.aria-invalid]="invalid('email')"
+              [attr.aria-describedby]="invalid('email') ? 'email-msg' : null"
+            />
+          </app-field>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" formControlName="minor" aria-controls="guardian" />
+          <span>Si es menor de edad</span>
+        </label>
+        @if (isMinor()) {
+          <div id="guardian">
+            <app-field
+              label="Nombre del padre, madre o apoderado"
+              controlId="guardianName"
+              [error]="error('guardianName')"
+            >
+              <input
+                id="guardianName"
+                class="input"
+                formControlName="guardianName"
+                [maxlength]="limits.guardianName"
+                [attr.aria-invalid]="invalid('guardianName')"
+                [attr.aria-describedby]="invalid('guardianName') ? 'guardianName-msg' : null"
+              />
+            </app-field>
+          </div>
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend class="legend">2. Identificación del bien contratado</legend>
+      <div class="stack">
+        <fieldset class="sub">
+          <legend class="sr-only">Producto o servicio</legend>
+          <div class="choices">
+            <label class="choice">
+              <input type="radio" formControlName="goodType" value="PRODUCT" />
+              <span>Producto</span>
+            </label>
+            <label class="choice">
+              <input type="radio" formControlName="goodType" value="SERVICE" />
+              <span>Servicio</span>
+            </label>
+          </div>
+          @if (error('goodType'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+        </fieldset>
+        <app-field
+          label="Monto reclamado"
+          controlId="claimedAmount"
+          [optional]="true"
+          [error]="error('claimedAmount')"
+          hint="En soles, por ejemplo 45.50."
+        >
+          <span class="money">
+            <span class="prefix" aria-hidden="true">S/</span>
+            <input
+              id="claimedAmount"
+              class="input"
+              formControlName="claimedAmount"
+              inputmode="decimal"
+              autocomplete="off"
+              maxlength="11"
+              [attr.aria-invalid]="invalid('claimedAmount')"
+              aria-describedby="claimedAmount-msg"
+            />
+          </span>
+        </app-field>
+        <app-field
+          label="Descripción"
+          controlId="goodDescription"
+          [error]="error('goodDescription')"
+          [hint]="count('goodDescription')"
+        >
+          <textarea
+            id="goodDescription"
+            class="input"
+            rows="2"
+            formControlName="goodDescription"
+            [maxlength]="limits.goodDescription"
+            [attr.aria-invalid]="invalid('goodDescription')"
+            aria-describedby="goodDescription-msg"
+          ></textarea>
+        </app-field>
+      </div>
+    </fieldset>
+
+    <fieldset class="group">
+      <legend class="legend">3. Detalle de la reclamación y pedido del consumidor</legend>
+      <div class="stack">
+        <fieldset class="sub">
+          <legend class="sr-only">Reclamo o queja</legend>
+          <div class="choices">
+            <label class="choice">
+              <input type="radio" formControlName="complaintType" value="CLAIM" />
+              <span>Reclamo<sup aria-hidden="true">1</sup></span>
+            </label>
+            <label class="choice">
+              <input type="radio" formControlName="complaintType" value="COMPLAINT" />
+              <span>Queja<sup aria-hidden="true">2</sup></span>
+            </label>
+          </div>
+          @if (error('complaintType'); as e) {
+            <p class="msg" role="alert">{{ e }}</p>
+          }
+          <ol class="defs">
+            @for (d of sheet.definitions; track d.term) {
+              <li>
+                <strong>{{ d.term }}:</strong> {{ d.text }}
+              </li>
+            }
+          </ol>
+        </fieldset>
+        <app-field
+          label="Detalle"
+          controlId="detail"
+          [error]="error('detail')"
+          [hint]="count('detail')"
+        >
+          <textarea
+            id="detail"
+            class="input"
+            rows="6"
+            formControlName="detail"
+            [maxlength]="limits.detail"
+            [attr.aria-invalid]="invalid('detail')"
+            aria-describedby="detail-msg"
+          ></textarea>
+        </app-field>
+        <app-field
+          label="Pedido"
+          controlId="consumerRequest"
+          [error]="error('consumerRequest')"
+          [hint]="count('consumerRequest')"
+        >
+          <textarea
+            id="consumerRequest"
+            class="input"
+            rows="4"
+            formControlName="consumerRequest"
+            [maxlength]="limits.consumerRequest"
+            [attr.aria-invalid]="invalid('consumerRequest')"
+            aria-describedby="consumerRequest-msg"
+          ></textarea>
+        </app-field>
+        @if (showPending) {
+          <p class="dev" role="note">Firma del consumidor: {{ sheet.signature }}</p>
+        }
+      </div>
+    </fieldset>
+
+    <!-- Honeypot: fuera de la vista, del orden de tabulación, del autocompletado y de los lectores. -->
+    <div class="hp" aria-hidden="true">
+      <label for="website">Website</label>
+      <input id="website" name="website" formControlName="website" autocomplete="off" tabindex="-1" />
+    </div>
+
+    <fieldset class="group">
+      <legend class="sr-only">Confirmación</legend>
+      <label class="check">
+        <input type="checkbox" formControlName="privacyAccepted" />
+        <span
+          >Acepto la
+          <a class="doc" routerLink="/privacidad" target="_blank" rel="noopener"
+            >política de privacidad<span class="sr-only"> (se abre en una pestaña nueva)</span></a
+          >.</span
+        >
+      </label>
+      @if (error('privacyAccepted'); as e) {
+        <p class="msg" role="alert">{{ e }}</p>
+      }
+    </fieldset>
+
+    @if (failure(); as f) {
+      <p class="alert" role="alert" tabindex="-1">{{ f }}</p>
+    }
+    <button type="submit" class="btn btn-ghost send" [disabled]="sending()">
+      {{ sending() ? 'Enviando…' : 'Enviar hoja de reclamación' }}
+    </button>
+  </form>
+}
