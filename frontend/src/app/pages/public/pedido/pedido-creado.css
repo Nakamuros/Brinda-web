@@ -81,3 +81,115 @@
     justify-self: start;
   }
 }
+
+/* Cabecera compacta: el paso pendiente debe verse sin scroll a 360 px */
+.head:has(.code) {
+  padding-block: var(--space-6) var(--space-4);
+}
+.head .code {
+  font-size: var(--step-3);
+}
+
+/* Paso pendiente: enviar el pedido por WhatsApp */
+.pending {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-deep) 70%, transparent);
+  border: 1px solid var(--whatsapp);
+  border-radius: var(--radius-lg);
+  animation: pending-in 0.6s var(--ease-out) both;
+}
+.pending-eyebrow {
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--whatsapp);
+}
+.pending-title {
+  font-size: var(--step-2);
+  font-weight: 400;
+  line-height: 1.15;
+}
+.pending-text {
+  line-height: 1.5;
+}
+.pending-code {
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.pending-note {
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--text-soft);
+}
+.saved {
+  margin-bottom: var(--space-6);
+}
+
+/* Única excepción a "burdeos = pedir" (DESIGN.md): verde de WhatsApp con texto --bg (7.6:1) */
+.btn-whatsapp {
+  position: relative;
+  min-height: 3.25rem;
+  margin-top: var(--space-2);
+  padding-inline: var(--space-5);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  background: var(--whatsapp);
+  border-color: var(--whatsapp);
+  color: var(--on-whatsapp);
+}
+.btn-whatsapp:hover {
+  background: var(--whatsapp-hover);
+  border-color: var(--whatsapp-hover);
+  transform: translateY(-2px);
+}
+.btn-whatsapp:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+/* Aviso suave: un halo que crece y se apaga dos veces (solo transform y opacity) */
+.btn-whatsapp::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--whatsapp);
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  animation: pending-halo 1.8s var(--ease-out) 0.8s 2;
+}
+
+@keyframes pending-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes pending-halo {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08, 1.35);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pending,
+  .btn-whatsapp::after {
+    animation: none;
+  }
+  .btn-whatsapp:hover {
+    transform: none;
+  }
+}
+@media (min-width: 48rem) {
+  .pending {
+    padding: var(--space-6);
+  }
+}

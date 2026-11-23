@@ -2446,7 +2446,7 @@
                   "pm.test('Combo a su precio', () => pm.expect(cents(j.items[2].subtotal)).to.eql(combo));",
                   "pm.test('Total = subtotal + tarifa, calculado en el servidor', () => { pm.expect(cents(j.subtotal)).to.eql(whisky + pisco + combo); pm.expect(cents(j.deliveryFee)).to.eql(fee); pm.expect(cents(j.total)).to.eql(whisky + pisco + combo + fee); });",
                   "const url = decodeURIComponent(j.whatsappUrl || '');",
-                  "pm.test('WhatsApp: lista el contenido del combo y no lleva el DNI', () => { pm.expect(url).to.include('wa.me'); pm.expect(url).to.include('incluye:'); pm.expect(url).to.not.include('12345678'); });",
+                  "pm.test('WhatsApp: mensaje corto (código, total y pago) sin datos personales', () => { pm.expect(url).to.include('wa.me'); pm.expect(url).to.include('Pedido BRINDA ' + j.code); pm.expect(url).to.include('Total: S/ ' + Number(j.total).toFixed(2)); pm.expect(url).to.include('Pago: '); ['12345678', 'Ana', 'Pérez', '987654321', 'Larco', 'incluye:'].forEach(x => pm.expect(url).to.not.include(x)); });",
                   "s('codeA', j.code);"
                 ]
               }

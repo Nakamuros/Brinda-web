@@ -3,7 +3,6 @@
     @if (order()?.code ?? savedCode(); as code) {
       <p class="eyebrow">Pedido registrado</p>
       <h1 id="done-title" class="title code">{{ code }}</h1>
-      <p class="lead">Este es el código de tu pedido.</p>
     } @else {
       <h1 id="done-title" class="title">Tu <span class="accent">pedido</span></h1>
     }
@@ -14,41 +13,12 @@
   @if (order(); as o) {
     <div class="layout">
       <section class="next" aria-label="Siguiente paso">
+        <ng-container [ngTemplateOutlet]="sendStep" [ngTemplateOutletContext]="{ $implicit: o.code }" />
+
         <p class="deadline" role="note">
           Tu pedido se mantiene <strong>{{ minutes }} minutos</strong>: si no se confirma antes de
           las {{ expiresAt() }}, vence.
         </p>
-
-        @if (whatsappUrl(); as url) {
-          <a class="btn btn-cta send" [href]="url" target="_blank" rel="noopener noreferrer">
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M21 3 10.5 13.5M21 3l-6.5 18-4-7.5L3 9.5 21 3z" />
-            </svg>
-            Enviar por WhatsApp
-          </a>
-          <p class="note">
-            Se abre el chat con el mensaje de tu pedido listo. Pagas cuando lo confirmemos por
-            WhatsApp.
-          </p>
-        } @else {
-          <div class="unavailable" role="status">
-            <p class="un-title">El envío por WhatsApp aún no está disponible</p>
-            <p>
-              Tu pedido quedó registrado con el código <strong>{{ o.code }}</strong>, pero todavía
-              no hay un número de WhatsApp configurado para recibirlo. Guarda tu código.
-            </p>
-          </div>
-        }
 
         <dl class="pay">
           <div>
@@ -98,7 +68,10 @@
         <app-legal-notice kind="minors" />
       </aside>
     </div>
-  } @else if (savedCode()) {
+  } @else if (savedCode(); as code) {
+    <div class="saved">
+      <ng-container [ngTemplateOutlet]="sendStep" [ngTemplateOutletContext]="{ $implicit: code }" />
+    </div>
     <app-state-panel
       title="Guarda tu código"
       text="Lo recordaremos en este navegador durante una hora y media. El detalle del pedido ya no se muestra aquí por tu privacidad."
@@ -114,3 +87,45 @@
     </app-state-panel>
   }
 </div>
+
+<!-- Paso pendiente: lo primero que se ve. Sin enviar el mensaje, el pedido no avanza. -->
+<ng-template #sendStep let-code>
+  @if (whatsappUrl(); as url) {
+    <section class="pending" aria-labelledby="pending-title">
+      <p class="pending-eyebrow">Falta un paso</p>
+      <h2 id="pending-title" class="pending-title">Envía tu pedido por WhatsApp</h2>
+      <p class="pending-text">
+        Tu pedido <strong class="pending-code">{{ code }}</strong> no avanza hasta que nos llegue tu
+        mensaje.
+      </p>
+      <a class="btn btn-whatsapp send" [href]="url" target="_blank" rel="noopener noreferrer">
+        <svg
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z" />
+        </svg>
+        Enviar por WhatsApp
+      </a>
+      <p class="pending-note">
+        No cierres esta página hasta enviarlo. El mensaje lleva tu código, el total y cómo pagarás;
+        pagas cuando lo confirmemos por WhatsApp.
+      </p>
+    </section>
+  } @else {
+    <div class="unavailable" role="status">
+      <p class="un-title">El envío por WhatsApp aún no está disponible</p>
+      <p>
+        Tu pedido quedó registrado con el código <strong>{{ code }}</strong>, pero todavía no hay
+        un número de WhatsApp configurado para recibirlo. Guarda tu código.
+      </p>
+    </div>
+  }
+</ng-template>

@@ -17,7 +17,12 @@ const ORDER: CreatedOrder = {
   whatsappUrl: 'https://wa.me/51999999999?text=Pedido%20EQ12',
 };
 
-function render(order: CreatedOrder | null, codigo = 'EQ12', recent = '') {
+function render(
+  order: CreatedOrder | null,
+  codigo = 'EQ12',
+  recent = '',
+  recentUrl: string | null = null,
+) {
   TestBed.resetTestingModule();
   TestBed.configureTestingModule({
     imports: [PedidoCreado],
@@ -30,7 +35,9 @@ function render(order: CreatedOrder | null, codigo = 'EQ12', recent = '') {
     ],
   });
   TestBed.inject(OrderService).last.set(order);
-  TestBed.inject(OrderService).recent.set(recent ? { code: recent, at: Date.now() } : null);
+  TestBed.inject(OrderService).recent.set(
+    recent ? { code: recent, at: Date.now(), whatsappUrl: recentUrl } : null,
+  );
   const fixture = TestBed.createComponent(PedidoCreado);
   fixture.detectChanges();
   return fixture.nativeElement as HTMLElement;
@@ -53,6 +60,18 @@ describe('PedidoCreado (/pedido/:codigo)', () => {
     expect(el.querySelector('.unavailable')).toBeNull();
   });
 
+  it('el paso pendiente va primero: "Falta un paso", el código y el botón verde', () => {
+    const el = render(ORDER);
+    const pending = el.querySelector('.next > *') as HTMLElement;
+    expect(pending.classList).toContain('pending');
+    expect(pending.textContent).toContain('Falta un paso');
+    expect(pending.textContent).toContain('EQ12');
+    expect(pending.textContent).toContain('no avanza');
+    expect(pending.textContent).toContain('No cierres esta página');
+    expect(pending.querySelector('a.btn-whatsapp')).not.toBeNull();
+    expect(pending.querySelector('a.btn-cta')).toBeNull();
+  });
+
   it('sin WhatsApp configurado no hay botón: aviso honesto con el código', () => {
     const el = render({ ...ORDER, whatsappUrl: null });
     expect(el.querySelector('a.send')).toBeNull();
@@ -65,12 +84,22 @@ describe('PedidoCreado (/pedido/:codigo)', () => {
     expect(el.querySelector('a.send')).toBeNull();
   });
 
-  it('tras recargar conserva solo el código recordado, sin detalle ni WhatsApp', () => {
+  it('tras recargar recupera el enlace de WhatsApp recordado (sin datos personales)', () => {
+    const el = render(null, 'EQ12', 'EQ12', ORDER.whatsappUrl);
+    expect(el.querySelector('.pending')?.textContent).toContain('Falta un paso');
+    expect((el.querySelector('a.send') as HTMLAnchorElement).getAttribute('href')).toBe(
+      ORDER.whatsappUrl,
+    );
+    expect(el.querySelector('.summary')).toBeNull();
+  });
+
+  it('tras recargar sin enlace recordado conserva solo el código', () => {
     const el = render(null, 'EQ12', 'EQ12');
     expect(el.querySelector('h1')?.textContent).toContain('EQ12');
     expect(el.textContent).toContain('Guarda tu código');
     expect(el.querySelector('.summary')).toBeNull();
     expect(el.querySelector('a.send')).toBeNull();
+    expect(el.querySelector('.unavailable')?.textContent).toContain('EQ12');
   });
 
   it('sin pedido en memoria ni código recordado (u otro código) no muestra datos', () => {

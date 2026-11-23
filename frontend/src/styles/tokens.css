@@ -9,6 +9,10 @@
   --promo: #ca5a4e;
   --teal: #00585e;
   --stone: #7d7267;
+  /* Única excepción a "burdeos = pedir": el botón "Enviar por WhatsApp" de /pedido/:codigo (DESIGN.md).
+     Texto --bg sobre este verde: 7.6:1. El blanco no cumple (2:1). */
+  --whatsapp: #25d366;
+  --on-whatsapp: var(--bg);
 
   /* Derivados (sin hex nuevos) */
   --line: color-mix(in srgb, var(--brass) 55%, transparent);
@@ -16,6 +20,7 @@
   --text-soft: color-mix(in srgb, var(--cream) 84%, var(--bg));
   --bg-deep: color-mix(in srgb, var(--bg) 78%, black);
   --cta-hover: color-mix(in srgb, var(--cta) 88%, var(--cream));
+  --whatsapp-hover: color-mix(in srgb, var(--whatsapp) 82%, var(--cream));
 
   --font-display: 'Libre Baskerville', 'Baskerville', Georgia, serif;
   --font-accent: 'Limelight', var(--font-display);

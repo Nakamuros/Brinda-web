@@ -48,10 +48,20 @@ const RECENT_KEY = 'brinda.order.v1';
 /** Tiempo que el código del último pedido se recuerda en el navegador. */
 const RECENT_MS = 90 * 60 * 1000;
 
-/** Lo único que se guarda del pedido en el navegador: su código y cuándo se creó. Sin datos personales. */
+/**
+ * Lo único que se guarda del pedido en el navegador: código, cuándo se creó y el enlace de WhatsApp.
+ * Sin datos personales: el mensaje del servidor solo lleva código, total y método de pago.
+ */
 export interface RecentOrder {
   code: string;
   at: number;
+  /** null si el WhatsApp no está configurado en el servidor. */
+  whatsappUrl: string | null;
+}
+
+/** Solo enlaces wa.me del servidor. */
+export function safeWhatsappUrl(url: unknown): string | null {
+  return typeof url === 'string' && url.startsWith('https://wa.me/') && url.length <= 600 ? url : null;
 }
 
 function readRecent(): RecentOrder | null {
@@ -62,15 +72,15 @@ function readRecent(): RecentOrder | null {
       /^[A-Z]{2}\d{2,4}$/.test(r.code) &&
       typeof r.at === 'number' &&
       Date.now() - r.at < RECENT_MS;
-    return fresh ? { code: r.code, at: r.at } : null;
+    return fresh ? { code: r.code, at: r.at, whatsappUrl: safeWhatsappUrl(r.whatsappUrl) } : null;
   } catch {
     return null;
   }
 }
 
 /**
- * Crea el pedido. El detalle vive solo en memoria (su enlace de WhatsApp lleva datos personales);
- * el código se recuerda 1 h 30 min en el navegador para que el cliente no lo pierda al recargar o cerrar.
+ * Crea el pedido. El detalle vive solo en memoria; el código y el enlace de WhatsApp (sin datos
+ * personales) se recuerdan 1 h 30 min para que el cliente pueda enviarlo aunque recargue o cierre.
  */
 @Injectable({ providedIn: 'root' })
 export class OrderService {
@@ -82,7 +92,11 @@ export class OrderService {
   async create(request: CreateOrderRequest): Promise<CreatedOrder> {
     const order = await firstValueFrom(this.http.post<CreatedOrder>(`${API_URL}/orders`, request));
     this.last.set(order);
-    const recent: RecentOrder = { code: order.code, at: Date.now() };
+    const recent: RecentOrder = {
+      code: order.code,
+      at: Date.now(),
+      whatsappUrl: safeWhatsappUrl(order.whatsappUrl),
+    };
     this.recent.set(recent);
     try {
       localStorage.setItem(RECENT_KEY, JSON.stringify(recent));

@@ -27,6 +27,8 @@ Cuerpo de `POST /api/v1/orders` (el servidor ignora cualquier precio/total envia
 ```
 `dni` **obligatorio siempre**, exactamente 8 dígitos (400 con `fields.dni` si falta o es inválido). La base lo exige además en todo pedido nuevo (V8).
 
+`whatsappUrl` (`https://wa.me/<número configurado>?text=…`, o `null` si no hay número) lleva un **mensaje corto sin datos personales**: `*Pedido BRINDA <código>*`, `Total: S/ <total>` y `Pago: Yape|Plin`. Ni productos, ni nombre, celular, dirección o DNI: el detalle lo ve la dueña en el panel. Por eso el navegador puede recordar el enlace junto al código (1 h 30 min).
+
 ### Libro de Reclamaciones (público)
 `POST /api/v1/complaints` guarda la Hoja de Reclamación (un campo por campo del PDF `public/legal/hoja-reclamacion.pdf`). **Sin pedido previo.** Responde `201`:
 ```json

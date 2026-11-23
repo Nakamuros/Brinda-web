@@ -204,8 +204,10 @@ describe('Pedido (checkout)', () => {
     const stored = JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage });
     expect(stored).not.toContain('12345678');
     expect(stored).not.toContain('987654321');
-    // Solo se recuerda el código (1 h 30 min).
-    expect(JSON.parse(localStorage.getItem('brinda.order.v1') ?? '{}').code).toBe('EQ12');
+    // Se recuerdan el código y el enlace de WhatsApp del servidor (sin datos personales, 1 h 30 min).
+    const recent = JSON.parse(localStorage.getItem('brinda.order.v1') ?? '{}');
+    expect(recent.code).toBe('EQ12');
+    expect(recent.whatsappUrl).toBe(CREATED.whatsappUrl);
   });
 
   it('429: pide esperar un minuto y conserva el carrito', async () => {
