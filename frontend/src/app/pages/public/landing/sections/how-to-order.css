@@ -52,9 +52,10 @@ h3 {
 }
 
 @media (min-width: 48rem) {
+  /* 4 pasos: 2×2 en tablet, una fila desde 64rem */
   .steps {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-7) var(--space-6);
   }
   .step {
     display: block;
@@ -68,5 +69,11 @@ h3 {
   }
   .step h3 {
     margin-bottom: var(--space-2);
+  }
+}
+@media (min-width: 64rem) {
+  .steps {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 72rem;
   }
 }

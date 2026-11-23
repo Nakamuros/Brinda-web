@@ -41,13 +41,22 @@ export const IMAGES = {
   introProduct: 'media/product-placeholder.svg',
 } as const;
 
+/** Minutos que un pedido espera confirmación; igual que la expiración del backend (`OrderProperties`). */
+export const ORDER = { expiryMinutes: 20 } as const;
+
+/** Cómo pedir: el paso 3 deja claro que sin el mensaje de WhatsApp el pedido no avanza. */
 export const HOW_TO_ORDER = [
   { title: 'Elige', text: 'Arma tu carrito desde el catálogo.' },
+  { title: 'Deja tus datos', text: 'Tu pedido recibe un código corto.' },
   {
-    title: 'Envía por WhatsApp',
-    text: 'Tu pedido recibe un código corto y se abre el chat con el mensaje listo.',
+    title: 'Envíalo por WhatsApp',
+    text: 'Pulsa «Enviar por WhatsApp». Sin ese mensaje, tu pedido no avanza.',
   },
-  { title: 'Paga con Yape o Plin', text: 'Confirmamos tu pago y salimos a tu dirección.' },
+  {
+    title: 'Paga con Yape o Plin',
+    // Misma redacción que el aviso de /pedido/:codigo; no promete reserva de stock.
+    text: `Verificamos tu pago y salimos a tu dirección. Tu pedido se mantiene ${ORDER.expiryMinutes} minutos: si no se confirma antes, vence.`,
+  },
 ] as const;
 
 /** Datos de contacto. whatsappNumber en formato internacional sin "+" (p. ej. 51XXXXXXXXX). */
@@ -60,9 +69,6 @@ export const CONTACT = {
   zones: '',
   hours: '',
 } as const;
-
-/** Minutos que un pedido espera confirmación; igual que la expiración del backend (`OrderProperties`). */
-export const ORDER = { expiryMinutes: 20 } as const;
 
 /**
  * Datos legales. Proveedor y notas literales de la Hoja de Reclamación (public/legal/hoja-reclamacion.pdf).
