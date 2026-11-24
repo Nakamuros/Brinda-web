@@ -3,6 +3,12 @@
 > Registro de estado. Se actualiza al terminar cada tarea. Decisiones: `CONTEXTO-BRINDA.md` (secciones 18 y 19).
 > Para retomar: arranque local en `readme.md` y prompt de inicio en `PROMPT-INICIO-SESION.md`.
 
+## Edad en el checkout (2026-11-23)
+- **Pedido de Lucía:** en `/pedido` la casilla de edad pasa a dos opciones excluyentes, sin marcar de antemano: "Soy mayor de 18 años." / "No soy mayor de 18 años." (radios con el estilo `.check` de las casillas; sin CSS nuevo).
+- **Reglas:** "Sí" + términos + privacidad (y el resto válido) → se crea el pedido. "No" → aviso al momento ("Lo sentimos, solo vendemos a mayores de 18 años.") y "Finalizar compra" lleva al inicio sin crear el pedido; el carrito se conserva. Sin responder → "Indica si eres mayor de 18 años." y no se envía. **Decisión del usuario:** no se desactiva ni bloquea nada; solo mensaje y vuelta al inicio.
+- Backend sin cambios (`adultConfirmed` sigue exigiendo `true`). `scripts/pedido-real.mjs` marca ahora `#adult-yes`.
+- **Verificación:** 84 tests (+1), build sin avisos, Playwright a 360/768/1440 con la API simulada (aviso visible, botón activo, vuelve a `/`, sin POST, carrito intacto, sin scroll horizontal). No se corrió `pedido-real.mjs` contra el backend real.
+
 ## Resumen (2026-11-22)
 - **Libro de Reclamaciones, Etapa C hecha:** formulario público en `/libro-de-reclamaciones` (secciones 1–3 de la hoja, guarda y descarga la copia en PDF). **Sigue sin poder salir a producción** hasta que la asesora confirme correo, conservación ≥2 años, firma, validez de la copia digital y feriados.
 - **Landing:** "Cómo pedir" pasa a 4 pasos (el envío por WhatsApp es un paso propio).

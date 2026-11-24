@@ -30,12 +30,15 @@ const MESSAGES = {
   address: { required: 'Ingresa tu dirección.', maxlength: 'Máximo 255 caracteres.' },
   reference: { maxlength: 'Máximo 255 caracteres.' },
   paymentMethod: { required: 'Elige cómo pagarás.' },
-  adultConfirmed: { required: 'Debes confirmar que eres mayor de 18 años.' },
+  adultConfirmed: { required: 'Indica si eres mayor de 18 años.' },
   termsAccepted: { required: 'Debes aceptar los términos y condiciones.' },
   privacyAccepted: { required: 'Debes aceptar la política de privacidad.' },
 } as const;
 
 type FieldName = keyof typeof MESSAGES;
+
+/** Mismo texto que el control de edad de la entrada. */
+const MINOR = 'Lo sentimos, solo vendemos a mayores de 18 años.';
 
 @Component({
   selector: 'app-pedido',
@@ -68,7 +71,8 @@ export class Pedido {
     address: ['', [Validators.required, Validators.maxLength(255)]],
     reference: ['', Validators.maxLength(255)],
     paymentMethod: this.fb.control<'YAPE' | 'PLIN' | null>(null, Validators.required),
-    adultConfirmed: [false, Validators.requiredTrue],
+    // Sin marcar (null) o "No" (false) no pasan `requiredTrue`.
+    adultConfirmed: this.fb.control<boolean | null>(null, Validators.requiredTrue),
     termsAccepted: [false, Validators.requiredTrue],
     privacyAccepted: [false, Validators.requiredTrue],
   });
@@ -124,6 +128,9 @@ export class Pedido {
   protected error(name: FieldName): string {
     this.formEvent();
     const control = this.form.controls[name];
+    if (name === 'adultConfirmed' && control.value === false) {
+      return MINOR; // al momento, sin esperar a que se toque
+    }
     if (!control.touched || !control.errors) {
       return '';
     }
@@ -145,6 +152,11 @@ export class Pedido {
       return;
     }
     this.failure.set(null);
+    // Menor de edad: no se crea el pedido; vuelve al inicio (el carrito se conserva).
+    if (this.form.controls.adultConfirmed.value === false) {
+      await this.router.navigate(['/']);
+      return;
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.focusFirstInvalid();
@@ -164,6 +176,7 @@ export class Pedido {
         ...value,
         districtId: value.districtId,
         paymentMethod: value.paymentMethod,
+        adultConfirmed: true, // el formulario es válido: solo puede ser "Sí"
         items,
       });
       await this.router.navigate(['/pedido', order.code]);

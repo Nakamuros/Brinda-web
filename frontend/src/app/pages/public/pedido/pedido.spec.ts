@@ -82,7 +82,7 @@ function fill(el: HTMLElement) {
   type(el, 'address', 'Av. Larco 123');
   select(el, 'Barranco');
   el.querySelectorAll<HTMLInputElement>('input[type=radio], input[type=checkbox]').forEach((i) => {
-    if (i.value !== 'PLIN') {
+    if (i.value !== 'PLIN' && i.id !== 'adult-no') {
       i.click();
     }
   });
@@ -177,6 +177,24 @@ describe('Pedido (checkout)', () => {
     http.verify(); // sin POST /orders
     expect(el.querySelector('#dni-msg')?.textContent).toContain('Ingresa tu DNI.');
     expect(el.textContent).toContain('Debes aceptar los términos y condiciones.');
+    expect(el.textContent).toContain('Indica si eres mayor de 18 años.');
+  });
+
+  it('"No soy mayor de 18 años": avisa al momento y al finalizar vuelve al inicio sin pedir', async () => {
+    const { fixture, http, el } = await render();
+    const cart = TestBed.inject(CartService);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    fill(el);
+    (el.querySelector('#adult-no') as HTMLInputElement).click();
+    fixture.detectChanges();
+    expect(el.textContent).toContain('Lo sentimos, solo vendemos a mayores de 18 años.');
+    const finish = el.querySelector('.finish') as HTMLButtonElement;
+    expect(finish.disabled).toBe(false);
+    finish.click();
+    await fixture.whenStable();
+    http.verify(); // sin POST /orders
+    expect(navigate).toHaveBeenCalledWith(['/']);
+    expect(cart.itemCount()).toBe(2);
   });
 
   it('envía solo productId y cantidad; al crearse vacía el carrito y va a /pedido/:codigo', async () => {

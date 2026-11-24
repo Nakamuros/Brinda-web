@@ -83,7 +83,8 @@ async function fill(page) {
   await page.selectOption('#districtId', { label: near.name });
   await page.fill('#address', CLIENT.address);
   await page.locator('.choice', { hasText: 'Yape' }).click();
-  for (const id of ['adultConfirmed', 'termsAccepted', 'privacyAccepted']) {
+  await page.locator('#adult-yes').check();
+  for (const id of ['termsAccepted', 'privacyAccepted']) {
     await page.locator(`input[formControlName="${id}"]`).check();
   }
 }

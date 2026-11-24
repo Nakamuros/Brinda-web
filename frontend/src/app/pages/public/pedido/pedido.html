@@ -193,10 +193,17 @@
 
         <fieldset class="group">
           <legend class="sr-only">Confirmaciones</legend>
-          <label class="check">
-            <input type="checkbox" formControlName="adultConfirmed" />
-            <span>Soy mayor de 18 años.</span>
-          </label>
+          <fieldset class="group">
+            <legend class="sr-only">Mayoría de edad</legend>
+            <label class="check">
+              <input id="adult-yes" type="radio" formControlName="adultConfirmed" [value]="true" />
+              <span>Soy mayor de 18 años.</span>
+            </label>
+            <label class="check">
+              <input id="adult-no" type="radio" formControlName="adultConfirmed" [value]="false" />
+              <span>No soy mayor de 18 años.</span>
+            </label>
+          </fieldset>
           @if (error('adultConfirmed'); as e) {
             <p class="msg" role="alert">{{ e }}</p>
           }
