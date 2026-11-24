@@ -1074,10 +1074,10 @@
     "semantic_hash": "f50848209d7c7cae7d6d857d94ee4e8c"
   },
   "avances.md": {
-    "mtime": 1795408765.4098735,
-    "seen": 1795409434.7335207,
-    "ast_hash": "b4e34815c2ab149122cd6959daa77c31",
-    "semantic_hash": "b4e34815c2ab149122cd6959daa77c31"
+    "mtime": 1795480371.737581,
+    "seen": 1795480658.0700357,
+    "ast_hash": "7e202d4eb0acf0ac55181bf3a7f2f2c5",
+    "semantic_hash": "7e202d4eb0acf0ac55181bf3a7f2f2c5"
   },
   "backend/ENDPOINTS.md": {
     "mtime": 1795406945.121666,
@@ -1272,16 +1272,16 @@
     "semantic_hash": "d504b0445738b4afeb7d29222e8966ba"
   },
   "frontend/src/app/pages/public/pedido/pedido.spec.ts": {
-    "mtime": 1795407069.7347164,
-    "seen": 1795408755.6457603,
-    "ast_hash": "7b62d19a0b41c1359005e4b01e15b834",
-    "semantic_hash": "7b62d19a0b41c1359005e4b01e15b834"
+    "mtime": 1795480202.2501445,
+    "seen": 1795480658.069974,
+    "ast_hash": "308f4f6c3596e459d5654247ad2faafe",
+    "semantic_hash": "308f4f6c3596e459d5654247ad2faafe"
   },
   "frontend/src/app/pages/public/pedido/pedido.ts": {
-    "mtime": 1794769217.0586083,
-    "seen": 1795408755.6457617,
-    "ast_hash": "aefae34328631bc4c30865829f80125e",
-    "semantic_hash": "aefae34328631bc4c30865829f80125e"
+    "mtime": 1795480184.074276,
+    "seen": 1795480658.0699759,
+    "ast_hash": "671ba7a7797f8513e8cfd0eea6e05675",
+    "semantic_hash": "671ba7a7797f8513e8cfd0eea6e05675"
   },
   "frontend/src/app/services/cart.service.spec.ts": {
     "mtime": 1793040208.4708364,
@@ -1386,10 +1386,10 @@
     "semantic_hash": "61ea465b3e6055bf6eda1507bbe6ba1a"
   },
   "frontend/src/app/pages/public/pedido/pedido.html": {
-    "mtime": 1794769217.0427809,
-    "seen": 1795409434.733564,
-    "ast_hash": "91a23ac928de9206fae888ba04f35e7e",
-    "semantic_hash": "91a23ac928de9206fae888ba04f35e7e"
+    "mtime": 1795480189.6930952,
+    "seen": 1795480658.0700376,
+    "ast_hash": "89f838857699fdbe670232768bdc0722",
+    "semantic_hash": "89f838857699fdbe670232768bdc0722"
   },
   "backend/src/main/java/com/brinda/api/complaint/controller/ComplaintAdminController.java": {
     "mtime": 1793576139.3873532,
@@ -1932,10 +1932,10 @@
     "semantic_hash": "c534761f18f40375b2aab7a8f9c4a2ff"
   },
   "frontend/scripts/pedido-real.mjs": {
-    "mtime": 1794771555.7769997,
-    "seen": 1795408755.6456387,
-    "ast_hash": "82cae3374a40477491f7067d11608d68",
-    "semantic_hash": "82cae3374a40477491f7067d11608d68"
+    "mtime": 1795480189.7315898,
+    "seen": 1795480658.0698442,
+    "ast_hash": "555af96e6cbd68f86ab32cb102f13155",
+    "semantic_hash": "555af96e6cbd68f86ab32cb102f13155"
   },
   "frontend/src/app/admin/categorias/categorias.ts": {
     "mtime": 1794787061.1047378,
