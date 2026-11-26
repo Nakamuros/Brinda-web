@@ -72,3 +72,16 @@ textarea.reason {
   background: var(--cream);
   color: var(--bg);
 }
+/* Delivery cobrado: campo obligatorio antes de confirmar */
+.fee {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.fee .live {
+  font-variant-numeric: tabular-nums;
+}
+.confirm .ask {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+}

@@ -43,11 +43,12 @@ export class Ventas implements OnInit {
     return {
       range: `${formatDate(r.from)} al ${formatDate(r.to)}`,
       tiles: [
-        { label: 'Ventas', value: formatPrice(r.revenue), note: 'Total cobrado, con delivery' },
-        { label: 'Pedidos confirmados', value: String(r.orders), note: '' },
-        { label: 'Ticket promedio', value: formatPrice(r.averageTicket), note: 'Ventas entre pedidos' },
+        // Delivery cobrado = el que se registró al confirmar; en pedidos antiguos, la tarifa base.
         { label: 'Productos', value: formatPrice(r.productsRevenue), note: 'Ventas sin delivery' },
-        { label: 'Delivery', value: formatPrice(r.deliveryRevenue), note: 'Tarifas cobradas' },
+        { label: 'Delivery cobrado', value: formatPrice(r.deliveryRevenue), note: 'Registrado al confirmar' },
+        { label: 'Total cobrado', value: formatPrice(r.revenue), note: 'Productos más delivery' },
+        { label: 'Pedidos confirmados', value: String(r.orders), note: '' },
+        { label: 'Ticket promedio', value: formatPrice(r.averageTicket), note: 'Total cobrado entre pedidos' },
       ],
       // Del día más reciente al más antiguo.
       days: [...r.days]

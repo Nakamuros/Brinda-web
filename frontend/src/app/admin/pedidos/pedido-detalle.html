@@ -14,7 +14,7 @@
         </div>
         <div class="state">
           <span class="badge" [class.badge-soon]="o.status === 'PENDING'" [class.badge-done]="o.status !== 'PENDING'">{{ v.status }}</span>
-          <span class="badge">{{ money(o.total) }}</span>
+          <span class="badge">{{ money(v.charged) }}</span>
         </div>
       </header>
 
@@ -40,9 +40,15 @@
               }
             </ul>
             <dl class="totals">
-              <div><dt>Subtotal</dt><dd>{{ money(o.subtotal) }}</dd></div>
-              <div><dt>Delivery ({{ o.zoneName }})</dt><dd>{{ money(o.deliveryFee) }}</dd></div>
-              <div class="total"><dt>Total</dt><dd>{{ money(o.total) }}</dd></div>
+              <div><dt>Productos</dt><dd>{{ money(o.subtotal) }}</dd></div>
+              <div><dt>Delivery base ({{ o.zoneName }})</dt><dd>{{ money(o.deliveryFee) }}</dd></div>
+              @if (v.final; as f) {
+                <div><dt>Total estimado</dt><dd>{{ money(o.total) }}</dd></div>
+                <div><dt>Delivery cobrado</dt><dd>{{ money(f.fee) }}</dd></div>
+                <div class="total"><dt>Total cobrado</dt><dd>{{ money(f.total) }}</dd></div>
+              } @else {
+                <div class="total"><dt>Total estimado</dt><dd>{{ money(o.total) }}</dd></div>
+              }
             </dl>
           </section>
 
@@ -51,8 +57,9 @@
             <dl class="grid">
               <div><dt>Nombre</dt><dd>{{ o.firstName }} {{ o.lastName }}</dd></div>
               <div><dt>Celular</dt><dd>{{ o.phone }}</dd></div>
-              <div><dt>DNI</dt><dd>{{ o.dni }}</dd></div>
+              <div><dt>{{ v.document }}</dt><dd>{{ o.documentNumber }}</dd></div>
               <div><dt>Distrito</dt><dd>{{ o.districtName }}</dd></div>
+              <div><dt>Promociones</dt><dd>{{ v.marketing }}</dd></div>
               <div class="full"><dt>Dirección</dt><dd>{{ o.address }}</dd></div>
               @if (o.reference) {
                 <div class="full"><dt>Referencia</dt><dd>{{ o.reference }}</dd></div>
@@ -82,6 +89,9 @@
               <p class="hint">Venció el {{ v.expires }}; aún se puede confirmar si el pago llegó tarde.</p>
             } @else if (o.status === 'CONFIRMED') {
               <p class="hint">Confirmado el {{ v.confirmed }}; el stock ya se descontó.</p>
+              @if (!v.final) {
+                <p class="hint">Confirmado antes de registrar el delivery cobrado: se usa la tarifa base.</p>
+              }
             } @else if (o.cancelReason) {
               <p class="hint">Motivo: {{ o.cancelReason }}</p>
             }
@@ -92,9 +102,19 @@
 
             @if (asking() === 'confirm') {
               <div class="confirm" role="alert">
-                <p>Al confirmar, el pedido <strong>{{ o.code }}</strong> queda finalizado y se descuenta el stock. Hazlo solo con el pago recibido.</p>
+                <p class="ask">¿Recibiste <strong>{{ money(finalTotal() ?? 0) }}</strong> por {{ v.payment }}?</p>
+                <p>Productos {{ money(o.subtotal) }} + delivery {{ money(fee() ?? 0) }}. Al confirmar, el pedido <strong>{{ o.code }}</strong> queda finalizado y se descuenta el stock.</p>
                 <div class="actions">
                   <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="confirm()">{{ saving() ? 'Confirmando…' : 'Sí, confirmar' }}</button>
+                  <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="ask(null)">Volver</button>
+                </div>
+              </div>
+            } @else if (asking() === 'fix') {
+              <div class="confirm">
+                <ng-container [ngTemplateOutlet]="feeField" />
+                <p class="hint">La corrección queda registrada en la auditoría con el monto anterior.</p>
+                <div class="actions">
+                  <button type="button" class="btn btn-ghost solid" [disabled]="saving() || !feeValid()" (click)="fixDelivery()">{{ saving() ? 'Guardando…' : 'Guardar delivery' }}</button>
                   <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="ask(null)">Volver</button>
                 </div>
               </div>
@@ -114,15 +134,45 @@
                 </div>
               </div>
             } @else {
+              @if (v.canConfirm) {
+                <ng-container [ngTemplateOutlet]="feeField" />
+              }
               <div class="actions">
                 @if (v.canConfirm) {
-                  <button type="button" class="btn btn-ghost solid" (click)="ask('confirm')">Confirmar pago</button>
+                  <button type="button" class="btn btn-ghost solid" [disabled]="!feeValid()" (click)="ask('confirm')">Confirmar pago</button>
+                }
+                @if (o.status === 'CONFIRMED') {
+                  <button type="button" class="btn btn-ghost" (click)="ask('fix')">Corregir delivery</button>
                 }
                 @if (v.canCancel) {
                   <button type="button" class="btn btn-ghost" (click)="ask('cancel')">Anular</button>
                 }
               </div>
             }
+
+            <!-- "Delivery cobrado (S/)": obligatorio, vacío, con la tarifa base como ayuda y el total final en vivo -->
+            <ng-template #feeField>
+              <div class="field fee">
+                <label class="label" for="fee">Delivery cobrado (S/)</label>
+                <input id="fee" class="input" type="text" inputmode="decimal" autocomplete="off" maxlength="9"
+                  placeholder="Ej. 12.50" aria-describedby="fee-hint fee-total"
+                  [attr.aria-invalid]="feeError() ? true : null"
+                  [value]="feeText()" (input)="setFee($any($event.target).value)" />
+                <p id="fee-hint" class="hint">Tarifa base: {{ money(o.deliveryFee) }} ({{ o.zoneName }}).</p>
+                @if (feeError(); as e) {
+                  <p class="error" role="alert">{{ e }}</p>
+                }
+                @if (fee() === 0) {
+                  <label class="check">
+                    <input id="free" type="checkbox" [checked]="freeOk()" (change)="freeOk.set($any($event.target).checked)" />
+                    <span>El delivery fue gratis (S/ 0).</span>
+                  </label>
+                }
+                <p id="fee-total" class="live" aria-live="polite">
+                  Total final: <strong>{{ finalTotal() === null ? '—' : money(finalTotal()!) }}</strong>
+                </p>
+              </div>
+            </ng-template>
           </section>
         </aside>
       </div>

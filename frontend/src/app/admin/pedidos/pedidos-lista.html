@@ -36,6 +36,14 @@
         <option value="" [selected]="status() === ''">Todos</option>
       </select>
     </div>
+    <div class="field">
+      <label class="label" for="mk">Promociones</label>
+      <select id="mk" class="input" (change)="setMarketing($any($event.target).value)">
+        <option value="" [selected]="marketing() === ''">Todos</option>
+        <option value="yes" [selected]="marketing() === 'yes'">Aceptaron</option>
+        <option value="no" [selected]="marketing() === 'no'">No aceptaron</option>
+      </select>
+    </div>
   </form>
   <p id="code-hint" class="hint">El código se busca entre los pedidos de esta página y estado.</p>
 
@@ -59,7 +67,7 @@
           <a class="row" [routerLink]="['/admin/pedidos', r.o.id]">
             <span class="code">{{ r.o.code }}</span>
             <span class="who">{{ r.o.customerName }}</span>
-            <span class="meta">{{ r.meta }}</span>
+            <span class="meta">{{ r.meta }}@if (r.o.marketingConsent) { · Acepta promociones }</span>
             <span class="state">
               <span class="badge" [class.badge-soon]="r.o.status === 'PENDING'" [class.badge-done]="r.o.status !== 'PENDING'">{{ r.status }}</span>
               <span class="badge">{{ r.total }}</span>

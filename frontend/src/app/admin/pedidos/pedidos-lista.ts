@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { PAYMENT_LABEL } from '../../models/order';
 import { Page } from '../../models/page';
 import { formatPrice } from '../../shared/format';
 import { apiError } from '../admin-auth.service';
@@ -22,6 +23,8 @@ export class PedidosLista implements OnInit {
   /** Por defecto, lo que hay que atender. */
   protected readonly status = signal<OrderStatus | ''>('PENDING');
   protected readonly code = signal('');
+  /** Promociones: '' todos, 'yes' aceptaron, 'no' no aceptaron. */
+  protected readonly marketing = signal<'' | 'yes' | 'no'>('');
   protected readonly pageIndex = signal(0);
   protected readonly result = signal<Page<OrderSummary> | null>(null);
   protected readonly loading = signal(true);
@@ -35,7 +38,7 @@ export class PedidosLista implements OnInit {
       .map((o) => ({
         o,
         status: ORDER_STATUS[o.status],
-        meta: `${formatDateTime(o.createdAt)} · ${o.districtName} · ${o.paymentMethod === 'YAPE' ? 'Yape' : 'Plin'}`,
+        meta: `${formatDateTime(o.createdAt)} · ${o.districtName} · ${PAYMENT_LABEL[o.paymentMethod]}`,
         total: formatPrice(o.total),
       }));
   });
@@ -46,6 +49,12 @@ export class PedidosLista implements OnInit {
 
   protected setStatus(v: string): void {
     this.status.set(v as OrderStatus | '');
+    this.pageIndex.set(0);
+    void this.load();
+  }
+
+  protected setMarketing(v: string): void {
+    this.marketing.set(v as '' | 'yes' | 'no');
     this.pageIndex.set(0);
     void this.load();
   }
@@ -61,7 +70,8 @@ export class PedidosLista implements OnInit {
     this.error.set('');
     void this.api.refreshPending();
     try {
-      const page = await this.api.list(this.status(), this.pageIndex());
+      const m = this.marketing();
+      const page = await this.api.list(this.status(), this.pageIndex(), 20, m === '' ? null : m === 'yes');
       if (mine === this.seq) {
         this.result.set(page);
       }
