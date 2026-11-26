@@ -30,7 +30,7 @@ describe('HowToOrder', () => {
       'Elige',
       'Deja tus datos',
       'Envíalo por WhatsApp',
-      'Paga con Yape o Plin',
+      'Paga con Yape, Plin o transferencia',
     ]);
     const text = el.textContent ?? '';
     expect(text).toContain('Sin ese mensaje, tu pedido no avanza.');
