@@ -234,10 +234,13 @@ Selector de − / cantidad / + con botones de 44px. Con cantidad 1, el "−" es 
 Fila fija bajo el menú: chips de 44px (categorías y "Ofertas") con contorno fino; el elegido se rellena de crema con texto marrón. En celular se desplaza horizontalmente con el borde derecho difuminado; desde 64rem se reparte en filas. La búsqueda es un campo de 48px con lupa de latón.
 
 ### Campos de formulario
-Etiqueta en mayúsculas espaciadas sobre un campo de 48px (`.input`: fondo marrón profundo al 55%, filete de latón al 28%, foco con contorno crema). El error lleva borde terracota, ícono y mensaje en crema (la terracota como texto no llega a 4.5:1). Casillas y opciones de pago (Yape/Plin) de 44px; la opción elegida se rellena de crema. Los datos sensibles (DNI) no se guardan en el navegador.
+Etiqueta en mayúsculas espaciadas sobre un campo de 48px (`.input`: fondo marrón profundo al 55%, filete de latón al 28%, foco con contorno crema). El error lleva borde terracota, ícono y mensaje en crema (la terracota como texto no llega a 4.5:1). Casillas y opciones de pago (Yape/Plin/Transferencia) de 44px; la opción elegida se rellena de crema; en celular, Transferencia ocupa la fila entera y desde 48rem van las tres en fila. El documento es un selector (DNI, Carné de extranjería, Pasaporte) más el número, con ayuda y largo máximo según el tipo. La casilla de promociones es opcional, va sin marcar y separada de las obligatorias por un filete de latón al 28%. Los datos sensibles (documento) no se guardan en el navegador.
 
 ### Resumen del pedido
-Tarjeta de 12px con filete de latón: líneas, subtotal, promoción, delivery (según el distrito) y total estimado en Libre Baskerville 700. Siempre aclara que el servidor confirma el total final. "Finalizar compra" y "Continuar con el pedido" son CTA burdeos.
+Tarjeta de 12px con filete de latón: líneas, subtotal, promoción, delivery (según el distrito) y "Total estimado" en Libre Baskerville 700. "Finalizar compra" y "Continuar con el pedido" son CTA burdeos.
+
+### Aviso de delivery
+Bloque destacado (no letra pequeña) en `/pedido` y `/pedido/:codigo`: fondo `--bg-deep`, borde de latón de 1px parejo, radio de 6px (la jerarquía la dan el fondo profundo y el titular, no un filete lateral), ícono de reparto en latón, titular "Delivery desde S/ X." en Libre Baskerville 700 (`--step-1`) y texto crema a `--step-0` (15.3:1 medido). X es la tarifa mínima que devuelve la API; si no carga, el titular pasa a "Sobre la tarifa de delivery" sin cifra. En `/pedido` es lo primero del cuerpo en celular y, desde 64rem, va sobre el resumen en la columna derecha; siempre visible sin scroll a 360/768/1440. Solo tokens existentes.
 
 ### Sello +18
 Un círculo de 44px con filete de latón y "+18" en Libre Baskerville, junto a "Venta solo para mayores de 18 años", en el pie.
@@ -249,10 +252,10 @@ Fondo marrón profundo con filete de latón arriba, marca centrada con su lema e
 Modal centrado sobre un velo marrón casi opaco: sello +18, pregunta en Libre Baskerville y dos botones de contorno ("Sí, soy mayor de 18" y "No"; el burdeos queda para pedir). Entra con un fundido y un leve ascenso (alternativa estática con `prefers-reduced-motion`). Sin cierre con Esc ni clic fuera; foco atrapado y fondo inerte.
 
 ### Avisos legales
-La advertencia de alcohol va en mayúsculas espaciadas, crema sobre fondo oscuro (contraste mayor a 13:1), siempre en el pie. El aviso de menores y DNI físico es un recuadro de filete fino dentro del resumen del carrito y del checkout. El logo del Libro de Reclamaciones va sobre una pastilla marfil de 12px de radio (el PNG oficial sin tocar colores ni proporciones), de al menos 120px de ancho en celular y con objetivo táctil de 44px.
+La advertencia de alcohol va en mayúsculas espaciadas, crema sobre fondo oscuro (contraste mayor a 13:1), siempre en el pie. El aviso de menores y documento de identidad es un recuadro de filete fino dentro del resumen del carrito y del checkout. El logo del Libro de Reclamaciones va sobre una pastilla marfil de 12px de radio (el PNG oficial sin tocar colores ni proporciones), de al menos 120px de ancho en celular y con objetivo táctil de 44px.
 
 ### Paso pendiente (/pedido/:codigo)
-Lo primero de la pantalla, visible sin scroll a 360px: tarjeta de 12px con borde verde de WhatsApp sobre marrón profundo, sobretítulo "Falta un paso" en verde (excepción pedida al sobretítulo), titular "Envía tu pedido por WhatsApp" en Libre Baskerville, el código, el botón verde y la nota "No cierres esta página hasta enviarlo". Debajo, el aviso de los 20 minutos y el resto. La cabecera se compacta (código a `--step-3`). Tras recargar, el mismo bloque reaparece con el enlace recordado (sin datos personales).
+Lo primero de la pantalla, visible sin scroll a 360px: tarjeta de 12px con borde verde de WhatsApp sobre marrón profundo, sobretítulo "Falta un paso" en verde (excepción pedida al sobretítulo), titular "Envía tu pedido por WhatsApp" en Libre Baskerville, el código, el botón verde y la nota "No cierres esta página hasta enviarlo". Debajo, el aviso de los 20 minutos, los datos para pagar (método; número de Yape/Plin o banco, cuenta, CCI y titular de la transferencia, que se seleccionan enteros con un toque; o "Te enviaremos los datos de la cuenta por WhatsApp") y el aviso de delivery. La cabecera se compacta (código a `--step-3`). Tras recargar, el mismo bloque reaparece con el enlace y los datos de pago recordados (sin datos personales).
 
 ### Cómo pedir
 Cuatro pasos numerados: una columna en celular, 2×2 desde 48rem y una fila de cuatro desde 64rem (máx. 72rem), cada uno con filete de latón arriba.
@@ -260,8 +263,14 @@ Cuatro pasos numerados: una columna en celular, 2×2 desde 48rem y una fila de c
 ### Hoja de Reclamación
 Formulario en `/libro-de-reclamaciones` con las tres secciones de la hoja oficial como `fieldset` (leyenda en Libre Baskerville con filete), reutilizando campos, opciones y casillas del checkout. Las opciones (DNI/CE, producto/servicio, reclamo/queja) son pastillas que se rellenan de crema. El envío es un botón fantasma (no es una acción de pedir). La confirmación es una tarjeta de 12px con filete de latón: N°, fecha y "Descargar mi copia en PDF" (fantasma).
 
+### Páginas legales (/terminos, /privacidad)
+Misma cabecera que el Libro (fondo `--bg-alt`, título Libre Baskerville a `--step-3`) y cuerpo de lectura de 48rem con párrafos a `--measure`. Cada sección lleva su número y título en Libre Baskerville 700 (`--step-1`) con filete de latón al 28%; las listas usan viñeta de latón. Las negritas del documento original van en Jost 600 crema. Bajo el título, "Última actualización: <fecha>" en `--step--1` y `--text-soft`, solo si `LEGAL.documentsUpdatedAt` tiene fecha.
+
+### Marca: íconos e imagen para compartir
+Provisionales, generados desde `docs/brinda_light.jpeg` (fondo crema opaco, no hay versión transparente): `favicon.ico` (16/32/48) y `brand/apple-touch-icon.png` (180) con las botellas sobre crema; `brand/og-image.jpg` (1200×630) con el logo completo sobre crema. Se reemplazan cuando llegue el logo transparente o vectorial. La cabecera y el pie siguen con la palabra BRINDA en texto.
+
 ### Panel de administración
-Sobrio y operativo (el panel prioriza rapidez y claridad sobre expresividad): marco propio sin barra de anuncio ni carrito, tarjetas de 12px con filete de latón al 28%, contadores que filtran (el elegido se rellena de crema) y etiquetas de plazo: vencido o por vencer en terracota tenue con borde terracota, ícono y texto crema (nunca solo color), respondido en latón apagado. Reutiliza `.input` y `.btn-ghost`; las acciones del panel no usan burdeos.
+Sobrio y operativo (el panel prioriza rapidez y claridad sobre expresividad): marco propio sin barra de anuncio ni carrito, tarjetas de 12px con filete de latón al 28%, contadores que filtran (el elegido se rellena de crema) y etiquetas de plazo: vencido o por vencer en terracota tenue con borde terracota, ícono y texto crema (nunca solo color), respondido en latón apagado. Reutiliza `.input` y `.btn-ghost`; las acciones del panel no usan burdeos. En el detalle del pedido, "Confirmar pago" va precedido del campo obligatorio "Delivery cobrado (S/)" (vacío, con la tarifa base como ayuda y el total final en vivo); el botón queda desactivado hasta que el monto es válido, S/ 0 pide la casilla "El delivery fue gratis" y el segundo paso pregunta "¿Recibiste S/ X por <método>?" en Libre Baskerville. Los totales muestran Productos, Delivery base, y luego Delivery cobrado y Total cobrado (o Total estimado si aún no se confirmó).
 
 ## Do's and Don'ts
 

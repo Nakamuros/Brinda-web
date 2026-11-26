@@ -11,23 +11,47 @@ Errores: `{ status, code, message, fields?, timestamp }`.
 | GET | `/api/v1/catalog/products/{slug}` | 404 si el producto está oculto |
 | GET | `/api/v1/delivery/districts` | Distritos con reparto y tarifa estimada |
 | GET | `/api/v1/catalog/images/{nombre}` | Foto subida desde el panel (caché de un año). 404 si no existe o el nombre no es `<uuid>.png\|jpg\|webp` |
-| POST | `/api/v1/orders` | Límite 5/min por IP. Devuelve código, total, pago y `whatsappUrl` |
+| POST | `/api/v1/orders` | Límite 5/min por IP. Devuelve código, montos estimados, datos de pago y `whatsappUrl` |
 | POST | `/api/v1/complaints` | Libro de Reclamaciones. Límite 3/min por IP. Ver sección más abajo |
 | GET | `/api/v1/complaints/copy/{token}` | Copia en PDF de la hoja (aplanada), solo con el token de ese reclamo. Límite 20/min por IP. 404 si no existe |
 
-Cuerpo de `POST /api/v1/orders` (el servidor ignora cualquier precio/total enviado):
+Cuerpo de `POST /api/v1/orders` (precios, tarifa y total los calcula el servidor; Jackson rechaza con 400 cualquier campo desconocido):
 ```json
 {
   "items": [{ "productId": "<uuid>", "quantity": 2 }],
   "firstName": "Ana", "lastName": "Pérez", "phone": "987654321",
-  "dni": "12345678", "address": "Av. Larco 123", "reference": "Frente al parque",
-  "districtId": 1, "paymentMethod": "YAPE",
-  "adultConfirmed": true, "termsAccepted": true, "privacyAccepted": true
+  "documentType": "DNI", "documentNumber": "12345678",
+  "address": "Av. Larco 123", "reference": "Frente al parque",
+  "districtId": 1, "paymentMethod": "YAPE|PLIN|TRANSFER",
+  "adultConfirmed": true, "termsAccepted": true, "privacyAccepted": true,
+  "marketingConsent": false
 }
 ```
-`dni` **obligatorio siempre**, exactamente 8 dígitos (400 con `fields.dni` si falta o es inválido). La base lo exige además en todo pedido nuevo (V8).
+- **Documento obligatorio siempre** (desde V11 reemplaza a `dni`): `DNI` = 8 dígitos; `CE` = 8 a 12 alfanuméricos; `PASSPORT` = 6 a 12 alfanuméricos (CE y pasaporte se guardan en mayúsculas). 400 con `fields.documentNumber` (o `fields.documentType`). El número va cifrado (AES-GCM) en `customer_dni_encrypted`, que conserva su nombre; el tipo, en `document_type`. *Criterios por confirmar con el asesor.* El Libro de Reclamaciones sigue solo con DNI y CE.
+- **`marketingConsent`** (opcional, `false` si no viene): consentimiento de promociones, separado de los términos. El servidor guarda `marketing_consent` y `marketing_consent_at` (hora del servidor); el CHECK `ck_orders_marketing` exige que uno vaya con el otro.
+- **Versión de los textos legales:** `terms_version` y `privacy_version` las escribe el servidor con `LEGAL_DOCUMENTS_VERSION` (nunca el navegador). Vacía (hoy) = NULL.
 
-`whatsappUrl` (`https://wa.me/<número configurado>?text=…`, o `null` si no hay número) lleva un **mensaje corto sin datos personales**: `*Pedido BRINDA <código>*`, `Total: S/ <total>` y `Pago: Yape|Plin`. Ni productos, ni nombre, celular, dirección o DNI: el detalle lo ve la dueña en el panel. Por eso el navegador puede recordar el enlace junto al código (1 h 30 min).
+Respuesta `201` (sin datos personales):
+```json
+{ "code": "EQ12", "status": "PENDING", "subtotal": 96.00, "deliveryFee": 6.00, "total": 102.00,
+  "expiresAt": "…", "items": [{ "name": "…", "quantity": 2, "unitPrice": 48.00, "promoDiscount": 0, "promo": null, "subtotal": 96.00 }],
+  "payment": { "method": "TRANSFER", "number": null,
+               "transfer": { "bank": "…", "account": "…", "cci": "…", "holder": "…" }, "amount": 102.00 },
+  "whatsappUrl": "https://wa.me/…" }
+```
+- `deliveryFee` y `total` son **estimados** (tarifa base del distrito). El delivery final lo fija la dueña al confirmar.
+- `payment.number`: Yape/Plin de BRINDA (`YAPE_NUMBER`/`PLIN_NUMBER`). `payment.transfer`: cuenta de BRINDA (`TRANSFER_BANK`, `TRANSFER_ACCOUNT`, `TRANSFER_CCI`, `TRANSFER_HOLDER`), solo si las **cuatro** están configuradas; si no, `null` y la web dice "Te enviaremos los datos de la cuenta por WhatsApp". Son datos de BRINDA, no del cliente: el navegador los recuerda junto al código (1 h 30 min) para mostrarlos tras recargar.
+
+`whatsappUrl` (`https://wa.me/<número configurado>?text=…`, o `null` si no hay número) lleva **código, productos y montos, sin datos personales**:
+```
+*Pedido BRINDA EQ12*
+2 × Pisco Quebranta 500 ml
+1 × Combo Fiesta
+Delivery base: S/ 6.00
+Total estimado: S/ 102.00
+Pago: Yape | Plin | Transferencia
+```
+Ni nombre, celular, dirección ni documento: el detalle lo ve la dueña en el panel. Por eso el navegador puede recordar el enlace junto al código (1 h 30 min). **Tope: 2000 caracteres** el enlace ya codificado (`WhatsAppMessageBuilder.MAX_URL_LENGTH`); si se pasa, se muestran los primeros productos y el resto como `+N productos más`. La web descarta enlaces que no empiecen por `https://wa.me/` o pasen de ese largo.
 
 ### Libro de Reclamaciones (público)
 `POST /api/v1/complaints` guarda la Hoja de Reclamación (un campo por campo del PDF `public/legal/hoja-reclamacion.pdf`). **Sin pedido previo.** Responde `201`:
@@ -87,14 +111,15 @@ Cuerpo (todo obligatorio salvo `guardianName`, `claimedAmount` y `website`):
 | GET | `/api/v1/admin/inventory/products/{id}/movements` |
 | GET/POST | `/api/v1/admin/delivery/zones` · PUT `/{id}` `{name, fee, active}` |
 | GET/POST | `/api/v1/admin/delivery/districts` · PUT `/{id}` `{zoneId, name, active}` |
-| GET | `/api/v1/admin/orders?status=PENDING&page=&size=` |
+| GET | `/api/v1/admin/orders?status=PENDING&marketing=true\|false&page=&size=` (`marketing` opcional: solo quienes aceptaron, o no, promociones; cada fila trae `marketingConsent` y `total` = cobrado si ya se confirmó) |
 | GET | `/api/v1/admin/orders/pending-count` (polling del panel) |
-| GET | `/api/v1/admin/orders/{id}` (incluye DNI descifrado; queda en auditoría) |
-| POST | `/api/v1/admin/orders/{id}/confirm` ("Finalizada": descuenta stock) |
+| GET | `/api/v1/admin/orders/{id}` (incluye `documentType` y `documentNumber` descifrado; queda en auditoría). Montos: `deliveryFee`/`total` estimados y `finalDeliveryFee`/`finalTotal` cobrados (null si no se confirmó o es anterior a V11). Además `marketingConsent`/`marketingConsentAt` |
+| POST | `/api/v1/admin/orders/{id}/confirm` `{deliveryFee, zeroFeeConfirmed}` ("Finalizada"). `deliveryFee` obligatorio, ≥ 0, 2 decimales (400 si falta o es inválido), máximo `MAX_DELIVERY_FEE` (por defecto 100; 422 si lo supera); S/ 0 exige `zeroFeeConfirmed: true` (422). En una sola transacción y bajo el mismo bloqueo: descuenta el stock y guarda `final_delivery_fee` y `final_total_amount` (= subtotal + delivery cobrado). Admite PENDING y EXPIRED. Auditoría `ORDER_CONFIRM` con `delivery <base> -> <cobrado>, total <final>` (sin datos personales) |
+| POST | `/api/v1/admin/orders/{id}/delivery-fee` `{deliveryFee, zeroFeeConfirmed}` | Corrige el delivery cobrado de un pedido **confirmado** (mismas validaciones; 422 en otro estado). Recalcula el total final. Auditoría `ORDER_DELIVERY_FIX` con el valor anterior y el nuevo |
 | POST | `/api/v1/admin/orders/{id}/cancel` `{reason}` (si estaba confirmada, devuelve el stock) |
-| GET | `/api/v1/admin/orders/{id}/copy/delivery` · `/copy/receipt` |
+| GET | `/api/v1/admin/orders/{id}/copy/delivery` · `/copy/receipt` (boleta: `<Tipo de documento>: <número>`, productos, `Envío` y `Total` cobrados —o estimados si no hay finales— y `Pago`) |
 | POST | `/api/v1/admin/images` (multipart, campo `file`) | Sube una foto de producto: PNG, JPG o WebP (se comprueba por los bytes del archivo, no por el nombre), máx. 3 MB. `201 {key, url}`: `key` es lo que se guarda en `imageUrl` del producto. 422 si no es una imagen permitida, 413 si pesa más. Auditado (`IMAGE_UPLOAD`). Los archivos van a `IMAGES_UPLOAD_DIR` (por defecto `./uploads`), nunca a la BD |
-| GET | `/api/v1/admin/reports/sales?from=AAAA-MM-DD&to=AAAA-MM-DD` | Ventas: solo pedidos `CONFIRMED`, por fecha de confirmación en hora de Lima. Rango inclusivo, máx. 366 días (422 si es mayor o está invertido); sin fechas, últimos 30 días. Devuelve `{from, to, orders, revenue, productsRevenue, deliveryRevenue, averageTicket, days[{date, orders, revenue}], topProducts[≤10 {name, units, revenue}], inventory{units, valueAtSalePrice}}`. Sin datos personales. No hay costo ni ganancia (la base no guarda precio de costo) |
+| GET | `/api/v1/admin/reports/sales?from=AAAA-MM-DD&to=AAAA-MM-DD` | Ventas: solo pedidos `CONFIRMED`, por fecha de confirmación en hora de Lima. Rango inclusivo, máx. 366 días (422 si es mayor o está invertido); sin fechas, últimos 30 días. `revenue` = total cobrado y `deliveryRevenue` = delivery cobrado: usan `final_total_amount`/`final_delivery_fee` y, en confirmados anteriores a V11, la tarifa base. Devuelve `{from, to, orders, revenue, productsRevenue, deliveryRevenue, averageTicket, days[{date, orders, revenue}], topProducts[≤10 {name, units, revenue}], inventory{units, valueAtSalePrice}}`. Sin datos personales. No hay costo ni ganancia (la base no guarda precio de costo) |
 | GET | `/api/v1/admin/complaints?status=RECEIVED\|ANSWERED&type=CLAIM\|COMPLAINT&q=&deadline=SOON\|OVERDUE&page=&size=` | Lista de reclamos **sin DNI/CE, teléfono, correo ni dirección**. Pendientes del más antiguo al más nuevo; el resto, del más nuevo. `deadline` solo admite SOON u OVERDUE (otro valor: 400/422) y trae solo pendientes |
 | GET | `/api/v1/admin/complaints/counts` | `{pending, dueSoon, overdue}` para el aviso del panel |
 | GET | `/api/v1/admin/complaints/{id}` | Detalle con el documento descifrado, plazo y estado de los dos correos. **Cada lectura queda auditada** (`COMPLAINT_VIEW`: usuario, hora e IP; sin el documento) |
@@ -110,3 +135,4 @@ Cuerpo (todo obligatorio salvo `guardianName`, `claimedAmount` y `website`):
 - Un pedido `EXPIRED` (20 min sin confirmar) aún se puede confirmar si el pago llegó tarde.
 - Nada se borra: se desactiva (`active`/`available`) o se cancela con motivo.
 - Los pedidos conservan la tarifa y precios de su momento aunque luego se editen.
+- La tarifa del distrito es la **base**: el delivery real puede ser mayor (dirección, contenido, hora). Se registra al confirmar y se puede corregir después con auditoría. "Anular" no lo pide.
