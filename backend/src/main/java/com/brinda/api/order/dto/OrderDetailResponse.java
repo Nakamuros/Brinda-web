@@ -8,13 +8,20 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/** Detalle para el panel autenticado. Incluye el DNI descifrado: cada consulta queda en la auditoría. */
+/**
+ * Detalle para el panel autenticado. Incluye el documento descifrado: cada consulta queda en la auditoría.
+ * {@code deliveryFee}/{@code total} son los estimados (tarifa base); {@code finalDeliveryFee}/{@code finalTotal}, lo
+ * cobrado al confirmar (null si aún no se confirmó o el pedido es anterior a V11).
+ */
 public record OrderDetailResponse(UUID id, String code, String status, String channel,
-                                  String firstName, String lastName, String phone, String dni,
+                                  String firstName, String lastName, String phone, String documentType,
+                                  String documentNumber,
                                   String address, String reference, String districtName, String zoneName,
-                                  BigDecimal subtotal, BigDecimal deliveryFee, BigDecimal total, String paymentMethod,
+                                  BigDecimal subtotal, BigDecimal deliveryFee, BigDecimal total,
+                                  BigDecimal finalDeliveryFee, BigDecimal finalTotal, String paymentMethod,
                                   boolean adultConfirmed, OffsetDateTime termsAcceptedAt,
-                                  OffsetDateTime privacyAcceptedAt, OffsetDateTime createdAt,
+                                  OffsetDateTime privacyAcceptedAt, boolean marketingConsent,
+                                  OffsetDateTime marketingConsentAt, OffsetDateTime createdAt,
                                   OffsetDateTime expiresAt, OffsetDateTime confirmedAt, String cancelReason,
                                   List<Item> items) {
 
@@ -28,12 +35,13 @@ public record OrderDetailResponse(UUID id, String code, String status, String ch
         }
     }
 
-    public static OrderDetailResponse from(Order o, String dni) {
+    public static OrderDetailResponse from(Order o, String documentNumber) {
         return new OrderDetailResponse(o.getId(), o.getOrderCode(), o.getStatus().name(), o.getChannel().name(),
-                o.getCustomerFirstName(), o.getCustomerLastName(), o.getCustomerPhone(), dni,
-                o.getDeliveryAddress(), o.getDeliveryReference(), o.getDistrict().getName(),
+                o.getCustomerFirstName(), o.getCustomerLastName(), o.getCustomerPhone(), o.getDocumentType().name(),
+                documentNumber, o.getDeliveryAddress(), o.getDeliveryReference(), o.getDistrict().getName(),
                 o.getDistrict().getZone().getName(), o.getSubtotalAmount(), o.getDeliveryFee(), o.getTotalAmount(),
-                o.getPaymentMethod().name(), o.isAdultConfirmed(), o.getTermsAcceptedAt(), o.getPrivacyAcceptedAt(),
+                o.getFinalDeliveryFee(), o.getFinalTotalAmount(), o.getPaymentMethod().name(), o.isAdultConfirmed(),
+                o.getTermsAcceptedAt(), o.getPrivacyAcceptedAt(), o.isMarketingConsent(), o.getMarketingConsentAt(),
                 o.getCreatedAt(), o.getExpiresAt(), o.getConfirmedAt(), o.getCancelReason(),
                 o.getItems().stream().map(Item::from).toList());
     }

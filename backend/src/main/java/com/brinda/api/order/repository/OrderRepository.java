@@ -24,12 +24,12 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     long countByStatus(OrderStatus status);
 
+    /** Lista del panel: filtros opcionales por estado y por consentimiento de promociones (null = todos). */
     @EntityGraph(attributePaths = {"district", "district.zone"})
-    Page<Order> findByStatus(OrderStatus status, Pageable pageable);
-
-    @Override
-    @EntityGraph(attributePaths = {"district", "district.zone"})
-    Page<Order> findAll(Pageable pageable);
+    @Query("select o from Order o where (:status is null or o.status = :status) "
+            + "and (:marketing is null or o.marketingConsent = :marketing)")
+    Page<Order> search(@Param("status") OrderStatus status, @Param("marketing") Boolean marketing,
+                       Pageable pageable);
 
     @EntityGraph(attributePaths = {"district", "district.zone"})
     Optional<Order> findWithDistrictById(UUID id);
@@ -47,13 +47,14 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     int expirePending(@Param("pending") OrderStatus pending, @Param("expired") OrderStatus expired,
                       @Param("now") OffsetDateTime now);
 
-    /** Ventas: (confirmedAt, totalAmount) de cada pedido confirmado en el rango [since, until). */
-    @Query("select o.confirmedAt, o.totalAmount from Order o "
+    /** Ventas: (confirmedAt, total cobrado) de cada pedido confirmado en [since, until). Sin total final: el estimado. */
+    @Query("select o.confirmedAt, coalesce(o.finalTotalAmount, o.totalAmount) from Order o "
             + "where o.status = :status and o.confirmedAt >= :since and o.confirmedAt < :until")
     List<Object[]> confirmedTotals(@Param("status") OrderStatus status, @Param("since") OffsetDateTime since,
                                    @Param("until") OffsetDateTime until);
 
-    @Query("select coalesce(sum(o.deliveryFee), 0) from Order o "
+    /** Delivery cobrado (el final; en confirmados antiguos, la tarifa base). */
+    @Query("select coalesce(sum(coalesce(o.finalDeliveryFee, o.deliveryFee)), 0) from Order o "
             + "where o.status = :status and o.confirmedAt >= :since and o.confirmedAt < :until")
     BigDecimal confirmedDeliveryFees(@Param("status") OrderStatus status, @Param("since") OffsetDateTime since,
                                      @Param("until") OffsetDateTime until);

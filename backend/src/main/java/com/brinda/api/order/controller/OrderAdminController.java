@@ -3,6 +3,7 @@ package com.brinda.api.order.controller;
 import com.brinda.api.auth.security.AuthenticatedUser;
 import com.brinda.api.catalog.dto.PageResponse;
 import com.brinda.api.order.dto.CancelOrderRequest;
+import com.brinda.api.order.dto.ConfirmOrderRequest;
 import com.brinda.api.order.dto.OrderDetailResponse;
 import com.brinda.api.order.dto.OrderSummaryResponse;
 import com.brinda.api.order.dto.PendingCountResponse;
@@ -33,9 +34,10 @@ public class OrderAdminController {
 
     @GetMapping
     public PageResponse<OrderSummaryResponse> list(@RequestParam(required = false) OrderStatus status,
+                                                   @RequestParam(required = false) Boolean marketing,
                                                    @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "20") int size) {
-        return service.list(status, page, size);
+        return service.list(status, marketing, page, size);
     }
 
     @GetMapping("/pending-count")
@@ -50,9 +52,16 @@ public class OrderAdminController {
     }
 
     @PostMapping("/{id}/confirm")
-    public OrderDetailResponse confirm(@PathVariable UUID id, @AuthenticationPrincipal AuthenticatedUser user,
-                                       HttpServletRequest http) {
-        return service.confirm(id, user.id(), ClientIp.of(http));
+    public OrderDetailResponse confirm(@PathVariable UUID id, @Valid @RequestBody ConfirmOrderRequest req,
+                                       @AuthenticationPrincipal AuthenticatedUser user, HttpServletRequest http) {
+        return service.confirm(id, req, user.id(), ClientIp.of(http));
+    }
+
+    /** Corrige el delivery cobrado de un pedido ya confirmado (queda auditado con el valor anterior). */
+    @PostMapping("/{id}/delivery-fee")
+    public OrderDetailResponse fixDelivery(@PathVariable UUID id, @Valid @RequestBody ConfirmOrderRequest req,
+                                           @AuthenticationPrincipal AuthenticatedUser user, HttpServletRequest http) {
+        return service.fixDelivery(id, req, user.id(), ClientIp.of(http));
     }
 
     @PostMapping("/{id}/cancel")

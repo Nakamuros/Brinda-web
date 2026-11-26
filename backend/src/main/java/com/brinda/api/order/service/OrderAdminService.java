@@ -3,7 +3,9 @@ package com.brinda.api.order.service;
 import com.brinda.api.catalog.dto.PageResponse;
 import com.brinda.api.inventory.service.InventoryService;
 import com.brinda.api.inventory.service.StockLine;
+import com.brinda.api.order.config.OrderProperties;
 import com.brinda.api.order.dto.CancelOrderRequest;
+import com.brinda.api.order.dto.ConfirmOrderRequest;
 import com.brinda.api.order.dto.OrderDetailResponse;
 import com.brinda.api.order.dto.OrderSummaryResponse;
 import com.brinda.api.order.dto.PendingCountResponse;
@@ -23,6 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +42,13 @@ public class OrderAdminService {
     private final DniCipher dniCipher;
     private final OrderComboContents comboContents;
     private final AuditService auditService;
+    private final OrderProperties props;
 
     @Transactional(readOnly = true)
-    public PageResponse<OrderSummaryResponse> list(OrderStatus status, int page, int size) {
+    public PageResponse<OrderSummaryResponse> list(OrderStatus status, Boolean marketing, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 50),
                 Sort.by(Sort.Direction.DESC, "createdAt"));
-        var result = status == null ? orderRepository.findAll(pageable) : orderRepository.findByStatus(status, pageable);
+        var result = orderRepository.search(status, marketing, pageable);
         return PageResponse.of(result, OrderSummaryResponse::from);
     }
 
@@ -63,8 +67,10 @@ public class OrderAdminService {
     /**
      * "Finalizada": confirma la venta, descuenta el stock y escribe los movimientos, todo en una transacción.
      * Admite PENDING y también EXPIRED (el pago pudo llegar tarde). Si el stock ya no alcanza, no se confirma nada.
+     * Guarda el delivery cobrado y el total final en la misma transacción (y bajo el mismo bloqueo).
      */
-    public OrderDetailResponse confirm(UUID id, UUID actor, String ip) {
+    public OrderDetailResponse confirm(UUID id, ConfirmOrderRequest req, UUID actor, String ip) {
+        checkFee(req);
         Order o = lock(id);
         if (o.getStatus() != OrderStatus.PENDING && o.getStatus() != OrderStatus.EXPIRED) {
             throw new BusinessRuleException("Solo se pueden confirmar pedidos pendientes o vencidos (estado actual: "
@@ -74,8 +80,41 @@ public class OrderAdminService {
         o.setStatus(OrderStatus.CONFIRMED);
         o.setConfirmedAt(OffsetDateTime.now());
         o.setConfirmedBy(actor);
-        auditService.record(actor, "ORDER_CONFIRM", "orders", o.getOrderCode(), ip);
+        o.chargeDelivery(req.deliveryFee());
+        auditService.record(actor, "ORDER_CONFIRM", "orders", o.getOrderCode(), ip,
+                "delivery " + money(o.getDeliveryFee()) + " -> " + money(o.getFinalDeliveryFee())
+                        + ", total " + money(o.getFinalTotalAmount()));
         return OrderDetailResponse.from(find(id), dni(o));
+    }
+
+    /** Corrige el delivery cobrado de un pedido ya confirmado (error de tipeo). Auditado con el valor anterior. */
+    public OrderDetailResponse fixDelivery(UUID id, ConfirmOrderRequest req, UUID actor, String ip) {
+        checkFee(req);
+        Order o = lock(id);
+        if (o.getStatus() != OrderStatus.CONFIRMED) {
+            throw new BusinessRuleException("Solo se corrige el delivery de pedidos confirmados");
+        }
+        String before = money(o.chargedDeliveryFee());
+        o.chargeDelivery(req.deliveryFee());
+        auditService.record(actor, "ORDER_DELIVERY_FIX", "orders", o.getOrderCode(), ip,
+                "delivery " + before + " -> " + money(o.getFinalDeliveryFee())
+                        + ", total " + money(o.getFinalTotalAmount()));
+        return OrderDetailResponse.from(find(id), dni(o));
+    }
+
+    /** Tope configurable (errores de tipeo) y S/ 0 solo con confirmación explícita. */
+    private void checkFee(ConfirmOrderRequest req) {
+        if (req.deliveryFee().compareTo(props.maxDeliveryFee()) > 0) {
+            throw new BusinessRuleException("El delivery no puede superar S/ " + money(props.maxDeliveryFee())
+                    + ". Revisa el monto.");
+        }
+        if (req.deliveryFee().signum() == 0 && !req.zeroFeeConfirmed()) {
+            throw new BusinessRuleException("Confirma que el delivery fue gratis (S/ 0)");
+        }
+    }
+
+    private static String money(BigDecimal amount) {
+        return WhatsAppMessageBuilder.money(amount);
     }
 
     /** Cancela con motivo. Si la venta ya estaba confirmada, devuelve el stock (CANCEL_RETURN). Nada se borra. */
@@ -109,15 +148,15 @@ public class OrderAdminService {
         return new TextResponse(sb.toString());
     }
 
-    /** "Copiar datos para boleta": nombre, DNI, productos y total. */
+    /** "Copiar datos para boleta": nombre, documento, productos, delivery cobrado y total final. */
     public TextResponse receiptText(UUID id, UUID actor, String ip) {
         Order o = find(id);
         auditService.record(actor, "ORDER_COPY_RECEIPT", "orders", o.getOrderCode(), ip);
         StringBuilder sb = new StringBuilder()
                 .append("Cliente: ").append(o.customerFullName()).append('\n');
-        String dni = dni(o);
-        if (dni != null) {
-            sb.append("DNI: ").append(dni).append('\n');
+        String document = dni(o);
+        if (document != null) {
+            sb.append(o.getDocumentType().label()).append(": ").append(document).append('\n');
         }
         sb.append("Productos:\n");
         Map<UUID, List<String>> contents = comboContents.of(o.getItems());
@@ -125,8 +164,9 @@ public class OrderAdminService {
             sb.append("- ").append(OrderLineText.line(i, contents.get(i.getProductId())))
                     .append("  S/ ").append(WhatsAppMessageBuilder.money(i.getSubtotal())).append('\n');
         }
-        sb.append("Envío: S/ ").append(WhatsAppMessageBuilder.money(o.getDeliveryFee())).append('\n')
-                .append("Total: S/ ").append(WhatsAppMessageBuilder.money(o.getTotalAmount()));
+        sb.append("Envío: S/ ").append(money(o.chargedDeliveryFee())).append('\n')
+                .append("Total: S/ ").append(money(o.chargedTotal())).append('\n')
+                .append("Pago: ").append(o.getPaymentMethod().label());
         return new TextResponse(sb.toString());
     }
 
