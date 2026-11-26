@@ -19,9 +19,9 @@ export const API_URL = environment.apiUrl;
 export const SITE = {
   name: 'BRINDA',
   tagline: 'Licorería a domicilio en Lima',
-  announcement: 'Delivery en Lima · Pide por WhatsApp · Paga con Yape o Plin',
+  announcement: 'Delivery en Lima · Pide por WhatsApp · Paga con Yape, Plin o transferencia',
   /** Versión de una sola línea para celular. */
-  announcementShort: 'Delivery en Lima · Yape o Plin',
+  announcementShort: 'Delivery en Lima · Yape, Plin o transferencia',
 } as const;
 
 /**
@@ -53,7 +53,7 @@ export const HOW_TO_ORDER = [
     text: 'Pulsa «Enviar por WhatsApp». Sin ese mensaje, tu pedido no avanza.',
   },
   {
-    title: 'Paga con Yape o Plin',
+    title: 'Paga con Yape, Plin o transferencia',
     // Misma redacción que el aviso de /pedido/:codigo; no promete reserva de stock.
     text: `Verificamos tu pago y salimos a tu dirección. Tu pedido se mantiene ${ORDER.expiryMinutes} minutos: si no se confirma antes, vence.`,
   },
@@ -61,7 +61,7 @@ export const HOW_TO_ORDER = [
 
 /** Datos de contacto. whatsappNumber en formato internacional sin "+" (p. ej. 51XXXXXXXXX). */
 export const CONTACT = {
-  whatsappNumber: '',
+  whatsappNumber: '51939448967',
   whatsappMessage: 'Hola BRINDA, quisiera hacer un pedido.',
   /** Texto público de zonas mientras no haya la lista real de distritos. */
   zonesIntro: 'Lima. Distritos con cobertura, muy pronto.',
@@ -75,18 +75,24 @@ export const CONTACT = {
  * La redacción final la confirma el asesor de Lucía: no inventar ni parafrasear textos legales.
  */
 export const LEGAL = {
+  /**
+   * Fecha de la versión vigente de Términos y Privacidad (AAAA-MM-DD). Vacía hasta el lanzamiento: sin fecha,
+   * las páginas no muestran la línea "Última actualización". Debe ser IGUAL a LEGAL_DOCUMENTS_VERSION del backend,
+   * que la guarda en cada pedido como terms_version y privacy_version.
+   */
+  documentsUpdatedAt: '',
   /** Avisos legales de licor y tabaco (texto del asesor de Lucía). Vacío = no se muestra. */
   noticesText: '',
   /** Datos del proveedor tal como figuran en la hoja. El domicilio NO es zona de reparto ni punto de venta. */
   provider: {
     name: 'BRINDA PERU SAC',
     ruc: '20616579607',
-    /** Literal de la hoja oficial (txtDomicilio). */
-    address: 'AV ALFREDO BENAVIDES 707. 1403, MIRAFLORES',
+    /** Domicilio unificado del sitio (igual que en los textos legales y en la hoja que genera el backend). */
+    address: 'Av. Alfredo Benavides 707, int. 1403, Miraflores',
   },
   alcoholWarning: 'TOMAR BEBIDAS ALCOHÓLICAS EN EXCESO ES DAÑINO',
   minorsNotice:
-    'No se entregan productos a menores de 18 años. El repartidor pedirá tu DNI físico al momento de la entrega.',
+    'No se entregan productos a menores de 18 años. El repartidor pedirá tu documento de identidad al momento de la entrega.',
   complaints: {
     path: '/libro-de-reclamaciones',
     logo: 'legal/logo-libro-reclamaciones.png',

@@ -1,0 +1,33 @@
+<section class="head candle-edge" aria-labelledby="legal-title">
+  <div class="container">
+    <h1 id="legal-title" class="title">{{ doc.title }}</h1>
+    @if (updated) {
+      <p class="updated">{{ updated }}</p>
+    }
+  </div>
+</section>
+
+<article class="container body legal" aria-labelledby="legal-title">
+  @for (section of doc.sections; track section.heading) {
+    <section class="section">
+      <h2 class="heading">{{ section.heading }}</h2>
+      @for (block of section.blocks; track $index) {
+        @if (block.kind === 'p') {
+          <!-- prettier-ignore -->
+          <p><ng-container [ngTemplateOutlet]="inline" [ngTemplateOutletContext]="{ $implicit: block.text }" /></p>
+        } @else {
+          <ul class="list">
+            @for (item of block.items; track $index) {
+              <!-- prettier-ignore -->
+              <li><ng-container [ngTemplateOutlet]="inline" [ngTemplateOutletContext]="{ $implicit: item }" /></li>
+            }
+          </ul>
+        }
+      }
+    </section>
+  }
+</article>
+
+<!-- En una sola línea a propósito: los saltos entre fragmentos se verían como espacios ("S.A.C. , con"). -->
+<!-- prettier-ignore -->
+<ng-template #inline let-text>@for (s of segments(text); track $index) {@if (s.bold) {<strong>{{ s.text }}</strong>} @else {<ng-container>{{ s.text }}</ng-container>}}</ng-template>

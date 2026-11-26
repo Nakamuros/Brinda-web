@@ -29,19 +29,19 @@ export const routes: Routes = [
           import('./pages/public/pedido/pedido-creado').then((m) => m.PedidoCreado),
       },
       {
-        // Sin texto todavía: lo entrega el asesor legal.
+        // Texto literal del asesor en core/legal-texts.ts; fecha en LEGAL.documentsUpdatedAt.
         path: 'terminos',
         title: 'Términos y condiciones · BRINDA',
-        data: { heading: 'Términos y condiciones' },
+        data: { doc: 'terms' },
         loadComponent: () =>
-          import('./pages/public/legal-soon/legal-soon').then((m) => m.LegalSoon),
+          import('./pages/public/legal-page/legal-page').then((m) => m.LegalPage),
       },
       {
         path: 'privacidad',
         title: 'Política de privacidad · BRINDA',
-        data: { heading: 'Política de privacidad' },
+        data: { doc: 'privacy' },
         loadComponent: () =>
-          import('./pages/public/legal-soon/legal-soon').then((m) => m.LegalSoon),
+          import('./pages/public/legal-page/legal-page').then((m) => m.LegalPage),
       },
       {
         path: 'carrito',
