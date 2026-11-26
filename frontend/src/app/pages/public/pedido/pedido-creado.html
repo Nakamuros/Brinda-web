@@ -20,18 +20,8 @@
           las {{ expiresAt() }}, vence.
         </p>
 
-        <dl class="pay">
-          <div>
-            <dt>Pago</dt>
-            <dd>{{ method() }}</dd>
-          </div>
-          @if (o.payment.number; as number) {
-            <div>
-              <dt>{{ method() }} de BRINDA</dt>
-              <dd>{{ number }}</dd>
-            </div>
-          }
-        </dl>
+        <ng-container [ngTemplateOutlet]="payBlock" />
+        <app-delivery-notice [fee]="delivery.minFee()" />
 
         <a class="back" routerLink="/catalogo">Volver al catálogo</a>
       </section>
@@ -61,7 +51,7 @@
             <dd>{{ money(o.deliveryFee) }}</dd>
           </div>
           <div class="sum-total">
-            <dt>Total</dt>
+            <dt>Total estimado</dt>
             <dd>{{ money(o.total) }}</dd>
           </div>
         </dl>
@@ -71,6 +61,8 @@
   } @else if (savedCode(); as code) {
     <div class="saved">
       <ng-container [ngTemplateOutlet]="sendStep" [ngTemplateOutletContext]="{ $implicit: code }" />
+      <ng-container [ngTemplateOutlet]="payBlock" />
+      <app-delivery-notice [fee]="delivery.minFee()" />
     </div>
     <app-state-panel
       title="Guarda tu código"
@@ -87,6 +79,48 @@
     </app-state-panel>
   }
 </div>
+
+<!-- Datos para pagar (de BRINDA, no del cliente): también tras recargar. -->
+<ng-template #payBlock>
+  @if (payment(); as p) {
+    <dl class="pay">
+      <div>
+        <dt>Pago</dt>
+        <dd>{{ method() }}</dd>
+      </div>
+      @if (p.method === 'TRANSFER') {
+        @if (p.transfer; as t) {
+          <div>
+            <dt>Banco</dt>
+            <dd>{{ t.bank }}</dd>
+          </div>
+          <div>
+            <dt>Cuenta</dt>
+            <dd class="acct">{{ t.account }}</dd>
+          </div>
+          <div>
+            <dt>CCI</dt>
+            <dd class="acct">{{ t.cci }}</dd>
+          </div>
+          <div>
+            <dt>Titular</dt>
+            <dd>{{ t.holder }}</dd>
+          </div>
+        } @else {
+          <div>
+            <dt>Cuenta</dt>
+            <dd>Te enviaremos los datos de la cuenta por WhatsApp</dd>
+          </div>
+        }
+      } @else if (p.number; as number) {
+        <div>
+          <dt>{{ method() }} de BRINDA</dt>
+          <dd>{{ number }}</dd>
+        </div>
+      }
+    </dl>
+  }
+</ng-template>
 
 <!-- Paso pendiente: lo primero que se ve. Sin enviar el mensaje, el pedido no avanza. -->
 <ng-template #sendStep let-code>
@@ -115,8 +149,8 @@
         Enviar por WhatsApp
       </a>
       <p class="pending-note">
-        No cierres esta página hasta enviarlo. El mensaje lleva tu código, el total y cómo pagarás;
-        pagas cuando lo confirmemos por WhatsApp.
+        No cierres esta página hasta enviarlo. El mensaje lleva tu código, tus productos, el total
+        estimado y cómo pagarás; pagas cuando lo confirmemos por WhatsApp.
       </p>
     </section>
   } @else {

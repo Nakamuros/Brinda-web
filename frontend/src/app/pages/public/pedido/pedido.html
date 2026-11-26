@@ -26,6 +26,7 @@
     </app-state-panel>
   } @else {
     <div class="layout">
+      <app-delivery-notice class="delivery" [fee]="delivery.minFee()" />
       <form class="form" [formGroup]="form" novalidate>
         <fieldset class="group">
           <legend class="legend">Tus datos</legend>
@@ -71,22 +72,52 @@
                 (input)="digits('phone', 9, $event)"
               />
             </app-field>
+            <app-field label="Tipo de documento" controlId="documentType" [error]="error('documentType')">
+              <span class="select">
+                <select
+                  id="documentType"
+                  class="input"
+                  formControlName="documentType"
+                  [attr.aria-invalid]="invalid('documentType')"
+                >
+                  @for (t of documentTypes; track t[0]) {
+                    <option [value]="t[0]">{{ t[1] }}</option>
+                  }
+                </select>
+                <svg
+                  class="chevron"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </app-field>
             <app-field
-              label="DNI"
-              controlId="dni"
-              [error]="error('dni')"
-              hint="8 dígitos. Lo necesitamos para tu boleta."
+              label="Número de documento"
+              controlId="documentNumber"
+              [error]="error('documentNumber')"
+              [hint]="documentHint()"
             >
               <input
-                id="dni"
+                id="documentNumber"
                 class="input"
-                formControlName="dni"
-                inputmode="numeric"
+                formControlName="documentNumber"
+                [attr.inputmode]="form.controls.documentType.value === 'DNI' ? 'numeric' : 'text'"
+                autocapitalize="characters"
                 autocomplete="off"
-                maxlength="8"
-                [attr.aria-invalid]="invalid('dni')"
-                [attr.aria-describedby]="'dni-msg'"
-                (input)="digits('dni', 8, $event)"
+                spellcheck="false"
+                [attr.maxlength]="documentMax()"
+                [attr.aria-invalid]="invalid('documentNumber')"
+                [attr.aria-describedby]="'documentNumber-msg'"
+                (input)="document($event)"
               />
             </app-field>
           </div>
@@ -184,6 +215,10 @@
               <input type="radio" formControlName="paymentMethod" value="PLIN" />
               <span>Plin</span>
             </label>
+            <label class="choice choice-wide">
+              <input type="radio" formControlName="paymentMethod" value="TRANSFER" />
+              <span>Transferencia</span>
+            </label>
           </div>
           @if (error('paymentMethod'); as e) {
             <p class="msg" role="alert">{{ e }}</p>
@@ -232,6 +267,21 @@
             <p class="msg" role="alert">{{ e }}</p>
           }
         </fieldset>
+
+        <fieldset class="group optional">
+          <legend class="sr-only">Promociones (opcional)</legend>
+          <label class="check">
+            <input id="marketing" type="checkbox" formControlName="marketingConsent" />
+            <span
+              >Quiero recibir promociones, novedades y recomendaciones de BRINDA por WhatsApp, correo,
+              SMS o redes sociales. Es opcional: puedo retirar mi consentimiento cuando quiera. Más
+              detalles en la
+              <a class="doc" routerLink="/privacidad" target="_blank" rel="noopener"
+                >política de privacidad</a
+              >.</span
+            >
+          </label>
+        </fieldset>
       </form>
 
       <aside class="summary" aria-labelledby="sum-title">
@@ -276,9 +326,6 @@
             <dd>{{ total() }}</dd>
           </div>
         </dl>
-        <p class="note">
-          La tarifa y el total finales los confirma el servidor al enviar tu pedido.
-        </p>
         <app-legal-notice kind="minors" />
         @if (failure(); as f) {
           <p class="alert" role="alert">

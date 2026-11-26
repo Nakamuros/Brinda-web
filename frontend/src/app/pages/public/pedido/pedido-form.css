@@ -1,0 +1,39 @@
+/* Solo del checkout (/pedido). Se suma a pedido.css, que comparte con /pedido/:codigo. */
+
+/* Promociones: opcional y separada de los términos */
+.optional {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-soft);
+}
+
+/* Transferencia ocupa la fila entera en celular; en tablet y escritorio, las tres en fila */
+@media (max-width: 47.99rem) {
+  .choice-wide {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 48rem) {
+  .choices {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* El aviso de delivery va sobre el resumen, en la columna derecha; el formulario ocupa las dos filas */
+@media (min-width: 64rem) {
+  /* La fila del aviso se ajusta a él; la del resumen se lleva el resto del alto del formulario */
+  .layout {
+    grid-template-rows: auto 1fr;
+    row-gap: var(--space-5);
+  }
+  .delivery {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .form {
+    grid-row: 1 / span 2;
+  }
+  .summary {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}

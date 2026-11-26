@@ -62,8 +62,8 @@ async function render(withItems = true, districts = DISTRICTS) {
 /** Texto sin el espacio de no separación que pone Intl entre "S/" y el importe. */
 const money = (el: Element | null) => el?.textContent?.replace(/\u00a0/g, ' ').trim();
 
-function select(el: HTMLElement, value: string) {
-  const s = el.querySelector('select') as HTMLSelectElement;
+function select(el: HTMLElement, value: string, id = 'districtId') {
+  const s = el.querySelector(`#${id}`) as HTMLSelectElement;
   s.value = s.options[[...s.options].findIndex((o) => o.textContent?.trim() === value)].value;
   s.dispatchEvent(new Event('change'));
 }
@@ -78,11 +78,12 @@ function fill(el: HTMLElement) {
   type(el, 'firstName', 'Ana María');
   type(el, 'lastName', "Pérez O'Brien");
   type(el, 'phone', '987654321');
-  type(el, 'dni', '12345678');
+  type(el, 'documentNumber', '12345678');
   type(el, 'address', 'Av. Larco 123');
   select(el, 'Barranco');
   el.querySelectorAll<HTMLInputElement>('input[type=radio], input[type=checkbox]').forEach((i) => {
-    if (i.value !== 'PLIN' && i.id !== 'adult-no') {
+    // Yape, "Sí" a la edad y las dos casillas obligatorias; la de promociones queda sin marcar.
+    if (!['PLIN', 'TRANSFER'].includes(i.value) && i.id !== 'adult-no' && i.id !== 'marketing') {
       i.click();
     }
   });
@@ -96,7 +97,7 @@ const CREATED = {
   total: 102,
   expiresAt: '2026-11-15T20:20:00-05:00',
   items: [{ name: 'Pisco Quebranta 500 ml', quantity: 2, unitPrice: 48, subtotal: 96 }],
-  payment: { method: 'YAPE', number: null, amount: 102 },
+  payment: { method: 'YAPE', number: '999111222', transfer: null, amount: 102 },
   whatsappUrl: null,
 };
 
@@ -147,7 +148,7 @@ describe('Pedido (checkout)', () => {
 
   it('celular y DNI aceptan solo dígitos y respetan el largo', async () => {
     const { fixture, el } = await render();
-    const dni = el.querySelector('#dni') as HTMLInputElement;
+    const dni = el.querySelector('#documentNumber') as HTMLInputElement;
     dni.value = '12a3-4567890';
     dni.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -160,14 +161,54 @@ describe('Pedido (checkout)', () => {
 
   it('muestra el error de un campo solo después de tocarlo', async () => {
     const { fixture, el } = await render();
-    expect(el.querySelector('#dni-msg')?.getAttribute('role')).toBeNull();
-    const dni = el.querySelector('#dni') as HTMLInputElement;
+    expect(el.querySelector('#documentNumber-msg')?.getAttribute('role')).toBeNull();
+    const dni = el.querySelector('#documentNumber') as HTMLInputElement;
     dni.value = '123';
     dni.dispatchEvent(new Event('input'));
     dni.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
-    expect(el.querySelector('#dni-msg')?.textContent).toContain('El DNI debe tener 8 dígitos.');
+    expect(el.querySelector('#documentNumber-msg')?.textContent).toContain('El DNI debe tener 8 dígitos.');
     expect(dni.getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('carné de extranjería y pasaporte: letras y números en mayúsculas, con su propio largo', async () => {
+    const { fixture, el } = await render();
+    const number = el.querySelector('#documentNumber') as HTMLInputElement;
+    select(el, 'Pasaporte', 'documentType');
+    type(el, 'documentNumber', 'ab-12 3');
+    number.dispatchEvent(new Event('blur'));
+    fixture.detectChanges();
+    expect(number.value).toBe('AB123');
+    expect(number.getAttribute('maxlength')).toBe('12');
+    expect(el.querySelector('#documentNumber-msg')?.textContent).toContain(
+      'El pasaporte debe tener entre 6 y 12 letras o números.',
+    );
+    type(el, 'documentNumber', 'ab1234');
+    fixture.detectChanges();
+    expect(number.getAttribute('aria-invalid')).toBe('false');
+
+    select(el, 'Carné de extranjería', 'documentType');
+    fixture.detectChanges();
+    expect(el.querySelector('#documentNumber-msg')?.textContent).toContain('entre 8 y 12');
+    // Al volver a DNI el número se limpia a solo dígitos.
+    select(el, 'DNI', 'documentType');
+    fixture.detectChanges();
+    expect(number.value).toBe('1234');
+  });
+
+  it('el aviso de delivery muestra la tarifa mínima que da la API', async () => {
+    const { el } = await render();
+    const notice = el.querySelector('app-delivery-notice');
+    expect(money(notice?.querySelector('.title') ?? null)).toBe('Delivery desde S/ 6.00.');
+    expect(notice?.textContent).toContain('El monto final te lo confirmamos por WhatsApp antes de pagar.');
+    expect(money(el.querySelector('.sum-total dt'))).toBe('Total estimado');
+  });
+
+  it('paga con Yape, Plin o transferencia y la casilla de promociones empieza sin marcar', async () => {
+    const { el } = await render();
+    const methods = [...el.querySelectorAll<HTMLInputElement>('input[formcontrolname=paymentMethod]')];
+    expect(methods.map((m) => m.value)).toEqual(['YAPE', 'PLIN', 'TRANSFER']);
+    expect((el.querySelector('#marketing') as HTMLInputElement).checked).toBe(false);
   });
 
   it('con el formulario incompleto no envía nada y muestra los errores', async () => {
@@ -175,7 +216,9 @@ describe('Pedido (checkout)', () => {
     (el.querySelector('.finish') as HTMLButtonElement).click();
     fixture.detectChanges();
     http.verify(); // sin POST /orders
-    expect(el.querySelector('#dni-msg')?.textContent).toContain('Ingresa tu DNI.');
+    expect(el.querySelector('#documentNumber-msg')?.textContent).toContain(
+      'Ingresa el número de tu documento.',
+    );
     expect(el.textContent).toContain('Debes aceptar los términos y condiciones.');
     expect(el.textContent).toContain('Indica si eres mayor de 18 años.');
   });
@@ -204,7 +247,8 @@ describe('Pedido (checkout)', () => {
       firstName: 'Ana María',
       lastName: "Pérez O'Brien",
       phone: '987654321',
-      dni: '12345678',
+      documentType: 'DNI',
+      documentNumber: '12345678',
       districtId: 4,
       address: 'Av. Larco 123',
       reference: '',
@@ -212,6 +256,7 @@ describe('Pedido (checkout)', () => {
       adultConfirmed: true,
       termsAccepted: true,
       privacyAccepted: true,
+      marketingConsent: false,
     });
     expect(cart.itemCount()).toBe(2); // todavía no se vacía
     req.flush(CREATED, { status: 201, statusText: 'Created' });
@@ -226,6 +271,8 @@ describe('Pedido (checkout)', () => {
     const recent = JSON.parse(localStorage.getItem('brinda.order.v1') ?? '{}');
     expect(recent.code).toBe('EQ12');
     expect(recent.whatsappUrl).toBe(CREATED.whatsappUrl);
+    // Y los datos para pagar (de BRINDA), para verlos tras recargar.
+    expect(recent.payment).toEqual(CREATED.payment);
   });
 
   it('429: pide esperar un minuto y conserva el carrito', async () => {
@@ -265,12 +312,12 @@ describe('Pedido (checkout)', () => {
         status: 400,
         code: 'VALIDATION_ERROR',
         message: 'Datos inválidos',
-        fields: { dni: 'El DNI debe tener 8 dígitos' },
+        fields: { documentNumber: 'El DNI debe tener 8 dígitos' },
       },
       { status: 400, statusText: 'Bad Request' },
     );
     await settle();
-    expect(el.querySelector('#dni-msg')?.textContent).toContain('El DNI debe tener 8 dígitos');
+    expect(el.querySelector('#documentNumber-msg')?.textContent).toContain('El DNI debe tener 8 dígitos');
     expect(el.querySelector('.alert')?.textContent).toContain('Revisa los datos marcados');
     expect(cart.itemCount()).toBe(2);
   });
@@ -285,7 +332,8 @@ describe('Pedido (checkout)', () => {
   it('las casillas enlazan a /terminos y /privacidad en otra pestaña', async () => {
     const { el } = await render();
     const links = [...el.querySelectorAll<HTMLAnchorElement>('a.doc')];
-    expect(links.map((a) => a.getAttribute('href'))).toEqual(['/terminos', '/privacidad']);
+    // Términos, privacidad y, en la casilla de promociones, otra vez privacidad.
+    expect(links.map((a) => a.getAttribute('href'))).toEqual(['/terminos', '/privacidad', '/privacidad']);
     expect(links.every((a) => a.target === '_blank')).toBe(true);
   });
 });

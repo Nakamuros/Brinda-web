@@ -244,6 +244,7 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
 @media (min-width: 64rem) {
   .head {
     padding-block: var(--space-9) var(--space-6);

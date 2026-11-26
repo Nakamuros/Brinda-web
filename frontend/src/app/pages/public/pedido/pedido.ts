@@ -1,9 +1,17 @@
 import { Component, ElementRef, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { District } from '../../../models/district';
+import { DOCUMENT_LABEL, DocumentType, PaymentMethod } from '../../../models/order';
 import { CartService, lineTotals } from '../../../services/cart.service';
+import { DeliveryNotice } from '../../../shared/delivery-notice';
 import { DeliveryService } from '../../../services/delivery.service';
 import { OrderFailure, OrderService, orderFailure } from '../../../services/order.service';
 import { FormField } from '../../../shared/form-field';
@@ -15,6 +23,32 @@ import { StatePanel } from '../../../shared/state-panel';
 /** Mismas reglas que `CreateOrderRequest` del backend. */
 const NAME = /^[\p{L} .'-]{1,80}$/u;
 
+/** Mismas reglas que `ValidDocument` del backend: patrón y largo máximo por tipo. */
+const DOCUMENT_RULES: Record<DocumentType, { pattern: RegExp; max: number; message: string }> = {
+  DNI: { pattern: /^\d{8}$/, max: 8, message: 'El DNI debe tener 8 dígitos.' },
+  CE: {
+    pattern: /^[A-Z0-9]{8,12}$/,
+    max: 12,
+    message: 'El carné de extranjería debe tener entre 8 y 12 letras o números.',
+  },
+  PASSPORT: {
+    pattern: /^[A-Z0-9]{6,12}$/,
+    max: 12,
+    message: 'El pasaporte debe tener entre 6 y 12 letras o números.',
+  },
+};
+
+/** Valida el número según el tipo elegido en el mismo formulario. */
+function documentNumber(control: AbstractControl): ValidationErrors | null {
+  const type = control.parent?.get('documentType')?.value as DocumentType | undefined;
+  const value = String(control.value ?? '');
+  if (!type || !value) {
+    return null; // lo reporta `required`
+  }
+  const rule = DOCUMENT_RULES[type];
+  return rule.pattern.test(value) ? null : { document: rule.message };
+}
+
 const MESSAGES = {
   firstName: {
     required: 'Ingresa tus nombres.',
@@ -25,7 +59,8 @@ const MESSAGES = {
     pattern: 'Usa solo letras, espacios, punto, guion o apóstrofe.',
   },
   phone: { required: 'Ingresa tu celular.', pattern: 'El celular debe tener 9 dígitos.' },
-  dni: { required: 'Ingresa tu DNI.', pattern: 'El DNI debe tener 8 dígitos.' },
+  documentType: { required: 'Elige tu tipo de documento.' },
+  documentNumber: { required: 'Ingresa el número de tu documento.' },
   districtId: { required: 'Elige tu distrito.' },
   address: { required: 'Ingresa tu dirección.', maxlength: 'Máximo 255 caracteres.' },
   reference: { maxlength: 'Máximo 255 caracteres.' },
@@ -42,9 +77,17 @@ const MINOR = 'Lo sentimos, solo vendemos a mayores de 18 años.';
 
 @Component({
   selector: 'app-pedido',
-  imports: [LegalNotice, ReactiveFormsModule, RouterLink, FormField, RevealDirective, StatePanel],
+  imports: [
+    DeliveryNotice,
+    LegalNotice,
+    ReactiveFormsModule,
+    RouterLink,
+    FormField,
+    RevealDirective,
+    StatePanel,
+  ],
   templateUrl: './pedido.html',
-  styleUrl: './pedido.css',
+  styleUrls: ['./pedido.css', './pedido-form.css'],
 })
 export class Pedido {
   protected readonly cart = inject(CartService);
@@ -61,24 +104,32 @@ export class Pedido {
     () => this.delivery.status() === 'ready' && this.delivery.districts().length === 0,
   );
 
-  // El DNI no se guarda en el navegador: el formulario vive solo en memoria.
+  protected readonly documentTypes = Object.entries(DOCUMENT_LABEL) as [DocumentType, string][];
+
+  // El documento no se guarda en el navegador: el formulario vive solo en memoria.
   protected readonly form = this.fb.group({
     firstName: ['', [Validators.required, Validators.pattern(NAME)]],
     lastName: ['', [Validators.required, Validators.pattern(NAME)]],
     phone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-    dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
+    documentType: this.fb.control<DocumentType>('DNI', Validators.required),
+    documentNumber: ['', [Validators.required, documentNumber]],
     districtId: this.fb.control<number | null>(null, Validators.required),
     address: ['', [Validators.required, Validators.maxLength(255)]],
     reference: ['', Validators.maxLength(255)],
-    paymentMethod: this.fb.control<'YAPE' | 'PLIN' | null>(null, Validators.required),
+    paymentMethod: this.fb.control<PaymentMethod | null>(null, Validators.required),
     // Sin marcar (null) o "No" (false) no pasan `requiredTrue`.
     adultConfirmed: this.fb.control<boolean | null>(null, Validators.requiredTrue),
     termsAccepted: [false, Validators.requiredTrue],
     privacyAccepted: [false, Validators.requiredTrue],
+    // Opcional y sin marcar: no condiciona la compra (Política de Privacidad, puntos 3 y 4).
+    marketingConsent: [false],
   });
 
   /** Cambia con cada evento del formulario (valor, toque, estado) para refrescar errores. */
   private readonly formEvent = toSignal(this.form.events, { initialValue: null });
+  private readonly documentType = toSignal(this.form.controls.documentType.valueChanges, {
+    initialValue: 'DNI' as DocumentType,
+  });
   private readonly districtId = toSignal(this.form.controls.districtId.valueChanges, {
     initialValue: null,
   });
@@ -120,8 +171,21 @@ export class Pedido {
     return formatPrice(Math.round((this.cart.totals().net + fee) * 100) / 100);
   });
 
+  /** Largo máximo del número según el tipo (atributo `maxlength`). */
+  protected readonly documentMax = computed(() => DOCUMENT_RULES[this.documentType()].max);
+  protected readonly documentHint = computed(() =>
+    this.documentType() === 'DNI'
+      ? '8 dígitos. Lo necesitamos para tu boleta.'
+      : `${this.documentType() === 'CE' ? '8' : '6'} a 12 letras o números. Lo necesitamos para tu boleta.`,
+  );
+
   constructor() {
     void this.delivery.load();
+    // Al cambiar el tipo, el número se vuelve a validar (y se recorta al nuevo largo).
+    this.form.controls.documentType.valueChanges.subscribe((type) => {
+      const number = this.form.controls.documentNumber;
+      number.setValue(this.cleanDocument(type, number.value));
+    });
   }
 
   /** Mensaje de error de un campo, solo después de tocarlo. */
@@ -136,8 +200,8 @@ export class Pedido {
     }
     const messages: Record<string, string> = MESSAGES[name];
     const key = Object.keys(control.errors)[0];
-    if (key === 'server') {
-      return control.errors['server'];
+    if (key === 'server' || key === 'document') {
+      return control.errors[key];
     }
     return messages[key] ?? messages['required'] ?? 'Revisa este campo.';
   }
@@ -208,13 +272,28 @@ export class Pedido {
       ?.focus();
   }
 
-  /** Solo dígitos y largo máximo, para celular y DNI. */
-  protected digits(name: 'phone' | 'dni', max: number, event: Event): void {
+  /** Solo dígitos y largo máximo, para el celular. */
+  protected digits(name: 'phone', max: number, event: Event): void {
     const input = event.target as HTMLInputElement;
     const clean = input.value.replace(/\D/g, '').slice(0, max);
     if (clean !== input.value) {
       input.value = clean;
     }
     this.form.controls[name].setValue(clean);
+  }
+
+  /** DNI: solo dígitos; CE y pasaporte: letras y números en mayúsculas. Siempre dentro del largo del tipo. */
+  protected document(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const clean = this.cleanDocument(this.form.controls.documentType.value, input.value);
+    if (clean !== input.value) {
+      input.value = clean;
+    }
+    this.form.controls.documentNumber.setValue(clean);
+  }
+
+  private cleanDocument(type: DocumentType, value: string): string {
+    const allowed = type === 'DNI' ? value.replace(/\D/g, '') : value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    return allowed.slice(0, DOCUMENT_RULES[type].max);
   }
 }

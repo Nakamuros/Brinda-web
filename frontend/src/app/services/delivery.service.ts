@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../core/config';
 import { District } from '../models/district';
@@ -13,6 +13,11 @@ export class DeliveryService {
 
   readonly status = signal<DeliveryStatus>('idle');
   readonly districts = signal<District[]>([]);
+  /** Tarifa más baja entre los distritos entregables ("Delivery desde S/ X"); null si no hay datos. */
+  readonly minFee = computed(() => {
+    const fees = this.districts().map((d) => d.fee);
+    return fees.length ? Math.min(...fees) : null;
+  });
 
   async load(): Promise<void> {
     if (this.status() === 'loading' || this.status() === 'ready') {

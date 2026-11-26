@@ -66,6 +66,13 @@
 }
 .pay dd {
   margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+/* Números de cuenta: se copian enteros con un toque */
+.acct {
+  letter-spacing: 0.04em;
+  user-select: all;
 }
 .back {
   justify-self: start;
@@ -126,6 +133,8 @@
   color: var(--text-soft);
 }
 .saved {
+  display: grid;
+  gap: var(--space-5);
   margin-bottom: var(--space-6);
 }
 

@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { API_URL } from '../core/config';
-import { CreateOrderRequest, CreatedOrder } from '../models/order';
+import { CreateOrderRequest, CreatedOrder, OrderPayment, PAYMENT_LABEL } from '../models/order';
 
 export interface OrderFailure {
   message: string;
@@ -49,19 +49,42 @@ const RECENT_KEY = 'brinda.order.v1';
 const RECENT_MS = 90 * 60 * 1000;
 
 /**
- * Lo único que se guarda del pedido en el navegador: código, cuándo se creó y el enlace de WhatsApp.
- * Sin datos personales: el mensaje del servidor solo lleva código, total y método de pago.
+ * Lo único que se guarda del pedido en el navegador: código, cuándo se creó, el enlace de WhatsApp y los datos
+ * para pagar. Sin datos personales: el mensaje lleva código, productos, montos y método de pago, y los datos de
+ * pago son de BRINDA (Yape/Plin o cuenta), no del cliente.
  */
 export interface RecentOrder {
   code: string;
   at: number;
   /** null si el WhatsApp no está configurado en el servidor. */
   whatsappUrl: string | null;
+  payment: OrderPayment | null;
 }
+
+/** Mismo tope que `WhatsAppMessageBuilder.MAX_URL_LENGTH` del backend. */
+const MAX_WHATSAPP_URL = 2000;
 
 /** Solo enlaces wa.me del servidor. */
 export function safeWhatsappUrl(url: unknown): string | null {
-  return typeof url === 'string' && url.startsWith('https://wa.me/') && url.length <= 600 ? url : null;
+  return typeof url === 'string' && url.startsWith('https://wa.me/') && url.length <= MAX_WHATSAPP_URL
+    ? url
+    : null;
+}
+
+const text = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 120;
+
+/** Revisa lo leído del navegador: un valor alterado se descarta en vez de mostrarse. */
+function safePayment(p: unknown): OrderPayment | null {
+  const r = p as Partial<OrderPayment> | null;
+  if (!r || typeof r !== 'object' || !r.method || !(r.method in PAYMENT_LABEL) || typeof r.amount !== 'number') {
+    return null;
+  }
+  const t = r.transfer;
+  const transfer =
+    t && text(t.bank) && text(t.account) && text(t.cci) && text(t.holder)
+      ? { bank: t.bank, account: t.account, cci: t.cci, holder: t.holder }
+      : null;
+  return { method: r.method, number: text(r.number) ? r.number : null, transfer, amount: r.amount };
 }
 
 function readRecent(): RecentOrder | null {
@@ -72,7 +95,14 @@ function readRecent(): RecentOrder | null {
       /^[A-Z]{2}\d{2,4}$/.test(r.code) &&
       typeof r.at === 'number' &&
       Date.now() - r.at < RECENT_MS;
-    return fresh ? { code: r.code, at: r.at, whatsappUrl: safeWhatsappUrl(r.whatsappUrl) } : null;
+    return fresh
+      ? {
+          code: r.code,
+          at: r.at,
+          whatsappUrl: safeWhatsappUrl(r.whatsappUrl),
+          payment: safePayment(r.payment),
+        }
+      : null;
   } catch {
     return null;
   }
@@ -96,6 +126,7 @@ export class OrderService {
       code: order.code,
       at: Date.now(),
       whatsappUrl: safeWhatsappUrl(order.whatsappUrl),
+      payment: safePayment(order.payment),
     };
     this.recent.set(recent);
     try {
