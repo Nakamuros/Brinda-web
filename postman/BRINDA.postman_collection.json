@@ -1750,7 +1750,7 @@
                   "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
                   "s('retry429', '');",
                   "const j = pm.response.json();",
-                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('documentNumber'); });",
                   ""
                 ]
               }
@@ -1777,7 +1777,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1799,7 +1799,7 @@
                   "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
                   "s('retry429', '');",
                   "const j = pm.response.json();",
-                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('documentNumber'); });",
                   ""
                 ]
               }
@@ -1826,7 +1826,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1848,7 +1848,7 @@
                   "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
                   "s('retry429', '');",
                   "const j = pm.response.json();",
-                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('documentNumber'); });",
                   ""
                 ]
               }
@@ -1875,7 +1875,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"1234567\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"1234567\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1897,7 +1897,7 @@
                   "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
                   "s('retry429', '');",
                   "const j = pm.response.json();",
-                  "pm.test('400 con error en dni', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('dni'); });",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('documentNumber'); });",
                   ""
                 ]
               }
@@ -1924,12 +1924,157 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"1234567a\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"1234567a\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            }
+          }
+        },
+        {
+          "name": "06.4b Pasaporte de 5 caracteres → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en documentNumber', () => { pm.response.to.have.status(400); pm.expect(j.fields.documentNumber).to.include('pasaporte'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"PASSPORT\",\n  \"documentNumber\": \"AB123\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06.4c Tipo de documento inválido → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "s('retry429', '');",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"RUC\",\n  \"documentNumber\": \"20123456789\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
+            }
+          }
+        },
+        {
+          "name": "06.4d Precios o total enviados por el navegador → 400 (no crea pedido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "s('retry429', '');",
+                  "pm.test('400: el servidor no acepta precios del navegador', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 2,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{piscoId}}\",\n      \"quantity\": 3,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{comboId}}\",\n      \"quantity\": 1,\n      \"unitPrice\": 0.01\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true,\n  \"total\": 0.01,\n  \"deliveryFee\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
             }
           }
         },
@@ -1973,7 +2118,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": false,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": false,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2022,7 +2167,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": false\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": false\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2071,7 +2216,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": false,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": false,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2120,7 +2265,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"12345\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"12345\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2168,7 +2313,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2216,7 +2361,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 0\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 0\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2264,7 +2409,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 51\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 51\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2312,7 +2457,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": 999999,\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": 999999,\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2360,7 +2505,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"00000000-0000-0000-0000-000000000000\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"00000000-0000-0000-0000-000000000000\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2408,7 +2553,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 50\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 50\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2423,7 +2568,7 @@
       "name": "07 · Pedido: creación (precios del servidor)",
       "item": [
         {
-          "name": "07.1 Pedido A: oferta + lleva 3 paga 2 + combo (con precios manipulados)",
+          "name": "07.1 Pedido A: oferta + lleva 3 paga 2 + combo",
           "event": [
             {
               "listen": "test",
@@ -2446,8 +2591,9 @@
                   "pm.test('Combo a su precio', () => pm.expect(cents(j.items[2].subtotal)).to.eql(combo));",
                   "pm.test('Total = subtotal + tarifa, calculado en el servidor', () => { pm.expect(cents(j.subtotal)).to.eql(whisky + pisco + combo); pm.expect(cents(j.deliveryFee)).to.eql(fee); pm.expect(cents(j.total)).to.eql(whisky + pisco + combo + fee); });",
                   "const url = decodeURIComponent(j.whatsappUrl || '');",
-                  "pm.test('WhatsApp: mensaje corto (código, total y pago) sin datos personales', () => { pm.expect(url).to.include('wa.me'); pm.expect(url).to.include('Pedido BRINDA ' + j.code); pm.expect(url).to.include('Total: S/ ' + Number(j.total).toFixed(2)); pm.expect(url).to.include('Pago: '); ['12345678', 'Ana', 'Pérez', '987654321', 'Larco', 'incluye:'].forEach(x => pm.expect(url).to.not.include(x)); });",
-                  "s('codeA', j.code);"
+                  "pm.test('WhatsApp: código, productos, delivery base, total estimado y pago, sin datos personales', () => { pm.expect(url).to.include('wa.me'); pm.expect(url).to.include('Pedido BRINDA ' + j.code); j.items.forEach(i => pm.expect(url).to.include(i.quantity + ' × ' + i.name)); pm.expect(url).to.include('Delivery base: S/ ' + Number(j.deliveryFee).toFixed(2)); pm.expect(url).to.include('Total estimado: S/ ' + Number(j.total).toFixed(2)); pm.expect(url).to.include('Pago: Yape'); pm.expect(j.whatsappUrl.length).to.be.at.most(2000); ['12345678', 'Ana', 'Pérez', '987654321', 'Larco', 'incluye:'].forEach(x => pm.expect(url).to.not.include(x)); });",
+                  "s('codeA', j.code);",
+                  "pm.test('Pago de BRINDA: método y monto (sin cuenta de transferencia)', () => { pm.expect(j.payment.method).to.eql('YAPE'); pm.expect(j.payment.transfer).to.not.exist; pm.expect(cents(j.payment.amount)).to.eql(cents(j.total)); });"
                 ]
               }
             }
@@ -2473,7 +2619,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 2,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{piscoId}}\",\n      \"quantity\": 3,\n      \"unitPrice\": 0.01\n    },\n    {\n      \"productId\": \"{{comboId}}\",\n      \"quantity\": 1,\n      \"unitPrice\": 0.01\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true,\n  \"total\": 0.01,\n  \"deliveryFee\": 0\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 2\n    },\n    {\n      \"productId\": \"{{piscoId}}\",\n      \"quantity\": 3\n    },\n    {\n      \"productId\": \"{{comboId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2526,7 +2672,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2578,7 +2724,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2630,12 +2776,65 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 6\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{whiskyId}}\",\n      \"quantity\": 6\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            }
+          }
+        },
+        {
+          "name": "07.5 Pedido E: transferencia, pasaporte y promociones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "if (pm.response.code === 429 && Number(g('retry429') || 0) < 2) { s('retry429', String(Number(g('retry429') || 0) + 1)); console.log('429 por uso reciente: espera 62 s y reintenta'); setTimeout(() => {}, 62000); postman.setNextRequest(pm.info.requestName); return; }",
+                  "s('retry429', '');",
+                  "const j = pm.response.json();",
+                  "pm.test('Pedido creado (200/201) en PENDING', () => { pm.expect([200, 201]).to.include(pm.response.code); pm.expect(j.status).to.eql('PENDING'); });",
+                  "pm.test('El pasaporte no viaja en la respuesta', () => pm.expect(JSON.stringify(j).toUpperCase()).to.not.include('AB123456'));",
+                  "pm.test('Pago por transferencia: cuenta completa o null (sin configurar)', () => { pm.expect(j.payment.method).to.eql('TRANSFER'); pm.expect(j.payment.number).to.not.exist; if (j.payment.transfer) { ['bank', 'account', 'cci', 'holder'].forEach(k => pm.expect(j.payment.transfer[k]).to.be.a('string').and.not.empty); } });",
+                  "const url = decodeURIComponent(j.whatsappUrl || '');",
+                  "pm.test('WhatsApp: Pago: Transferencia', () => pm.expect(url).to.include('Pago: Transferencia'));",
+                  "s('codeE', j.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"PASSPORT\",\n  \"documentNumber\": \"ab123456\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtId}},\n  \"paymentMethod\": \"TRANSFER\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true,\n  \"marketingConsent\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders"
+              ]
             }
           }
         }
@@ -2689,6 +2888,221 @@
           }
         },
         {
+          "name": "08.1b Lista con promociones aceptadas → incluye E",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 y todas con marketingConsent', () => { pm.response.to.have.status(200); pm.expect(j.content.every(o => o.marketingConsent === true)).to.be.true; });",
+                  "const e = j.content.find(o => o.code === g('codeE'));",
+                  "pm.test('Está E (transferencia)', () => { pm.expect(e).to.exist; pm.expect(e.paymentMethod).to.eql('TRANSFER'); });",
+                  "if (e) s('orderE', e.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders?status=PENDING&marketing=true&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "marketing",
+                  "value": "true"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.1c Lista sin promociones → no incluye E",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200, sin E y con A', () => { pm.response.to.have.status(200); pm.expect(j.content.find(o => o.code === g('codeE'))).to.not.exist; pm.expect(j.content.find(o => o.code === g('codeA'))).to.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders?status=PENDING&marketing=false&size=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING"
+                },
+                {
+                  "key": "marketing",
+                  "value": "false"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.1d Detalle de E: pasaporte y consentimiento con fecha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('PASSPORT en mayúsculas, promociones con fecha', () => { pm.expect(j.documentType).to.eql('PASSPORT'); pm.expect(j.documentNumber).to.eql('AB123456'); pm.expect(j.marketingConsent).to.be.true; pm.expect(j.marketingConsentAt).to.exist; pm.expect(j.paymentMethod).to.eql('TRANSFER'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderE}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderE}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.1e Boleta de E: \"Pasaporte:\" y \"Pago: Transferencia\"",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const t = Object.values(pm.response.json())[0];",
+                  "pm.test('Tipo de documento y pago', () => { pm.expect(t).to.include('Pasaporte: AB123456'); pm.expect(t).to.include('Pago: Transferencia'); pm.expect(t).to.not.include('DNI:'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderE}}/copy/receipt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderE}}",
+                "copy",
+                "receipt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.1f Anular E (no deja pendientes de prueba)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('200 CANCELLED', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql('CANCELLED'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Prueba Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderE}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderE}}",
+                "cancel"
+              ]
+            }
+          }
+        },
+        {
           "name": "08.2 Contador de pendientes",
           "event": [
             {
@@ -2734,8 +3148,10 @@
                   "const s = (k, v) => pm.collectionVariables.set(k, v);",
                   "const j = pm.response.json();",
                   "pm.test('200', () => pm.response.to.have.status(200));",
-                  "pm.test('DNI descifrado y consentimientos guardados', () => { pm.expect(j.dni).to.eql('12345678'); pm.expect(j.adultConfirmed).to.be.true; pm.expect(j.termsAcceptedAt).to.exist; pm.expect(j.privacyAcceptedAt).to.exist; });",
-                  "pm.test('promoType por línea', () => { const t = {}; j.items.forEach(i => t[i.name] = i.promoType); const v = Object.values(t); pm.expect(v).to.include('OFFER'); pm.expect(v).to.include('BUY_X_PAY_Y'); pm.expect(v.filter(x => x === null || x === undefined).length).to.eql(1); });"
+                  "pm.test('Documento descifrado con su tipo y consentimientos guardados', () => { pm.expect(j.documentType).to.eql('DNI'); pm.expect(j.documentNumber).to.eql('12345678'); pm.expect(j.adultConfirmed).to.be.true; pm.expect(j.termsAcceptedAt).to.exist; pm.expect(j.privacyAcceptedAt).to.exist; pm.expect(j.marketingConsent).to.be.false; pm.expect(j.marketingConsentAt).to.not.exist; });",
+                  "pm.test('promoType por línea', () => { const t = {}; j.items.forEach(i => t[i.name] = i.promoType); const v = Object.values(t); pm.expect(v).to.include('OFFER'); pm.expect(v).to.include('BUY_X_PAY_Y'); pm.expect(v.filter(x => x === null || x === undefined).length).to.eql(1); });",
+                  "pm.test('Sin confirmar: sin delivery ni total finales', () => { pm.expect(j.finalDeliveryFee).to.not.exist; pm.expect(j.finalTotal).to.not.exist; });",
+                  "s('subtotalA', String(j.subtotal));"
                 ]
               }
             }
@@ -2806,7 +3222,8 @@
                   "const s = (k, v) => pm.collectionVariables.set(k, v);",
                   "const j = pm.response.json();",
                   "const t = Object.values(j)[0];",
-                  "pm.test('Incluye DNI y \"incluye:\" del combo', () => { pm.response.to.have.status(200); pm.expect(t).to.include('DNI: 12345678'); pm.expect(t).to.include('incluye:'); });"
+                  "pm.test('Incluye DNI y \"incluye:\" del combo', () => { pm.response.to.have.status(200); pm.expect(t).to.include('DNI: 12345678'); pm.expect(t).to.include('incluye:'); });",
+                  "pm.test('Sin confirmar: envío y total estimados, y el pago', () => { pm.expect(t).to.include('Total: S/ '); pm.expect(t).to.include('Pago: Yape'); });"
                 ]
               }
             }
@@ -2876,7 +3293,7 @@
           }
         },
         {
-          "name": "08.7 Confirmar A",
+          "name": "08.6b Confirmar A sin cuerpo → 400",
           "event": [
             {
               "listen": "test",
@@ -2885,8 +3302,7 @@
                 "exec": [
                   "const g = k => pm.collectionVariables.get(k);",
                   "const s = (k, v) => pm.collectionVariables.set(k, v);",
-                  "const j = pm.response.json();",
-                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });"
+                  "pm.test('400 (falta el delivery cobrado)', () => pm.response.to.have.status(400));"
                 ]
               }
             }
@@ -2907,6 +3323,333 @@
                 "{{orderA}}",
                 "confirm"
               ]
+            }
+          }
+        },
+        {
+          "name": "08.6c Confirmar A sin deliveryFee → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('400 con error en deliveryFee', () => { pm.response.to.have.status(400); pm.expect(Object.keys(j.fields || {})).to.include('deliveryFee'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6d Delivery con 3 decimales → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 9.555,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6e Delivery negativo → 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": -1,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6f Delivery sobre el tope (S/ 100) → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('422 con el tope en el mensaje', () => { pm.response.to.have.status(422); pm.expect(j.message).to.include('100.00'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 100.01,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6g Delivery S/ 0 sin confirmación explícita → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 0,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.6h A sigue PENDING tras los rechazos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('PENDING y sin finales', () => { pm.expect(j.status).to.eql('PENDING'); pm.expect(j.finalDeliveryFee).to.not.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.7 Confirmar A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });",
+                  "const cents = x => Math.round(Number(x) * 100);",
+                  "pm.test('Guarda delivery cobrado y total final; el estimado no cambia', () => { pm.expect(cents(j.finalDeliveryFee)).to.eql(950); pm.expect(cents(j.finalTotal)).to.eql(cents(j.subtotal) + 950); pm.expect(cents(j.total)).to.eql(cents(j.subtotal) + cents(j.deliveryFee)); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "confirm"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 9.5,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -2973,7 +3716,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/confirm",
               "host": [
@@ -2986,6 +3734,150 @@
                 "orders",
                 "{{orderA}}",
                 "confirm"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 9.5,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "08.9b Boleta de A con el total final",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const t = Object.values(pm.response.json())[0];",
+                  "const total = (Math.round(Number(g('subtotalA')) * 100) + 950) / 100;",
+                  "pm.test('Envío 9.50 y total final', () => { pm.expect(t).to.include('Envío: S/ 9.50'); pm.expect(t).to.include('Total: S/ ' + total.toFixed(2)); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/copy/receipt",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "copy",
+                "receipt"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.9c Corregir el delivery de A → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "const cents = x => Math.round(Number(x) * 100);",
+                  "pm.test('200 con total final recalculado', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); pm.expect(cents(j.finalDeliveryFee)).to.eql(1200); pm.expect(cents(j.finalTotal)).to.eql(cents(j.subtotal) + 1200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 12,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderA}}/delivery-fee",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderA}}",
+                "delivery-fee"
+              ]
+            }
+          }
+        },
+        {
+          "name": "08.9d Corregir el delivery de B (pendiente) → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "pm.test('422', () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 12,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderB}}/delivery-fee",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                "{{orderB}}",
+                "delivery-fee"
               ]
             }
           }
@@ -3304,7 +4196,12 @@
           ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/orders/{{orderD}}/confirm",
               "host": [
@@ -3318,6 +4215,15 @@
                 "{{orderD}}",
                 "confirm"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 5,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },
@@ -3713,7 +4619,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"dni\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
+              "raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{snackId}}\",\n      \"quantity\": 1\n    }\n  ],\n  \"firstName\": \"Ana\",\n  \"lastName\": \"Pérez\",\n  \"phone\": \"987654321\",\n  \"documentType\": \"DNI\",\n  \"documentNumber\": \"12345678\",\n  \"address\": \"Av. Larco 123\",\n  \"reference\": \"Frente al parque\",\n  \"districtId\": {{districtTestId}},\n  \"paymentMethod\": \"YAPE\",\n  \"adultConfirmed\": true,\n  \"termsAccepted\": true,\n  \"privacyAccepted\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4220,7 +5126,7 @@
           }
         },
         {
-          "name": "10.4 Editar: el stock enviado se ignora",
+          "name": "10.4 Editar (nombre, precio y sin imagen); el stock no cambia",
           "event": [
             {
               "listen": "test",
@@ -4231,6 +5137,54 @@
                   "const s = (k, v) => pm.collectionVariables.set(k, v);",
                   "const j = pm.response.json();",
                   "pm.test('200, stock sigue en 0 y sin imagen', () => { pm.response.to.have.status(200); pm.expect(j.stockQuantity).to.eql(0); pm.expect(j.name).to.include('editado'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/products/{{prodTestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "products",
+                "{{prodTestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"categoryId\": {{catTestId}}, \"sku\": \"TST-{{ts}}\", \"name\": \"Producto Test {{ts}} editado\", \"price\": 12.00, \"imageUrl\": \"\", \"minStock\": 1, \"maxStock\": 10, \"available\": true, \"featured\": false }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "10.4b Editar enviando stockQuantity → 400 (el stock no se edita aquí)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const g = k => pm.collectionVariables.get(k);",
+                  "const s = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const j = pm.response.json();",
+                  "pm.test('400: campo desconocido (Jackson estricto); el producto no cambia', () => pm.response.to.have.status(400));"
                 ]
               }
             }
@@ -4708,14 +5662,20 @@
                   "const g = k => pm.collectionVariables.get(k);",
                   "const s = (k, v) => pm.collectionVariables.set(k, v);",
                   "const j = pm.response.json();",
-                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });"
+                  "pm.test('200 CONFIRMED', () => { pm.response.to.have.status(200); pm.expect(j.status).to.eql('CONFIRMED'); });",
+                  "pm.test('Vencido confirmado con su delivery cobrado', () => pm.expect(Number(j.finalDeliveryFee)).to.eql(6));"
                 ]
               }
             }
           ],
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/admin/orders/{{expiredOrderId}}/confirm",
               "host": [
@@ -4729,6 +5689,15 @@
                 "{{expiredOrderId}}",
                 "confirm"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryFee\": 6,\n  \"zeroFeeConfirmed\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           }
         },

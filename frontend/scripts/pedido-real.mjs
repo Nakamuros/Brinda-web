@@ -16,7 +16,7 @@ const products = (await (await fetch(`${base}/api/v1/catalog/products?size=50`))
 const near = districts.find((d) => d.name === 'Barranco') ?? districts[0];
 const cheap = [...products].filter((p) => p.inStock).sort((a, b) => a.finalPrice - b.finalPrice)[0];
 const pricey = [...products].sort((a, b) => b.finalPrice - a.finalPrice)[0];
-const CLIENT = { dni: '12345678', phone: '987654321', first: 'Ana María', address: 'Av. Larco 123' };
+const CLIENT = { dni: '12345678', passport: 'PW123456', phone: '987654321', first: 'Ana María', address: 'Av. Larco 123' };
 
 const sizes = [
   { name: '360', width: 360, height: 780 },
@@ -74,18 +74,27 @@ const until = async (page, fn) => {
   return false;
 };
 
-async function fill(page) {
+/** `transfer`: paga por transferencia con pasaporte y acepta promociones; si no, Yape con DNI y sin promociones. */
+async function fill(page, transfer = false) {
   await page.waitForSelector('#districtId option:not([disabled])', { state: 'attached' });
   await page.fill('#firstName', CLIENT.first);
   await page.fill('#lastName', "Pérez O'Brien");
   await page.fill('#phone', CLIENT.phone);
-  await page.fill('#dni', CLIENT.dni);
+  if (transfer) {
+    await page.selectOption('#documentType', 'PASSPORT');
+    await page.fill('#documentNumber', CLIENT.passport.toLowerCase());
+  } else {
+    await page.fill('#documentNumber', CLIENT.dni);
+  }
   await page.selectOption('#districtId', { label: near.name });
   await page.fill('#address', CLIENT.address);
-  await page.locator('.choice', { hasText: 'Yape' }).click();
+  await page.locator('.choice', { hasText: transfer ? 'Transferencia' : 'Yape' }).click();
   await page.locator('#adult-yes').check();
   for (const id of ['termsAccepted', 'privacyAccepted']) {
     await page.locator(`input[formControlName="${id}"]`).check();
+  }
+  if (transfer) {
+    await page.locator('#marketing').check();
   }
 }
 
@@ -120,6 +129,7 @@ for (const size of sizes) {
   const L = (t) => `${size.name}px ${t}`;
   const { ctx, page, errors, popups } = await open(size);
   const fakeNoWhatsapp = size.name === '768';
+  const transfer = size.name === '1440';
   if (fakeNoWhatsapp) {
     // El pedido se crea de verdad; solo se quita el enlace para ver el estado "sin WhatsApp".
     await page.route(ORDERS, async (route) => {
@@ -152,9 +162,9 @@ for (const size of sizes) {
   await page.screenshot({ path: `capturas/pedido-real-${size.name}-errores.png`, fullPage: true });
 
   const docs = await page.locator('a.doc').evaluateAll((as) => as.map((a) => `${a.getAttribute('href')} ${a.target}`));
-  check(L('casillas enlazan a /terminos y /privacidad (otra pestaña)'), docs.join() === '/terminos _blank,/privacidad _blank', docs.join());
+  check(L('casillas enlazan a /terminos y /privacidad (otra pestaña), también la de promociones'), docs.join() === '/terminos _blank,/privacidad _blank,/privacidad _blank', docs.join());
 
-  await fill(page);
+  await fill(page, transfer);
   await until(page, async () => (await page.locator('main [role="alert"]').count()) === 0);
   let small = await smallTargets(page);
   check(L('/pedido: objetivos táctiles >= 44px'), small.length === 0, small.join(', '));
@@ -164,6 +174,11 @@ for (const size of sizes) {
   const order = await res.json();
   check(L('POST /orders responde 201'), res.status() === 201, String(res.status()));
   check(L('envía solo productId y cantidad (sin precios)'), JSON.stringify(sent.items) === JSON.stringify([{ productId: cheap.id, quantity: 2 }]) && !/price|total|fee/i.test(JSON.stringify(sent)));
+  check(L(transfer ? 'envía pasaporte en mayúsculas, transferencia y promociones' : 'envía DNI, Yape y promociones sin marcar'),
+    transfer
+      ? sent.documentType === 'PASSPORT' && sent.documentNumber === CLIENT.passport && sent.paymentMethod === 'TRANSFER' && sent.marketingConsent === true
+      : sent.documentType === 'DNI' && sent.documentNumber === CLIENT.dni && sent.paymentMethod === 'YAPE' && sent.marketingConsent === false);
+  check(L('la respuesta trae el método de pago'), order.payment?.method === (transfer ? 'TRANSFER' : 'YAPE'));
 
   await page.waitForURL(`**/pedido/${order.code}`);
   await page.waitForSelector('.summary');
@@ -172,6 +187,19 @@ for (const size of sizes) {
   check(L('total y delivery = los del servidor'), money(await page.locator('.sum-total dd').innerText()) === cents(order.total) && cents(order.deliveryFee) === cents(near.fee) && cents(order.total) === cents(cheap.finalPrice * 2 + near.fee), `S/ ${order.total}`);
   check(L('resumen con las líneas del pedido'), (await page.locator('.items').innerText()).includes(`2 × ${cheap.name}`));
   check(L('aviso de 20 minutos'), (await page.locator('.deadline').innerText()).includes('20 minutos'));
+  check(L('resumen: "Total estimado"'), (await page.locator('.sum-total dt').innerText()).includes('Total estimado'));
+  const payText = await page.locator('.pay').innerText();
+  check(L(transfer ? 'pago por transferencia: cuenta o aviso de WhatsApp' : 'pago: Yape'),
+    transfer
+      ? payText.includes('Transferencia') && (order.payment.transfer ? payText.includes(order.payment.transfer.cci) : payText.includes('Te enviaremos los datos de la cuenta por WhatsApp'))
+      : payText.includes('Yape'),
+    payText.replace(/\s+/g, ' '));
+  check(L('aviso de delivery con la tarifa mínima de la API'), money(await page.locator('app-delivery-notice .title').innerText()) === cents(Math.min(...districts.map((d) => d.fee))));
+  if (!fakeNoWhatsapp) {
+    const text = decodeURIComponent(order.whatsappUrl);
+    check(L('mensaje de WhatsApp: productos, delivery base, total estimado y pago, sin datos personales'),
+      text.includes(`2 × ${cheap.name}`) && text.includes('Delivery base: S/ ') && text.includes(`Total estimado: S/ ${order.total.toFixed(2)}`) && text.includes(transfer ? 'Pago: Transferencia' : 'Pago: Yape') && noPersonalData(text));
+  }
   if (fakeNoWhatsapp) {
     check(L('sin WhatsApp: no hay botón'), (await page.locator('a.send').count()) === 0);
     check(L('sin WhatsApp: aviso honesto con el código'), (await page.locator('.unavailable').innerText()).includes('aún no está disponible') && (await page.locator('.unavailable').innerText()).includes(order.code));
@@ -182,15 +210,18 @@ for (const size of sizes) {
   }
   const s = await stored(page);
   check(L('carrito vacío tras crear el pedido'), (await page.evaluate(() => localStorage.getItem('brinda.cart.v1'))) === '[]');
-  check(L('DNI y datos personales fuera del navegador'), noPersonalData(s) && !s.includes('wa.me'));
+  check(L('documento y datos personales fuera del navegador'), noPersonalData(s));
   small = await smallTargets(page);
   check(L('/pedido/:codigo: objetivos táctiles >= 44px'), small.length === 0, small.join(', '));
   check(L('sin scroll horizontal'), await noOverflow(page));
   await page.screenshot({ path: `capturas/pedido-real-${size.name}-creado.png`, fullPage: true });
 
   await page.reload({ waitUntil: 'networkidle' });
-  check(L('al recargar queda solo el código, sin detalle ni WhatsApp'), (await page.locator('h1').innerText()).trim() === order.code && (await page.locator('.summary, a.send').count()) === 0);
-  check(L('lo guardado es solo el código'), /^\{"code":"[A-Z]{2}\d{2,4}","at":\d+\}$/.test(await page.evaluate(() => localStorage.getItem('brinda.order.v1'))));
+  check(L('al recargar: código, WhatsApp y pago, sin el detalle'),
+    (await page.locator('h1').innerText()).trim() === order.code && (await page.locator('.summary').count()) === 0 && (await page.locator('a.send').count()) === (fakeNoWhatsapp ? 0 : 1) && (await page.locator('.pay').innerText()).includes(transfer ? 'Transferencia' : 'Yape'));
+  const saved = JSON.parse(await page.evaluate(() => localStorage.getItem('brinda.order.v1')));
+  check(L('lo guardado: código, hora, enlace y pago (sin datos personales)'),
+    Object.keys(saved).join() === 'code,at,whatsappUrl,payment' && saved.code === order.code && saved.payment.method === order.payment.method && noPersonalData(JSON.stringify(saved)));
   await page.goto(`${base}/carrito`, { waitUntil: 'networkidle' });
   check(L('/carrito recuerda el último pedido'), (await page.locator('.recent a').innerText()).trim() === order.code && (await smallTargets(page)).length === 0);
   check(L('consola limpia'), errors.length === 0, errors.join(' | '));
@@ -209,7 +240,7 @@ for (const size of sizes) {
   check('stock: el servidor rechaza el pedido (422 regla de negocio; el 409 se trata igual)', res.status() === 422, String(res.status()));
   check('stock: mensaje claro con el producto', alert.includes('Sin stock suficiente') && alert.includes(pricey.name), alert);
   check('stock: enlace para revisar el carrito', (await page.locator('.alert a').getAttribute('href')) === '/carrito');
-  check('stock: sigue en /pedido con el carrito y los datos', page.url().endsWith('/pedido') && (await page.evaluate(() => localStorage.getItem('brinda.cart.v1'))).includes(pricey.id) && (await page.inputValue('#dni')) === CLIENT.dni);
+  check('stock: sigue en /pedido con el carrito y los datos', page.url().endsWith('/pedido') && (await page.evaluate(() => localStorage.getItem('brinda.cart.v1'))).includes(pricey.id) && (await page.inputValue('#documentNumber')) === CLIENT.dni);
   const small = await smallTargets(page);
   check('stock: objetivos táctiles >= 44px', small.length === 0, small.join(', '));
   check('stock: consola limpia', errors.length === 0, errors.join(' | '));
@@ -231,7 +262,7 @@ for (const size of sizes) {
   await page.waitForSelector('.alert');
   check(L('429: el servidor limita la IP'), res.status() === 429, String(res.status()));
   check(L('429: mensaje claro'), (await page.locator('.alert').innerText()).includes('Espera un minuto'));
-  check(L('429: conserva carrito y datos, botón activo'), (await page.evaluate(() => localStorage.getItem('brinda.cart.v1'))).includes(cheap.id) && (await page.inputValue('#dni')) === CLIENT.dni && (await page.getByRole('button', { name: 'Finalizar compra' }).isEnabled()));
+  check(L('429: conserva carrito y datos, botón activo'), (await page.evaluate(() => localStorage.getItem('brinda.cart.v1'))).includes(cheap.id) && (await page.inputValue('#documentNumber')) === CLIENT.dni && (await page.getByRole('button', { name: 'Finalizar compra' }).isEnabled()));
   check(L('429: DNI fuera del navegador'), noPersonalData(await stored(page)));
   check(L('429: sin scroll horizontal'), await noOverflow(page));
   check(L('429: consola limpia'), errors.length === 0, errors.join(' | '));
@@ -256,13 +287,15 @@ for (const size of sizes) {
   check(L('sin zonas: consola limpia'), errors.length === 0, errors.join(' | '));
   await ctx.close();
 
-  // /terminos y /privacidad: "Próximamente", sin texto legal y sin control de edad.
+  // /terminos y /privacidad: texto del asesor (13 secciones), sin corchetes, sin fecha (vacía) y sin control de edad.
   const c2 = await browser.newContext({ viewport: { width: size.width, height: size.height } });
   const p2 = await c2.newPage();
-  for (const [path, title] of [['/terminos', 'Términos y condiciones'], ['/privacidad', 'Política de privacidad']]) {
+  for (const [path, title] of [['/terminos', 'Términos y Condiciones de Uso y Compra'], ['/privacidad', 'Política de Privacidad y Protección de Datos Personales']]) {
     await p2.goto(base + path, { waitUntil: 'networkidle' });
     const text = (await p2.locator('main').innerText()).replace(/\s+/g, ' ').trim();
-    check(L(`${path}: "Próximamente" sin texto legal`), /^.{0,40}Próximamente Este documento aún no está publicado\. Volver al inicio$/i.test(text) && text.toLowerCase().startsWith(title.toLowerCase()), text);
+    check(L(`${path}: título, 13 secciones, sin corchetes ni "Próximamente"`),
+      (await p2.locator('h1').innerText()).trim() === title && (await p2.locator('main h2').count()) === 13 && !/[[\]]|Próximamente/.test(text), text.slice(0, 80));
+    check(L(`${path}: sin línea de fecha mientras documentsUpdatedAt esté vacía`), !text.includes('Última actualización'));
     check(L(`${path}: sin control de edad`), !(await p2.locator('[role=dialog]').isVisible()));
     check(L(`${path}: sin scroll horizontal`), await noOverflow(p2));
   }

@@ -11,11 +11,14 @@ const browser = await chromium.launch({ channel: process.env.PW_CHANNEL });
 const out = [];
 const check = (label, ok, extra = '') => out.push(`${ok ? 'OK ' : 'FALLA'} ${label}${extra ? ' · ' + extra : ''}`);
 
-const WA = 'https://wa.me/51900000000?text=*Pedido%20BRINDA%20PW12*%0ATotal%3A%20S%2F%20102.00%0APago%3A%20Yape';
+const WA =
+  'https://wa.me/51900000000?text=*Pedido%20BRINDA%20PW12*%0A2%20%C3%97%20Producto%20de%20prueba%0ADelivery%20base%3A%20S%2F%206.00%0ATotal%20estimado%3A%20S%2F%20102.00%0APago%3A%20Transferencia';
+// Cuenta de prueba (simulada): no son datos reales.
+const TRANSFER = { bank: 'Banco de prueba', account: '000-0000000-0-00', cci: '00000000000000000000', holder: 'Titular de prueba' };
 const created = (expiresAt) => ({
   code: 'PW12', status: 'PENDING', subtotal: 96, deliveryFee: 6, total: 102, expiresAt,
   items: [{ name: 'Producto de prueba', quantity: 2, unitPrice: 48, subtotal: 96 }],
-  payment: { method: 'YAPE', number: null, amount: 102 }, whatsappUrl: WA,
+  payment: { method: 'TRANSFER', number: null, transfer: TRANSFER, amount: 102 }, whatsappUrl: WA,
 });
 
 /** Contraste WCAG entre dos colores `rgb(...)`. */
@@ -76,9 +79,10 @@ for (const { name, width, height } of sizes) {
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(String(e)));
   const L = (t) => `${name}px /pedido/:codigo: ${t}`;
+  let sent = null;
   await page.route('**/api/v1/orders', (r) =>
     r.request().method() === 'POST'
-      ? r.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(created(new Date(Date.now() + 20 * 60000).toISOString())) })
+      ? ((sent = r.request().postDataJSON()), r.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify(created(new Date(Date.now() + 20 * 60000).toISOString())) }))
       : r.continue(),
   );
 
@@ -95,15 +99,25 @@ for (const { name, width, height } of sizes) {
   await page.fill('#firstName', 'Ana');
   await page.fill('#lastName', 'Prueba');
   await page.fill('#phone', '987654321');
-  await page.fill('#dni', '12345678');
+  await page.selectOption('#documentType', 'CE');
+  await page.fill('#documentNumber', 'x1234567');
   await page.selectOption('#districtId', { index: 1 });
   await page.fill('#address', 'Av. Prueba 123');
-  await page.locator('.choice', { hasText: 'Yape' }).click();
-  for (const id of ['adultConfirmed', 'termsAccepted', 'privacyAccepted']) await page.locator(`input[formControlName="${id}"]`).check();
+  await page.locator('.choice', { hasText: 'Transferencia' }).click();
+  for (const id of ['#adult-yes', 'input[formControlName="termsAccepted"]', 'input[formControlName="privacyAccepted"]']) await page.locator(id).check();
+  await page.locator('#marketing').check();
   await page.getByRole('button', { name: 'Finalizar compra' }).click();
   await page.waitForURL('**/pedido/PW12');
   await page.waitForSelector('.pending');
   await page.waitForTimeout(900);
+  check(L('envía tipo de documento, CE en mayúsculas, transferencia y promociones'),
+    sent?.documentType === 'CE' && sent?.documentNumber === 'X1234567' && sent?.paymentMethod === 'TRANSFER' && sent?.marketingConsent === true && !('dni' in sent),
+    JSON.stringify({ documentType: sent?.documentType, paymentMethod: sent?.paymentMethod, marketingConsent: sent?.marketingConsent }));
+  const pay = async () => (await page.locator('.pay').innerText()).replace(/\s+/g, ' ');
+  const payText = await pay();
+  check(L('datos de la cuenta: banco, cuenta, CCI y titular'), ['Transferencia', TRANSFER.bank, TRANSFER.account, TRANSFER.cci, TRANSFER.holder].every((t) => payText.includes(t)), payText);
+  check(L('resumen: "Total estimado"'), (await page.locator('.sum-total dt').innerText()).includes('Total estimado'));
+  check(L('aviso de delivery con la tarifa mínima de la API'), /Delivery desde S\/\s?\d/.test(await page.locator('app-delivery-notice .title').innerText()));
 
   const pend = await page.evaluate(() => {
     const p = document.querySelector('.pending');
@@ -131,13 +145,32 @@ for (const { name, width, height } of sizes) {
 
   // Recargar: el enlace (sin datos personales) se recupera con el código
   const stored = await page.evaluate(() => localStorage.getItem('brinda.order.v1'));
-  check(L('se guarda código + enlace, sin datos personales'), stored.includes('wa.me') && !/Ana|987654321|12345678|Prueba 123/.test(stored));
+  check(L('se guarda código + enlace + datos de pago, sin datos personales'), stored.includes('wa.me') && stored.includes(TRANSFER.cci) && !/Ana|987654321|X1234567|x1234567|Prueba 123/.test(stored));
   await page.reload({ waitUntil: 'networkidle' });
   await page.waitForSelector('.pending');
   check(L('tras recargar sigue el botón de WhatsApp'), (await page.locator('a.btn-whatsapp').getAttribute('href')) === WA);
   check(L('tras recargar no hay detalle del pedido'), (await page.locator('.summary').count()) === 0);
+  check(L('tras recargar siguen los datos de la cuenta'), (await pay()).includes(TRANSFER.cci));
+  check(L('tras recargar sigue el aviso de delivery'), (await page.locator('app-delivery-notice').count()) === 1);
+  const smallReload = await page.evaluate(() =>
+    [...document.querySelectorAll('main a, main button')].map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && (r.height < 43.5 || r.width < 43.5)).length,
+  );
+  check(L('tras recargar: objetivos >= 44px y sin scroll horizontal'), smallReload === 0 && (await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)) <= 0);
   await page.screenshot({ path: `capturas/pedido-creado-${name}-recarga.png` });
   check(L('errores de consola'), errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
+
+// Transferencia sin cuenta configurada (guardada sin `transfer`): aviso de WhatsApp tras recargar
+{
+  const ctx = await browser.newContext({ viewport: { width: 360, height: 780 } });
+  await passAgeGate(ctx);
+  await ctx.addInitScript((wa) => localStorage.setItem('brinda.order.v1', JSON.stringify({ code: 'PW12', at: Date.now(), whatsappUrl: wa, payment: { method: 'TRANSFER', number: null, transfer: null, amount: 102 } })), WA);
+  const page = await ctx.newPage();
+  await page.goto(`${base}/pedido/PW12`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('.pay');
+  check('360px transferencia sin cuenta: "Te enviaremos los datos de la cuenta por WhatsApp"', (await page.locator('.pay').innerText()).includes('Te enviaremos los datos de la cuenta por WhatsApp'));
+  await page.screenshot({ path: 'capturas/pedido-creado-360-transferencia-sin-cuenta.png', fullPage: true });
   await ctx.close();
 }
 

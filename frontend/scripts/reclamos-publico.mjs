@@ -53,7 +53,7 @@ for (const { name, width, height } of [
   await page.goto(`${base}/libro-de-reclamaciones`, { waitUntil: 'networkidle' });
   await page.waitForSelector('app-complaint-form form');
   const text = await page.locator('main').innerText();
-  check(L('proveedor literal y tipo de hoja'), text.includes('AV ALFREDO BENAVIDES 707. 1403, MIRAFLORES') && text.includes('HOJA DE RECLAMACIÓN VIRTUAL'));
+  check(L('proveedor con el domicilio unificado y tipo de hoja'), text.includes('Av. Alfredo Benavides 707, int. 1403, Miraflores') && text.includes('HOJA DE RECLAMACIÓN VIRTUAL'));
   check(L('3 secciones de la hoja en orden'), (await page.locator('legend.legend').allInnerTexts()).map((t) => t.trim()[0]).join('') === '123');
   check(L('sin control de edad'), (await page.locator('dialog[open], .age-gate').count()) === 0);
 

@@ -1,4 +1,4 @@
-// Verifica el control de edad, el pie legal, el aviso de menores y /libro-de-reclamaciones a 360/768/1440.
+// Verifica el control de edad, el pie legal, el aviso de menores y /libro-de-reclamaciones (con formulario) a 360/768/1440.
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
 import { AGE_KEY, passAgeGate } from './age.mjs';
@@ -64,10 +64,25 @@ for (const { name, width, height } of sizes) {
   await page.waitForURL('**/libro-de-reclamaciones');
   await page.waitForTimeout(400);
   check(L('libro: encabezado y notas'), (await page.locator('main').innerText()).includes('20616579607') && (await page.locator('main').innerText()).includes('quince (15) días hábiles'));
-  check(L('libro: sin formulario'), (await page.locator('main form, main input, main textarea').count()) === 0);
-  check(L('libro: aviso de desarrollo'), await page.getByText('Formulario pendiente de implementar').isVisible());
+  // Desde el 2026-11-22 el Libro tiene formulario (el envío real lo prueba reclamos-publico.mjs; aquí no se envía nada).
+  const main = await page.locator('main').innerText();
+  check(L('libro: formulario con nombre, documento, detalle y botón de envío'), (await page.locator('app-complaint-form form').count()) === 1 && (await page.locator('#consumerName, #documentNumber, #detail').count()) === 3 && (await page.getByRole('button', { name: 'Enviar hoja de reclamación' }).count()) === 1);
+  check(L('libro: domicilio unificado del proveedor'), main.includes('Av. Alfredo Benavides 707, int. 1403, Miraflores'));
+  check(L('libro: aviso "no puede salir a producción" (solo en desarrollo)'), main.includes('no puede salir a producción'));
   check(L('libro: sin scroll horizontal'), await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   await page.screenshot({ path: `capturas/legal-${name}-libro.png`, fullPage: true });
+
+  // /terminos y /privacidad: texto del asesor, sin fecha mientras LEGAL.documentsUpdatedAt esté vacía.
+  for (const [path, file] of [['/terminos', 'terminos'], ['/privacidad', 'privacidad']]) {
+    await page.goto(base + path, { waitUntil: 'networkidle' });
+    const text = await page.locator('main').innerText();
+    check(L(`${path}: 13 secciones, negritas y sin corchetes`), (await page.locator('main h2').count()) === 13 && (await page.locator('main strong').count()) > 0 && !/[[\]]/.test(text));
+    check(L(`${path}: sin "Última actualización" (fecha vacía)`), !text.includes('Última actualización'));
+    check(L(`${path}: sin espacio antes de coma o punto (negritas)`), !/\S [,.](\s|$)/.test(text), (text.match(/.{20}\S [,.](\s|$)/) ?? [''])[0]);
+    check(L(`${path}: domicilio unificado (§1 y §13)`), text.split('Av. Alfredo Benavides 707, int. 1403, Miraflores').length - 1 === 2);
+    check(L(`${path}: sin scroll horizontal`), await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await page.screenshot({ path: `capturas/legal-${name}-${file}.png`, fullPage: true });
+  }
   check(L('consola limpia'), errors.length === 0, errors.join(' | '));
   await ctx.close();
 
@@ -91,7 +106,7 @@ for (const { name, width, height } of sizes) {
     await p3.goto(base + r, { waitUntil: 'networkidle' });
     const n = p3.locator('app-legal-notice p.minors');
     await n.waitFor({ timeout: 3000 }).catch(() => {});
-    check(L(`${r}: aviso de menores visible`), await n.isVisible() && (await n.innerText()).includes('DNI físico'));
+    check(L(`${r}: aviso de menores visible`), await n.isVisible() && (await n.innerText()).includes('documento de identidad'));
     await p3.screenshot({ path: `capturas/legal-${name}${r.replace('/', '-')}.png` });
   }
   await c3.close();
