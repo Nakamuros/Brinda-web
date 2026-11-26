@@ -62,7 +62,7 @@ class ComplaintAdminTest {
     private final DniCipher cipher = spy(new DniCipher(new CryptoProperties(Base64.getEncoder().encodeToString(new byte[32]))));
     private final ComplaintRepository repository = mock(ComplaintRepository.class);
     private final AuditService audit = mock(AuditService.class);
-    private final ComplaintProperties props = new ComplaintProperties("BRINDA PERU SAC", "20616579607", "", 5, 15);
+    private final ComplaintProperties props = new ComplaintProperties("BRINDA PERU SAC", "20616579607", "Av. Alfredo Benavides 707, int. 1403, Miraflores", "", 5, 15);
     private final UUID actor = UUID.randomUUID();
     private final UUID id = UUID.randomUUID();
     private final Complaint complaint = sample();
@@ -94,7 +94,7 @@ class ComplaintAdminTest {
         ComplaintDeadlines deadlines = new ComplaintDeadlines(props, clock);
         when(repository.findById(id)).thenReturn(Optional.of(complaint));
         when(repository.lockById(id)).thenReturn(Optional.of(complaint));
-        return new ComplaintAdminService(repository, deadlines, new ComplaintPdfService(cipher), cipher, audit, clock);
+        return new ComplaintAdminService(repository, deadlines, new ComplaintPdfService(cipher, props), cipher, audit, clock);
     }
 
     @SuppressWarnings("unchecked")

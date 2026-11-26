@@ -6,6 +6,7 @@ import com.brinda.api.complaint.model.ComplaintType;
 import com.brinda.api.complaint.model.DocumentType;
 import com.brinda.api.complaint.model.GoodType;
 import com.brinda.api.complaint.service.ComplaintPdfService;
+import com.brinda.api.complaint.service.ComplaintProperties;
 import com.brinda.api.shared.crypto.CryptoProperties;
 import com.brinda.api.shared.crypto.DniCipher;
 import org.apache.pdfbox.Loader;
@@ -24,7 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ComplaintPdfServiceTest {
 
     private final DniCipher cipher = new DniCipher(new CryptoProperties(Base64.getEncoder().encodeToString(new byte[32])));
-    private final ComplaintPdfService pdf = new ComplaintPdfService(cipher);
+    static final ComplaintProperties PROPS = new ComplaintProperties("BRINDA PERU SAC", "20616579607",
+            "Av. Alfredo Benavides 707, int. 1403, Miraflores", "", 5, 15);
+    private final ComplaintPdfService pdf = new ComplaintPdfService(cipher, PROPS);
 
     private Complaint sample() {
         Complaint c = new Complaint();
@@ -70,6 +73,9 @@ class ComplaintPdfServiceTest {
         assertTrue(t.contains("28/10/2026"));
         assertTrue(t.contains("La botella llegó abierta."));
         assertTrue(t.contains("BRINDA PERU SAC") && t.contains("20616579607"));
+        // Domicilio unificado: reemplaza el texto prerrellenado de la plantilla.
+        assertTrue(t.contains("Av. Alfredo Benavides 707, int. 1403, Miraflores"), t);
+        assertTrue(!t.contains("BENAVIDES 707. 1403"), t);
         assertTrue(t.contains("S/ 45.50"));
     }
 

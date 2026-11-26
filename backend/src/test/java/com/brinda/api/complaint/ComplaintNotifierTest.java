@@ -46,7 +46,7 @@ class ComplaintNotifierTest {
 
     private final ComplaintRepository repository = mock(ComplaintRepository.class);
     private final DniCipher cipher = new DniCipher(new CryptoProperties(Base64.getEncoder().encodeToString(new byte[32])));
-    private final ComplaintPdfService pdf = new ComplaintPdfService(cipher);
+    private final ComplaintPdfService pdf = new ComplaintPdfService(cipher, ComplaintPdfServiceTest.PROPS);
     private final TransactionTemplate tx = mock(TransactionTemplate.class);
     private final Clock clock = Clock.fixed(Instant.parse("2026-10-28T15:00:00Z"), ZoneOffset.UTC);
     private final UUID id = UUID.randomUUID();
@@ -82,7 +82,7 @@ class ComplaintNotifierTest {
     }
 
     private ComplaintNotifier notifier(EmailSender sender, String owner) {
-        return new ComplaintNotifier(repository, pdf, sender, new ComplaintProperties("BRINDA PERU SAC", "20616579607",
+        return new ComplaintNotifier(repository, pdf, sender, new ComplaintProperties("BRINDA PERU SAC", "20616579607", "Av. Alfredo Benavides 707, int. 1403, Miraflores",
                 owner, 3, 15), tx, clock);
     }
 

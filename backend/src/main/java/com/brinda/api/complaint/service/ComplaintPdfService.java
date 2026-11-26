@@ -42,6 +42,7 @@ public class ComplaintPdfService {
     private static final CharsetEncoder WIN_ANSI = Charset.forName("windows-1252").newEncoder();
 
     private final DniCipher cipher;
+    private final ComplaintProperties props;
     private byte[] template;
 
     public byte[] render(Complaint c) {
@@ -55,7 +56,9 @@ public class ComplaintPdfService {
             single(form, "dt_fecha", DATE.format(c.getFiledAt().atZoneSameInstant(LIMA)));
             single(form, "txtCorrelativo", String.format("%06d", c.getComplaintNumber()));
             single(form, "txtAnio", String.valueOf(c.getComplaintYear()));
-            // txtRazonSocial, txtRUC, txtDomicilio y txtTipoHoja ya vienen prerrellenados en la plantilla oficial.
+            // txtRazonSocial, txtRUC y txtTipoHoja vienen prerrellenados en la plantilla oficial. El domicilio de la
+            // plantilla es el texto anterior: se reemplaza por el domicilio unificado del sitio.
+            single(form, "txtDomicilio", props.providerAddress());
 
             single(form, "txtNombre", c.getConsumerName());
             single(form, "txtDNI", c.getDocumentType().name() + " " + cipher.decrypt(c.getDocumentEncrypted()));

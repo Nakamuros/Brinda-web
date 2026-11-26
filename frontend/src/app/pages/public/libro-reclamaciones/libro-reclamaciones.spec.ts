@@ -16,7 +16,7 @@ describe('LibroReclamaciones', () => {
     const text = el.textContent ?? '';
     expect(text).toContain('BRINDA PERU SAC');
     expect(text).toContain('20616579607');
-    expect(text).toContain('AV ALFREDO BENAVIDES 707. 1403, MIRAFLORES');
+    expect(text).toContain('Av. Alfredo Benavides 707, int. 1403, Miraflores');
     expect(text).toContain('HOJA DE RECLAMACIÓN VIRTUAL');
     expect(text).toContain('quince (15) días hábiles');
     expect(text).toContain('INDECOPI');
