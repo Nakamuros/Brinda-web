@@ -3,6 +3,7 @@ package com.brinda.api.complaint.dto;
 import com.brinda.api.complaint.model.ComplaintType;
 import com.brinda.api.complaint.model.DocumentType;
 import com.brinda.api.complaint.model.GoodType;
+import com.brinda.api.shared.validation.ValidDocument;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -37,7 +38,7 @@ public record CreateComplaintRequest(
         @AssertTrue(message = "Debes aceptar la política de privacidad") boolean privacyAccepted,
         /** Honeypot: un humano nunca lo ve ni lo llena. */
         @Size(max = 200) String website
-) {
+) implements ValidDocument.HasDocument {
 
     public boolean isHoneypotFilled() {
         return website != null && !website.isBlank();

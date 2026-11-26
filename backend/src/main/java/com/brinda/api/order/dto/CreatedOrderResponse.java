@@ -13,7 +13,13 @@ public record CreatedOrderResponse(String code, String status, BigDecimal subtot
                        BigDecimal subtotal) {
     }
 
-    /** number es el Yape/Plin de BRINDA; null si aún no está configurado. */
-    public record Payment(String method, String number, BigDecimal amount) {
+    /**
+     * number es el Yape/Plin de BRINDA; transfer, la cuenta para TRANSFER. Ambos null si aún no están configurados
+     * ("te enviaremos los datos por WhatsApp"). amount es el total estimado. Nada de esto es dato personal.
+     */
+    public record Payment(String method, String number, Transfer transfer, BigDecimal amount) {
+    }
+
+    public record Transfer(String bank, String account, String cci, String holder) {
     }
 }

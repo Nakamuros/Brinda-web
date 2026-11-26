@@ -25,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -85,7 +86,8 @@ public class OrderService {
         order.setCustomerFirstName(clean(req.firstName()));
         order.setCustomerLastName(clean(req.lastName()));
         order.setCustomerPhone(req.phone());
-        order.setCustomerDniEncrypted(dniCipher.encrypt(req.dni()));
+        order.setDocumentType(req.documentType());
+        order.setCustomerDniEncrypted(dniCipher.encrypt(req.documentNumber().trim().toUpperCase(Locale.ROOT)));
         order.setDeliveryAddress(clean(req.address()));
         order.setDeliveryReference(blankToNull(clean(req.reference())));
         order.setDistrict(district);
@@ -96,6 +98,12 @@ public class OrderService {
         order.setAdultConfirmed(true);
         order.setTermsAcceptedAt(now);
         order.setPrivacyAcceptedAt(now);
+        // La versión la fija el servidor, nunca el navegador. Vacía = textos aún sin publicar.
+        String version = blankToNull(props.legalDocumentsVersion());
+        order.setTermsVersion(version);
+        order.setPrivacyVersion(version);
+        order.setMarketingConsent(req.marketingConsent());
+        order.setMarketingConsentAt(req.marketingConsent() ? now : null);
         order.setExpiresAt(now.plusMinutes(props.expirationMinutes()));
         orderRepository.save(order);
 
@@ -160,11 +168,24 @@ public class OrderService {
                 .map(i -> new CreatedOrderResponse.Line(i.getProductName(), i.getQuantity(), i.getUnitPrice(),
                         i.getPromoDiscount(), OrderLineText.promo(i), i.getSubtotal()))
                 .toList();
-        String number = o.getPaymentMethod() == PaymentMethod.YAPE ? props.yapeNumber() : props.plinNumber();
         return new CreatedOrderResponse(o.getOrderCode(), o.getStatus().name(), o.getSubtotalAmount(),
-                o.getDeliveryFee(), o.getTotalAmount(), o.getExpiresAt(), lines,
-                new CreatedOrderResponse.Payment(o.getPaymentMethod().name(), blankToNull(number), o.getTotalAmount()),
-                whatsApp.url(o));
+                o.getDeliveryFee(), o.getTotalAmount(), o.getExpiresAt(), lines, payment(o), whatsApp.url(o));
+    }
+
+    /** Datos para pagar (de BRINDA, no del cliente). La cuenta solo si están los cuatro datos configurados. */
+    CreatedOrderResponse.Payment payment(Order o) {
+        PaymentMethod m = o.getPaymentMethod();
+        if (m == PaymentMethod.TRANSFER) {
+            String bank = blankToNull(props.transferBank());
+            String account = blankToNull(props.transferAccount());
+            String cci = blankToNull(props.transferCci());
+            String holder = blankToNull(props.transferHolder());
+            CreatedOrderResponse.Transfer transfer = bank == null || account == null || cci == null || holder == null
+                    ? null : new CreatedOrderResponse.Transfer(bank, account, cci, holder);
+            return new CreatedOrderResponse.Payment(m.name(), null, transfer, o.getTotalAmount());
+        }
+        String number = m == PaymentMethod.YAPE ? props.yapeNumber() : props.plinNumber();
+        return new CreatedOrderResponse.Payment(m.name(), blankToNull(number), null, o.getTotalAmount());
     }
 
     /** Quita saltos de línea y caracteres de control (evita romper el formato del mensaje de WhatsApp). */
