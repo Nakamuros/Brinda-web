@@ -3,7 +3,16 @@
 > Registro de estado. Se actualiza al terminar cada tarea. Decisiones: `CONTEXTO-BRINDA.md` (secciones 18 y 19).
 > Para retomar: arranque local en `readme.md` y prompt de inicio en `PROMPT-INICIO-SESION.md`.
 
-## Hito 3 · Trabajo 2: páginas legales, domicilio, ARCO y logo (2026-11-25, sin commit)
+## Resumen (2026-11-25)
+- **Hito 3, trabajos 1 y 2 hechos, commiteados y con push a `origin/main`** (`34c9a83..3171297`, 12 commits por tema; detalle abajo). El deploy a Render lo hace el usuario: Flyway aplicará V11 al arrancar.
+- **Tienda:** mensaje de WhatsApp con productos, delivery base, total estimado y pago (sin datos personales); pago por transferencia; documento DNI/CE/pasaporte; casilla opcional de promociones; aviso destacado "Delivery desde S/ X"; datos de pago visibles tras recargar; páginas `/terminos` y `/privacidad` con el texto del asesor; texto "Yape, Plin o transferencia"; WhatsApp de contacto 939448967.
+- **Panel:** "Delivery cobrado" obligatorio al confirmar (tope S/ 100, S/ 0 explícito), corrección auditada, tipo de documento y promociones en el detalle, filtro de promociones, Ventas con Productos / Delivery cobrado / Total cobrado.
+- **Backend y BD:** V11 (aplicada solo en local), `POST /admin/orders/{id}/delivery-fee`, domicilio unificado en la hoja PDF, script ARCO con simulación (`database/setup/arco.sql` + `run-arco.ps1`) y `PROCEDIMIENTO-ARCO.md`.
+- **Verificación:** backend 117 tests, frontend 102, build sin avisos, Newman 179/181 en la corrida completa (las 2 fallas, 10.4/10.5, se arreglaron después: 17/17 en 00+10), Playwright a 360/768/1440 en verde (`pedido`, `pedido-creado`, `pedido-real`, `admin-pedidos`, `legal`, `reclamos-publico`).
+- **Antes de producción (nuevo):** en Render `WHATSAPP_NUMBER=51939448967`, `TRANSFER_*` cuando Lucía entregue la cuenta y `LEGAL_DOCUMENTS_VERSION` el día del lanzamiento (igual a `LEGAL.documentsUpdatedAt`); desplegar backend y frontend a la vez (`dni` pasó a `documentType` + `documentNumber`). Ver "Pendientes antes de producción" y "Qué sigue".
+- **Grafo** actualizado con `--update` en un commit aparte (ver su sección).
+
+## Hito 3 · Trabajo 2: páginas legales, domicilio, ARCO y logo (2026-11-25)
 Plan aprobado por el usuario con sus respuestas; tandas A → E.
 - **A · `/terminos` y `/privacidad`:** texto literal de los `.docx` de `docs/` en `core/legal-texts.ts` (generado desde los documentos, con sus negritas), con solo las correcciones aprobadas: Términos §1 domicilio, §3 "contigo", §5 "Pueblo Libre, San Borja" y "martes a domingo", §6 correo; Privacidad sin la nota de §8 (Meta Pixel…) y §13 con WhatsApp 939448967. Sin tocar horarios, tarifas, finalidades adicionales de §3 ni el resto de cookies. Componente `pages/public/legal-page` (reemplaza a `legal-soon`, eliminado). "Última actualización: <fecha>" bajo el título de las dos páginas solo si `LEGAL.documentsUpdatedAt` (AAAA-MM-DD) tiene valor; **hoy vacía: no se muestra nada**. **Al lanzar:** poner la misma fecha en `LEGAL.documentsUpdatedAt` y en `LEGAL_DOCUMENTS_VERSION` del backend (Render), que la guarda en cada pedido como `terms_version`/`privacy_version`.
 - **Contacto:** `CONTACT.whatsappNumber = '51939448967'` (la landing muestra "Escribir por WhatsApp"). **`WHATSAPP_NUMBER` del backend:** formato internacional sin "+": `51939448967` (el backend quita todo lo que no sea dígito y arma `https://wa.me/<número>`; sin el 51, wa.me no encuentra el número en Perú). El correo de §6 solo va en el texto legal; `COMPLAINTS_OWNER_EMAIL` sin tocar.
@@ -13,14 +22,16 @@ Plan aprobado por el usuario con sus respuestas; tandas A → E.
 - **E · Logo (provisional):** `favicon.ico`, `brand/apple-touch-icon.png` y `brand/og-image.jpg` generados con Pillow (herramienta local, sin dependencia nueva) desde `docs/brinda_light.jpeg`, con fondo crema opaco. **Se reemplazan cuando Lucía envíe el archivo transparente o vectorial.** `index.html`: `apple-touch-icon` y etiquetas `og:*`; `og:image` es relativa hasta tener dominio (las redes piden URL absoluta: cambiarla a `https://<dominio>/brand/og-image.jpg`).
 - **Scripts:** `legal.mjs` al Libro con formulario y con las páginas legales (102/102); `pedido-real.mjs` con las páginas legales nuevas (146/146); `reclamos-publico.mjs` con el domicilio unificado (70/70, creó reclamos de prueba que no se pueden borrar). Pedidos de prueba anulados (0 pendientes).
 - **Verificación:** backend 117 tests, frontend 102 (16 archivos), build sin avisos.
+- **Después de la revisión del usuario:** el aviso de delivery perdió el filete izquierdo de 4 px (lo marcó el hook de diseño como "side-tab"); queda con borde de latón parejo de 1 px. Cambio solo de CSS: no se repitió Playwright.
+- **Git (2026-11-25):** 12 commits por tema con push a `origin/main` (`34c9a83..3171297`): V11 `3edf689`, pedido (backend) `8b51db3`, panel (backend) `8aae93f`, checkout `776e77e`, panel web `7603771`, texto de pago `b27195c`, páginas legales `25ff21c` (incluye todo `config.ts`), domicilio y PDF `d356373`, ARCO `650d6c5`, marca `c025c1d` (incluye `index.html`), Postman y Playwright `6167d66`, documentación `3171297`. `docs/` (los `.docx` y JPEG) sigue sin versionar. Los commits intermedios no se compilaron uno por uno: lo verificado es el estado final.
 
-## Ajustes antes del trabajo 2 (2026-11-25, sin commit)
-- **Texto de pago:** "Paga con Yape, Plin o transferencia" en la barra de anuncio (larga y corta), el hero y el paso 4 de "Cómo pedir" (+ su spec). Sin cambios de estilo. A 360 px la barra corta entra sin recorte ni scroll, pero ocupa todo el ancho. **No cambiado** (no estaba en el pedido): `<meta name="description">` de `index.html`, que sigue con "Yape o Plin".
+## Ajustes antes del trabajo 2 (2026-11-25)
+- **Texto de pago:** "Paga con Yape, Plin o transferencia" en la barra de anuncio (larga y corta), el hero y el paso 4 de "Cómo pedir" (+ su spec). Sin cambios de estilo. A 360 px la barra corta entra sin recorte ni scroll, pero ocupa todo el ancho. El `<meta name="description">` de `index.html` se cambió después, a pedido del usuario.
 - **Newman 10.4/10.5:** test desactualizado, no bug. `ProductRequest` no tiene `stockQuantity` y, desde S-07 (2026-11-02), Jackson rechaza con 400 los campos desconocidos; la 10.4 enviaba `stockQuantity: 999`, la edición no se aplicaba y la 10.5 (sin imagen) caía detrás. Ahora: 10.4 edita sin ese campo (200, stock 0) y la nueva 10.4b lo envía y espera 400. Newman 00+10 contra la API real: 17/17.
 - Frontend 97 tests y build sin avisos.
 
 ## Hito 3 · Trabajo 1: WhatsApp, transferencia, documento, promociones y delivery cobrado (2026-11-25)
-Plan aprobado tras una fase de solo lectura. **Sin commit.** V11 aplicada **solo en la BD local**; el deploy a Render lo hace el usuario (Flyway la aplica al arrancar).
+Plan aprobado tras una fase de solo lectura. Commiteado el 2026-11-25 (ver "Git" en el trabajo 2). V11 aplicada **solo en la BD local**; el deploy a Render lo hace el usuario (Flyway la aplica al arrancar).
 - **Decisiones del usuario:** el delivery cobrado se puede corregir después de confirmar (con auditoría); casilla solo de promociones (sin perfiles ni estadísticas); `terms_version`/`privacy_version` en V11; pasaporte 6–12 alfanuméricos; tope del delivery cobrado S/ 100 configurable (`MAX_DELIVERY_FEE`); tope del enlace de WhatsApp 2000 caracteres; los datos de pago se recuerdan junto al código; la versión de los textos la fija el servidor.
 - **1 · WhatsApp:** el mensaje vuelve a llevar `cantidad × nombre` de productos y combos, `Delivery base`, `Total estimado` y `Pago` (Yape/Plin/Transferencia), sin datos personales. Si el enlace codificado pasa de 2000 caracteres se recorta con `+N productos más` (`WhatsAppMessageBuilder.MAX_URL_LENGTH`). La web aceptaba enlaces de hasta 600: subido a 2000.
 - **2 · Transferencia:** `PaymentMethod.TRANSFER` (CHECK `ck_orders_payment`). Cuenta en `TRANSFER_BANK`, `TRANSFER_ACCOUNT`, `TRANSFER_CCI`, `TRANSFER_HOLDER` (en `.env.example`, vacías; nada en el repo): la respuesta trae `payment.transfer` solo si están las cuatro; si no, `/pedido/:codigo` dice "Te enviaremos los datos de la cuenta por WhatsApp". `brinda.order.v1` guarda ahora código, hora, enlace y datos de pago (de BRINDA): tras recargar se ven el método y el Yape/Plin o la cuenta.
@@ -289,7 +300,11 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 - Cuenta real de la dueña y desactivar el `admin` del seed; respaldar `DNI_ENCRYPTION_KEY` y usar claves nuevas.
 - IP real detrás del proxy (staging) y dominio propio (cookie `SameSite=Strict`).
 - Legal con el asesor de Lucía: licor y cigarros, términos, libro de reclamaciones, política de privacidad.
-- Datos reales de Lucía: tarifas, distritos, `WHATSAPP_NUMBER`, `YAPE_NUMBER`, `PLIN_NUMBER` (hoy son de prueba).
+- Datos reales de Lucía: tarifas, distritos, `YAPE_NUMBER`, `PLIN_NUMBER` (hoy de prueba) y la cuenta para transferencias (`TRANSFER_BANK`, `TRANSFER_ACCOUNT`, `TRANSFER_CCI`, `TRANSFER_HOLDER`).
+- `WHATSAPP_NUMBER=51939448967` en Render (formato internacional sin "+").
+- Hito 3: desplegar backend y frontend juntos (cambio de `dni` a `documentType` + `documentNumber`); revisar en `flyway_schema_history` que V11 quede `success`.
+- Lanzamiento legal: misma fecha en `LEGAL.documentsUpdatedAt` (frontend) y `LEGAL_DOCUMENTS_VERSION` (Render); `og:image` con URL absoluta del dominio; no servir la plantilla en blanco de la hoja (`frontend/public/legal/hoja-reclamacion.pdf`) sin revisar su domicilio.
+- ARCO: plazos, conservación de pedidos confirmados y canal de respuesta, con la asesora; herramienta de rectificación (no existe).
 
 ## Qué sigue
 0. ~~Borrar los datos hardcodeados~~ hecho el 2026-11-15 (frontend; la BD local no se tocó).
@@ -297,9 +312,10 @@ Detalle y estado de cada uno en `CONTEXTO-BRINDA.md` sección 19. Los principale
 2. ~~Caducidad del enlace de copia~~ hecha (30 días, commit 5f90a9d); confirmar el plazo con la asesora.
 3. ~~Pedido real (checkout)~~ hecho el 2026-11-15. Antes decía: al pulsar "Finalizar compra": validar, `POST /api/v1/orders`, manejar `429`, vaciar el carrito, pantalla `/pedido/:codigo` con aviso de 20 min y "Enviar por WhatsApp".
 4. **Categorías y datos reales de Lucía:** las fichas de la landing (cervezas, vinos…) no coinciden con las de la BD; además productos con fotos, WhatsApp/Yape/Plin, horario, distritos y tarifas reales, video del hero y su cuenta de administradora (desactivar el `admin` del seed).
-5. **Resto del panel admin:** pedidos (confirmar/anular), productos, ofertas, combos, stock, zonas/distritos (reutiliza `src/app/admin/`, `admin-ui.css` y los estilos `.input`/`.btn`).
+5. ~~Resto del panel admin~~ hecho (2026-11-15) y ampliado en el Hito 3 (delivery cobrado, documento, promociones, ventas separadas). Faltan las gráficas (pospuestas) y costo/ganancia (sin columna de costo).
 6. **Correo real:** conectar un `EmailSender` real (Resend u otro) cuando exista el dominio (SPF/DKIM/DMARC en Cloudflare, clave solo en variable de entorno); hoy solo `NoopEmailSender`. Con el correo real, el aviso de respuesta debería adjuntar el PDF ya respondido.
-7. **Legales y calidad:** términos y privacidad (`/terminos`, `/privacidad`, enlaces en el checkout y en el formulario), feriados en el plazo del reclamo, conservación ≥2 años; `/impeccable critique` y `audit` del catálogo, checkout y panel; probar en celular real.
+7. **Legales y calidad:** ~~términos y privacidad~~ publicados el 2026-11-25 (falta la fecha de lanzamiento); feriados en el plazo del reclamo, conservación ≥2 años; procedimiento ARCO con la asesora; `/impeccable critique` y `audit` del catálogo, checkout y panel; probar en celular real.
+9. **Marca:** reemplazar favicon, ícono de celular y `og:image` cuando Lucía envíe el logo transparente o vectorial.
 8. **Despliegue:** Spring Boot y Postgres gestionado en Render (roles ya creados, ver "Preparación del despliegue en Render"); frontend aparte; dominio propio con subdominios (`api.`) y el CORS exacto; falta el primer arranque.
 
 ## Historial resumido
